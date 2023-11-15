@@ -22,6 +22,32 @@
     <link rel="stylesheet" href="fonts/flaticon/font/flaticon.css">
     <link rel="stylesheet" href="css/aos.css">
     <link rel="stylesheet" href="css/style.css">
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+          var form = document.querySelector(".form");
+
+          form.addEventListener("submit", function (event) {
+              // Prevent the default form submission
+              event.preventDefault();
+
+              // Perform your form submission logic here (e.g., using Ajax)
+              // You can use fetch or another method to send the form data to your web app
+              fetch(form.action, {
+                  method: form.method,
+                  body: new FormData(form),
+              })
+              .then(response => response.json()) // If your web app returns JSON, adjust this accordingly
+              .then(data => {
+                  // Display a notification based on the response
+                  alert("Your message has been sent"); // Replace this with your custom notification logic
+
+                  // Optionally, reset the form
+                  form.reset();
+              })
+              .catch(error => console.error('Error:', error));
+          });
+      });
+  </script>
   </head>
   <body data-spy="scroll" data-target=".site-navbar-target" data-offset="300">
     <!-- <div id="overlayer"></div>
@@ -40,7 +66,7 @@
             <div class="">
               <nav class="site-navigation position-relative text-right" role="navigation">
                 <ul class="site-menu main-menu js-clone-nav mr-auto d-none d-lg-block">
-                  <li><a href="#home-section" class="nav-link">Home</a></li>
+                  <li><a href="Projects.html" class="nav-link">Projects</a></li>
                   <li><a href="#about-section" class="nav-link">About</a></li>
                   <li><a href="#services-section" class="nav-link">Experience</a></li>
                 </ul>
@@ -82,52 +108,61 @@
                   </p>
                   <p class="MsoNormal">Welcome to my personal webpage. <span style="mso-ansi-language:MN"
 
-                      lang="MN">You can call me Banza. I work at Rakuten as Business Analyst in a software development field. </p>
+                      lang="MN"> You can call me Banza. </br> I work at Rakuten as Business Analyst in a software development field. </p>
                   <a href="#portfolio-section"></a>
                   <p></p>
-                  <p><a href="https://drive.google.com/file/d/1fSPSkLoEBNukGzdHe_C6gGIcPq0YbN3g/view?usp=share_link"
-
-                      class="btn smoothscroll btn-primary" target="_blank">See
+                  <p><a href="Dolgormaa-Banzragch-CV.pdf" class="btn smoothscroll btn-primary" target="_blank" rel="noopener noreferrer">See
                       Resume</a></p>
+                  <p><a href="Projects.html"
+
+                      class="btn smoothscroll btn-primary">See
+                      Projects</a></p>
                 </div>
               </div>
             </div>
           </div>
         </div>
-        <img src="images/albedo_face.png" alt="image" class="img-face" data-aos="fade">
+        <img src="" alt="image" class="img-face" data-aos="fade">
       </div>
-      <div class="site-section" id="about-section">
-        <div class="container">
-          <div class="row ">
-            <div class="col-12 mb-4 position-relative">
-              <h2 class="section-title">About</h2>
-            </div>
-            <div class="col-lg-4 order-1 order-lg-3 mb-4 mb-lg-0">
-              <div class="bg-light pt-6"> <img src="images/albedo_face1.jpg" alt="image"
 
-                  class="img-fluid" style="width: 350px; height: 607px;"> </div>
-            </div>
-            <div class="col-lg-4 order-2 order-lg-1">
-              <p>I am currently working at Rakuten as a Business Analyst for a Bugdeting Automation platform. </p>
-                <p>I graduated from Nohara Lab at
-                the Tokyo Institute of Technology. Our laboratory is specialized
-                in science communication and linguistic, where we tackle issues
-                from translation to natural language prepossessing.</p>
-              <p>My major is Global Engineering and Development and I took a
-                minor degree in Artificial Intelligence and Data Science. My
-                interest is the combination of my major and my minor degrees and
-                in the long run I dream of building my own business that can
-                have an impact on the development of my country with experience. </p>
-            </div>
-            <div class="col-lg-4 order-3 order-lg-2">
-              <p>My research theme was "Prediction of daily COVID-19 cases
-                through Sentiment analysis approach using Twitter Data".</p>
-                
-              <p>This research intends to study the correlations between the daily COVID-19 cases, tweet activities, and sentiment scores of COVID-19 related tweets on the microblogging platform Twitter. The raw twitter data was obtained from an open resource, "Panacea Laboratory" as tweet IDs, then subsequently hydrated, preprocessed, and parsed for analysis. The sentiment score of tweets was calculated using the TextBlob library in Python. Scores were used to train a more robust predictive model that is more accurate when compared to other models that only use tweet frequency to make a prediction.</p>
-            </div>
-          </div>
+
+      <div class="site-section" id="about-section">
+  <div class="container">
+    <div class="row">
+      <div class="col-12 mb-4 position-relative">
+        <h2 class="section-title">About</h2>
+      </div>
+      <div class="col-lg-4 mb-4">
+        <p>I am currently working as a Data Analyst at Rakuten, having spent the past year as a Business Analyst contributing to the development of a financial automation platform. This journey has been enriching, allowing me to collaborate with a talented team and make meaningful strides in optimizing our financial processes.
+        </br> 
+        </p>
+
+        <p> my present role, I approach data analysis with a deep sense of humility, recognizing the ongoing learning opportunities it presents. The transition has opened new avenues for skill development, and I am eager to continue leveraging my experience to support Rakuten's objectives while refining my capabilities in the realm of data analysis. Looking ahead, I aspire to build a long-term career as a Data Analyst, further contributing to the evolving landscape of data-driven decision-making.
+        </p>
+      <p>Outside of work, I indulge in fascinating development projects as a hobby. This allows me to explore diverse aspects of development, contributing to my ongoing learning and passion for the field.</p>
+
+    
+      </div>
+      <div class="col-lg-4 mb-4">
+      <p>My educational journey includes a major in Global Engineering and Development, accompanied by a minor degree in Artificial Intelligence and Data Science. The convergence of these major and minor disciplines drives my passion for instigating positive change. Looking forward, my aspirations involve establishing a business that makes meaningful contributions to the development of my home country, incorporating the valuable experiences gained in my professional journey. </p>
+      <p> noteworthy project during my academic tenure focused on the development of a Financing Automation platform. This involved a comprehensive approach to unraveling intricate correlations and optimizing financial processes. The application of data science and analytical techniques played a crucial role in enhancing the platform's efficiency and impact. </p>
+      <p><em>Images on the right are AI trying to create me from my prompts</em></p>
+      </div>
+      <div class="col-lg-4 mb-4">
+        <div class="bg-light pt-6">
+          <video width="476" height="715" loop autoplay muted playbackRate="1.5">
+            <source src="images/ai/recording.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
         </div>
       </div>
+    </div>
+  </div>
+</div>
+
+      
+      
+      
       <div class="site-section" id="services-section">
         <div class="container">
           <div class="row ">
@@ -274,10 +309,12 @@
           </div>
           <div class="row justify-content-center mb-5" data-aos="fade">
             <div id="filters" class="filters text-center button-group col-md-7">
-              <button class="btn btn-primary active" data-filter="*">ALL</button>
+              
+              <button class="btn btn-primary" data-filter="*">ALL</button>
               <button class="btn btn-primary" data-filter=".web">HULT Prize</button>
               <button class="btn btn-primary" data-filter=".design">TISA</button>
               <button class="btn btn-primary" data-filter=".brand">EDx MOOC</button>
+              <button class="btn btn-primary active" data-filter=".ai">AI Generated</button>
             </div>
           </div>
           <div id="posts" class="row no-gutter">
@@ -315,58 +352,30 @@
             <div class="item brand col-6 col-sm-6 col-md-6 col-lg-4 col-xl-4 mb-4">
               <a href="images/img_11.jpg" class="item-wrap fancybox"> <span class="icon-search2"></span>
                 <img class="img-fluid" src="images/img_11.jpg"> </a> </div>
-          </div>
+            <div class="item ai col-6 col-sm-6 col-md-6 col-lg-4 col-xl-4 mb-4">
+              <a href="images/ai/ai1.png" class="item-wrap fancybox"> <span class="icon-search2"></span>
+              <img class="img-fluid" src="images/ai/ai1.png"> </a> </div>
+            <div class="item ai col-6 col-sm-6 col-md-6 col-lg-4 col-xl-4 mb-4">
+              <a href="images/ai/ai2.png" class="item-wrap fancybox"> <span class="icon-search2"></span>
+              <img class="img-fluid" src="images/ai/ai2.png"> </a> </div>
+            <div class="item ai col-6 col-sm-6 col-md-6 col-lg-4 col-xl-4 mb-4">
+              <a href="images/ai/ai3.png" class="item-wrap fancybox"> <span class="icon-search2"></span>
+              <img class="img-fluid" src="images/ai/ai3.png"> </a> </div>
+            <!-- <div class="item ai col-6 col-sm-6 col-md-6 col-lg-4 col-xl-4 mb-4">
+              <a href="images/ai/ai4.jpeg" class="item-wrap fancybox"> <span class="icon-search2"></span>
+              <img class="img-fluid" src="images/ai/ai4.jpeg"> </a> </div> -->
+            <div class="item ai col-6 col-sm-6 col-md-6 col-lg-4 col-xl-4 mb-4">
+              <a href="images/ai/ai5.jpeg" class="item-wrap fancybox"> <span class="icon-search2"></span>
+              <img class="img-fluid" src="images/ai/ai5.jpeg"> </a> </div>
+            <div class="item ai col-6 col-sm-6 col-md-6 col-lg-4 col-xl-4 mb-4">
+              <a href="images/ai/ai7.jpeg" class="item-wrap fancybox"> <span class="icon-search2"></span>
+              <img class="img-fluid" src="images/ai/ai7.jpeg"> </a> </div> 
+            <div class="item ai col-6 col-sm-6 col-md-6 col-lg-4 col-xl-4 mb-4">
+              <a href="images/ai/ai6.jpeg" class="item-wrap fancybox"> <span class="icon-search2"></span>
+              <img class="img-fluid" src="images/ai/ai6.jpeg"> </a> </div> 
+            </div>
         </div>
-      </section>
-      <section class="site-section bg-primary">
-        <div class="container">
-          <div class="row">
-            <div class="col-12 mb-5 position-relative">
-              <h2 class="section-title text-center mb-5 text-white">Skills</h2>
-            </div>
-          </div>
-          <div class="owl-carousel slide-one-item">
-            <div class="slide">
-              <blockquote>
-                <p>Programming and Data analysis: Python, R. </p>
-                <p>Have experience in machine learning algorithms, Neural network architectures, data mining and big data analysis</p>
-                
-                <p>  </p>
-                <p><cite> </cite></p>
-              </blockquote>
-            </div>
-            <div class="slide">
-              <blockquote>
-                <p>English: Full Professional Proficiency</p>
-                <p>Japanese: Proficient</p>
-                <p>Mongolian: Native</p>
-                <p><cite></cite></p>
-              </blockquote>
-            </div>
-            <div class="slide">
-              <blockquote>
-                <p>IT skill:</p>
-                <p>Experience with NAS, IOT, SSH remote server.</p>
-                <p>Familiar with Mac, Windows, Linux operating systems.</p>
-                <p>Well experienced in PC hardware and troubleshooting</p>
-                <p><cite></cite></p>
-              </blockquote>
-            </div>
-            <div class="slide">
-              <blockquote>
-                <p>Good problem solver</p>
-                <p>Adapts easily and flexible</p>
-                <p>Fast learner</p>
-                <p><cite></cite></p>
-              </blockquote>
-            </div>
-          </div>
-        </div>
-      </section>
-      <section class="site-section">
-        <div class="container"> </div>
-      </section>
-      <section class="site-section bg-light" id="blog-section">
+        
         <div class="container">
           <div class="row">
             <div class="col-12 mb-5 position-relative">
@@ -424,43 +433,43 @@
           </div>
         </div>
       </section>
+
+      
+      
       <section class="site-section" id="contact-section">
         <div class="container">
           <div class="row">
             <div class="col-12 mb-5 position-relative">
-              <h2 class="section-title text-center mb-5">Contact Form/under
-                development</h2>
+              <h2 class="section-title text-center mb-5">Contact Form</h2>
             </div>
           </div>
-          <form action="#" class="form">
+          <form method="POST" action="https://script.google.com/macros/s/AKfycbxiea3oqpjk5fq3HGBjA-QrubCViZPwgbH5DkveS4R4_HTchps4K0MWbQL1NI8jJj7f/exec" class="form">
             <div class="row mb-4">
-              <div class="form-group col-6"> <input class="form-control" placeholder="First name"
+              <div class="form-group col-6"> <input name="First Name" class="form-control" placeholder="First name"
 
                   type="text"> </div>
-              <div class="form-group col-6"> <input class="form-control" placeholder="Full name"
+              <div class="form-group col-6"> <input name="Last Name"  class="form-control" placeholder="Last name"
 
                   type="text"> </div>
             </div>
             <div class="row mb-4">
-              <div class="form-group col-12"> <input class="form-control" placeholder="Email address"
+              <div class="form-group col-12"> <input name="Email" class="form-control" placeholder="Email address"
 
                   type="email"> </div>
             </div>
             <div class="row mb-4">
-              <div class="form-group col-12"> <input class="form-control" placeholder="Subject of the message"
+              <div class="form-group col-12"> <input name="Subject" class="form-control" placeholder="Subject of the message"
 
                   type="text"> </div>
             </div>
             <div class="row mb-4">
-              <div class="form-group col-12"> <textarea id="" cols="30" rows="10"
+              <div class="form-group col-12"> <textarea name="Message" id="" cols="30" rows="10"
 
-class="form-control" placeholder="Type your message here.. (currently unavailable)"></textarea>
+class="form-control" placeholder="Type your message here.."></textarea>
               </div>
             </div>
             <div class="row">
-              <div class="col-md-6"> <input class="btn btn-primary" value="Send Message"
-
-formmethod="post" formenctype="text/plain" formtarget="_self" type="submit"> </div>
+              <div class="col-md-6"> <input class="btn btn-primary" value="Send Message" type="submit"> </div>
             </div>
           </form>
         </div>
@@ -509,7 +518,7 @@ formmethod="post" formenctype="text/plain" formtarget="_self" type="submit"> </d
             </div>
             <div class="col-md-3">
               <h3 class="footer-title">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                Follow Me</h3>
+                Find Me</h3>
               &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="https://twitter.com/DolgormaaBanzr1"
 
                 class="social-circle" target="_blank"><span class="icon-twitter"></span></a>
