@@ -256,7 +256,7 @@ jQuery(document).ready(function($) {
 	    });
 	  });
 	  
-	  $container.isotope({ filter: '*' });
+	  $container.isotope({ filter: 'ai' });
 
 	    // filter items on button click
 	  $('#filters').on( 'click', 'button', function(e) {
