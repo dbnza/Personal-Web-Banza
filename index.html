@@ -27,27 +27,30 @@
           var form = document.querySelector(".form");
 
           form.addEventListener("submit", function (event) {
-              // Prevent the default form submission
               event.preventDefault();
-
-              // Perform your form submission logic here (e.g., using Ajax)
-              // You can use fetch or another method to send the form data to your web app
               fetch(form.action, {
                   method: form.method,
                   body: new FormData(form),
               })
-              .then(response => response.json()) // If your web app returns JSON, adjust this accordingly
-              .then(data => {
-                  // Display a notification based on the response
-                  alert("Your message has been sent"); // Replace this with your custom notification logic
+              .then(response => response.json()) 
+              .then(data => {             
+                  alert("Your message has been sent"); 
 
-                  // Optionally, reset the form
                   form.reset();
               })
               .catch(error => console.error('Error:', error));
           });
       });
   </script>
+  <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-WNFX226J7X"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-WNFX226J7X');
+</script>
   </head>
   <body data-spy="scroll" data-target=".site-navbar-target" data-offset="300">
     <!-- <div id="overlayer"></div>
