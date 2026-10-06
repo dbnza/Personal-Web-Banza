@@ -1,79 +1,1543 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="mn">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Under Maintenance</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Мон-Шибасаки Агуулах — Санхүүгийн загвар · v02</title>
+<style>
+:root{
+  --ink:#16181A; --mute:#82858B; --faint:#B4B7BC; --line:#EBE9E4; --bg:#FCFBF9;
+  --navy:#2F4858; --rust:#B4713D; --red:#9C3D2E; --green:#2E6049; --sand:#C9BFA8; --blue:#8AA4B2;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0; background:var(--bg); color:var(--ink);
+  font:400 15px/1.55 ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI","Helvetica Neue",Arial,"Noto Sans",sans-serif;
+  -webkit-font-smoothing:antialiased; font-variant-numeric:tabular-nums}
+body.noscroll{overflow:hidden}
+h1,h2,h3{margin:0; font-weight:600; letter-spacing:-.018em}
+button{font:inherit; cursor:pointer}
+[data-ja],[data-cur]{cursor:help}
+.wrap{max-width:1080px; margin:0 auto; padding:0 28px}
+@media(max-width:640px){.wrap{padding:0 18px}}
 
-    <link rel="stylesheet" href="path/to/font-awesome/css/font-awesome.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+/* header */
+header{border-bottom:1px solid var(--line); background:#fff}
+.hd{display:flex; align-items:center; gap:16px; padding:18px 0; flex-wrap:wrap}
+.hd h1{font-size:17px}
+.hd .sub{font-size:13px; color:var(--mute); margin-top:1px}
+.spacer{flex:1}
+.seg{display:flex; background:#F2F0EC; border-radius:9px; padding:3px}
+.seg button{border:0; background:transparent; color:var(--mute); font-size:13px; font-weight:500;
+  padding:6px 13px; border-radius:7px; white-space:nowrap}
+.seg button.on{background:#fff; color:var(--ink); font-weight:600; box-shadow:0 1px 2px rgba(0,0,0,.07)}
+.lnk{border:0; background:transparent; color:var(--mute); font-size:13px; padding:6px 4px}
+.lnk:hover{color:var(--ink)}
 
-    <style>
-        body {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-        }
+/* sticky slider strip — sliders only */
+.ctrl{position:sticky; top:0; z-index:40; background:rgba(255,255,255,.94);
+  backdrop-filter:saturate(180%) blur(12px); border-bottom:1px solid var(--line)}
+.cg{display:grid; grid-template-columns:repeat(6,1fr); gap:24px; padding:14px 0 12px}
+@media(max-width:1000px){.cg{grid-template-columns:repeat(3,1fr); gap:18px}}
+@media(max-width:620px){.cg{grid-template-columns:repeat(2,1fr)}}
+.c .top{display:flex; justify-content:space-between; align-items:baseline; gap:6px}
+.c .lab{font-size:11px; color:var(--mute); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.c .val{font-size:13.5px; font-weight:600; white-space:nowrap}
+input[type=range]{-webkit-appearance:none; appearance:none; width:100%; height:3px; margin:9px 0 0;
+  border-radius:2px; background:#E4E1DA; outline:0}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none; width:14px; height:14px; border-radius:50%;
+  background:var(--navy); border:2.5px solid #fff; box-shadow:0 1px 3px rgba(0,0,0,.25); cursor:pointer}
+input[type=range]::-moz-range-thumb{width:11px;height:11px;border-radius:50%;background:var(--navy);
+  border:2.5px solid #fff; cursor:pointer}
+.more{display:flex; justify-content:space-between; align-items:center; padding-bottom:10px; gap:12px}
+.more .hintbar{font-size:11.5px; color:var(--faint)}
+.more button{border:1px solid var(--navy); background:var(--navy); color:#fff; font-size:12px;
+  padding:6px 14px; border-radius:20px}
+.more button:hover{background:#243844}
 
-        .under-management {
-            font-size: 2em;
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 10px;
-        }
+/* drawer */
+.drawer{position:fixed; inset:0; z-index:100; display:none}
+.drawer.open{display:block}
+.backdrop{position:absolute; inset:0; background:rgba(22,24,26,.34); animation:fade .18s ease}
+.panel{position:absolute; top:0; right:0; bottom:0; width:min(560px,100%); background:#FDFCFA;
+  display:flex; flex-direction:column; box-shadow:-12px 0 40px rgba(0,0,0,.14); animation:slide .22s ease}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@keyframes slide{from{transform:translateX(40px);opacity:.4}to{transform:none;opacity:1}}
+.phead{padding:18px 22px 0; border-bottom:1px solid var(--line); background:#fff}
+.phead .r1{display:flex; align-items:center; gap:10px}
+.phead h3{font-size:16px}
+.xclose{margin-left:auto; width:32px; height:32px; border:1px solid var(--line); border-radius:8px;
+  background:#fff; font-size:18px; line-height:1; color:var(--mute)}
+.xclose:hover{color:var(--ink); border-color:var(--faint)}
+.ptabs{display:flex; gap:2px; margin-top:14px; overflow-x:auto}
+.ptabs button{border:0; background:transparent; padding:9px 12px; font-size:13px; color:var(--mute);
+  border-bottom:2px solid transparent; white-space:nowrap}
+.ptabs button.on{color:var(--ink); font-weight:600; border-bottom-color:var(--rust)}
+.pbody{flex:1; overflow-y:auto; padding:18px 22px 60px; overscroll-behavior:contain}
+.pane{display:none} .pane.on{display:block}
+.grp{margin-bottom:24px}
+.grp h4{font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--rust);
+  font-weight:700; margin:0 0 8px}
+.preset{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:6px}
+.preset button{border:1px solid var(--line); background:#fff; border-radius:11px; padding:12px 14px;
+  text-align:left; transition:.12s}
+.preset button b{display:block; font-size:14px}
+.preset button span{font-size:11.5px; color:var(--mute)}
+.preset button.on{border-color:var(--navy); box-shadow:0 0 0 1px var(--navy); background:#F5F8F9}
+.f{display:flex; justify-content:space-between; align-items:center; gap:10px; padding:4px 0}
+.f label{font-size:12.8px; color:#4E5155; flex:1; min-width:0}
+.f input[type=number]{width:108px; flex:none; height:30px; text-align:right; font:inherit; font-size:12.8px;
+  border:1px solid var(--line); border-radius:7px; padding:0 8px; background:#fff; color:var(--ink)}
+.f input[type=text]{flex:1; min-width:0; height:30px; font:inherit; font-size:12.8px;
+  border:1px solid var(--line); border-radius:7px; padding:0 9px; background:#fff}
+.f input:focus{outline:2px solid var(--navy); outline-offset:-1px}
+.f select{height:30px; font:inherit; font-size:12.8px; border:1px solid var(--line); border-radius:7px;
+  padding:0 5px; background:#fff; max-width:180px}
+.sw,.f label.sw{position:relative; width:36px; height:20px; flex:none}
+.sw input{position:absolute; opacity:0; width:0; height:0}
+.sw i{position:absolute; inset:0; background:#DBD8D1; border-radius:20px; transition:.16s; cursor:pointer}
+.sw i::after{content:""; position:absolute; width:14px; height:14px; top:3px; left:3px; background:#fff;
+  border-radius:50%; transition:.16s}
+.sw input:checked + i{background:var(--green)}
+.sw input:checked + i::after{transform:translateX(16px)}
+.stf{border:1px solid var(--line); border-radius:10px; padding:9px 11px; margin-bottom:8px; background:#fff}
+.stf .r{display:flex; gap:7px; margin-bottom:4px}
+.xb{width:30px; height:30px; flex:none; border:1px solid var(--line); background:#fff; border-radius:7px;
+  color:var(--red); font-size:14px; line-height:1}
+.xb:hover{background:#FDF3F1}
+.addb{width:100%; padding:8px; font-size:12.5px; color:var(--rust); background:#fff;
+  border:1px dashed #E0D3BE; border-radius:8px}
+.addb:hover{background:#FFFBF4}
+.note{font-size:11.8px; color:var(--mute); margin-top:8px; line-height:1.55; background:#F4F2EC;
+  border-radius:8px; padding:7px 10px}
+.note b{color:var(--ink)}
 
-        .message {
-            font-size: 1.2em;
-            color: #666;
-            margin-bottom: 20px;
-        }
+/* body */
+section{padding:52px 0 0}
+.eyebrow{font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--rust); font-weight:700}
+section h2{font-size:23px; margin:7px 0 4px}
+.lede{font-size:14px; color:var(--mute); max-width:700px; line-height:1.6}
+.figcap{font-size:12px; color:var(--mute); margin-top:12px; font-style:italic}
+.kpis{display:grid; grid-template-columns:repeat(5,1fr); gap:1px; background:var(--line);
+  border:1px solid var(--line); border-radius:13px; overflow:hidden; margin-top:24px}
+@media(max-width:900px){.kpis{grid-template-columns:repeat(2,1fr)}}
+.k{background:#fff; padding:17px 18px}
+.k .v{font-size:25px; font-weight:600; letter-spacing:-.03em; line-height:1.15}
+.k .l{font-size:11.5px; color:var(--mute); margin-top:4px}
+.k.good .v{color:var(--green)} .k.bad .v{color:var(--red)} .k.warn .v{color:#A8741A}
+.k .s{font-size:11.5px; color:var(--mute); margin-top:3px; line-height:1.45}
+.kpis.two{grid-template-columns:repeat(2,1fr); margin-top:12px}
+@media(max-width:700px){.kpis.two{grid-template-columns:1fr}}
+.vd{display:flex; gap:13px; align-items:flex-start; margin-top:22px; padding:19px 21px;
+  border-radius:13px; border:1px solid var(--line); background:#fff}
+.vd.no{border-color:#EBD3CC; background:#FDF6F4}
+.vd .dot{width:9px; height:9px; border-radius:50%; margin-top:7px; flex:none; background:var(--green)}
+.vd.no .dot{background:var(--red)}
+.vd h3{font-size:15px; margin-bottom:5px}
+.vd.no h3{color:#7E2F22}
+.vd p{margin:0; font-size:13.5px; line-height:1.75; color:#55585C}
+.vd.no p{color:#6E3428}
+.vd b{color:var(--ink)} .vd.no b{color:#5A241A}
+.fig{margin-top:26px}
+svg{display:block; width:100%; height:auto; overflow:visible}
+.lg{display:flex; gap:18px; flex-wrap:wrap; margin-top:14px; font-size:12px; color:var(--mute)}
+.lg i{display:inline-block; width:10px; height:10px; border-radius:2.5px; margin-right:7px; vertical-align:-1px}
+.tbl{margin-top:22px; overflow-x:auto; -webkit-overflow-scrolling:touch}
+table{width:100%; border-collapse:collapse; font-size:13px}
+caption{text-align:left; font-size:13px; font-weight:600; padding-bottom:11px; color:var(--ink)}
+th{font-size:10.5px; letter-spacing:.04em; text-transform:uppercase; color:var(--mute); font-weight:600;
+  text-align:right; padding:0 0 9px 16px; border-bottom:1px solid var(--ink); white-space:nowrap}
+th:first-child{text-align:left; padding-left:0}
+td{text-align:right; padding:9px 0 9px 16px; border-bottom:1px solid var(--line); white-space:nowrap}
+td:first-child{text-align:left; padding-left:0; color:#4E5155}
+tr.hl td{background:#F7F5F1; font-weight:600}
+tr.hl td:first-child{color:var(--ink)}
+.neg{color:var(--red); font-weight:600} .pos{color:var(--green); font-weight:600}
+.sm{font-size:12px} .sm td,.sm th{padding-left:13px}
 
-        .col-md-3 {
-            text-align: center;
-        }
+/* formulas */
+.fstep{display:flex; align-items:baseline; gap:12px; margin:36px 0 4px}
+.fstep .n{width:26px; height:26px; flex:none; border-radius:50%; background:var(--navy); color:#fff;
+  font-size:13px; font-weight:700; display:flex; align-items:center; justify-content:center; transform:translateY(4px)}
+.fstep h3{font-size:17px}
+.fcards{display:grid; grid-template-columns:repeat(2,1fr); gap:16px; margin-top:14px}
+@media(max-width:820px){.fcards{grid-template-columns:1fr}}
+.fc{background:#fff; border:1px solid var(--line); border-radius:13px; padding:17px 19px}
+.fc h4{font-size:13.8px; margin:0 0 8px}
+.fc .fx{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:12.3px; line-height:1.75;
+  background:#F7F5F1; border:1px solid var(--line); border-radius:8px; padding:10px 13px; white-space:pre-wrap;
+  color:#23303A}
+.fc .fx b{color:var(--rust); font-weight:600}
+.chips{display:flex; flex-wrap:wrap; gap:6px; margin-top:10px}
+.chip{font-size:11.5px; padding:3px 9px; border-radius:20px; background:#EEF3F5; color:#2F4858;
+  border:1px solid #DCE6EA; white-space:nowrap}
+.chip.dn{background:#FBF0EC; color:#8A3526; border-color:#F0D9D1}
+.fc .exp{font-size:12.6px; color:#55585C; margin-top:10px; line-height:1.62}
+.fc .live{font-size:12px; color:var(--mute); margin-top:9px; padding-top:9px; border-top:1px dashed var(--line); line-height:1.6}
+.fc .live b{color:var(--green); font-weight:600}
+footer{margin:60px 0 40px; padding-top:20px; border-top:1px solid var(--line);
+  font-size:12px; color:var(--faint); line-height:1.7}
 
-        .footer-title {
-            margin-bottom: 10px;
-        }
+/* tooltip */
+#tip{position:fixed; z-index:300; max-width:320px; background:#1F2A31; color:#fff; font-size:12.5px; line-height:1.6;
+  padding:8px 11px; border-radius:8px; pointer-events:none; opacity:0; transition:opacity .1s; white-space:pre-line;
+  font-family:"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic UI","Yu Gothic","Meiryo",sans-serif;
+  box-shadow:0 6px 18px rgba(0,0,0,.2)}
+#tip.on{opacity:1}
+#tip .jl{font-size:10px; letter-spacing:.1em; color:#C9BFA8; display:block; margin-bottom:2px}
+#tip .en{display:block; margin-top:6px; padding-top:6px; border-top:1px solid rgba(255,255,255,.18);
+  font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}
+#tip .el{font-size:10px; letter-spacing:.1em; color:#8AA4B2; display:block; margin-bottom:2px}
 
-        .social-circle {
-            display: inline-block;
-            background-color: #333;
-            color: #fff;
-            border-radius: 50%;
-            padding: 10px;
-            margin: 5px;
-            text-align: center;
-            font-size: 20px;
-        }
-    </style>
+/* validation notes, change markers, toast, changelog */
+.warns{display:grid; gap:6px; margin:0 0 18px}
+.wn{font-size:12.8px; line-height:1.5; padding:8px 12px; border-radius:9px; border:1px solid #EAD9B5; background:#FFFAEE; color:#6B5219}
+.wn.err{border-color:#EBD3CC; background:#FDF6F4; color:#7E2F22}
+.wn b{display:inline-block; width:16px; font-weight:700}
+#dWarn:not(:empty){margin-bottom:18px}
+.f .rs{width:22px; height:22px; flex:none; border:0; background:transparent; color:var(--rust); font-size:14px; line-height:1; padding:0; visibility:hidden}
+.f.chg .rs{visibility:visible}
+.f.chg > label:first-child::before{content:""; display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--rust); margin-right:6px; vertical-align:1px}
+.f.ref > label:first-child{color:var(--faint)}
+.hid{display:none!important}
+.xs{border-left:2px solid #E0D3BE; padding-left:10px; margin:10px 0 14px}
+.xs.off{opacity:.5}
+.f:not(.ref) .reftag{display:none}
+.xnote{border:1px solid #E0D3BE; background:#FFFBF4; border-radius:12px; padding:12px 16px; margin:0 0 18px; font-size:13px; color:#55585C}
+.xnote b{color:var(--ink)}
+.xnote table{margin-top:8px; max-width:520px}
+.xtag{font-size:10.5px; color:var(--rust); background:#FBF3E8; border:1px solid #EFDDC2; border-radius:20px; padding:1px 8px}
+.chgc{font-size:11px; color:var(--rust); background:#FBF3E8; border:1px solid #EFDDC2; border-radius:20px; padding:1px 9px}
+.chgc:empty{display:none}
+#toast{position:fixed; left:50%; bottom:28px; transform:translateX(-50%); z-index:400; background:#1F2A31; color:#fff;
+  font-size:12.5px; padding:9px 16px; border-radius:20px; opacity:0; pointer-events:none; transition:opacity .2s}
+#toast.on{opacity:1}
+details.cl{margin-top:10px} details.cl summary{cursor:pointer; color:var(--mute)} details.cl ul{margin:6px 0 0; padding-left:18px}
+
+@media print{.ctrl,.drawer,.lnk,.more,.seg,#tip,#toast,.rs,.chgc{display:none!important}
+  section{padding-top:30px; break-inside:avoid} body{background:#fff}}
+</style>
 </head>
 <body>
-    <div class="under-management">Under Maintenance 😅</div>
-    <div class="message">Please visit again later. The webpage will be up and running in no time.</div>
-    <br>
-    <div class="col-md-3">
-        <h3 class="footer-title">Find Me at</h3>
-        <a href="https://twitter.com/DolgormaaBanzr1" class="social-circle" target="_blank">
-            <i class="fab fa-twitter"></i>
-        </a>
-        <a href="https://www.linkedin.com/in/banzragch-dolgormaa-96650b109/" class="social-circle" target="_blank">
-            <i class="fab fa-linkedin"></i>
-        </a>
-        <a href="https://www.facebook.com/Banza.RNC" class="social-circle" target="_blank">
-            <i class="fab fa-facebook"></i>
-        </a>
-        <a href="https://www.instagram.com/banza_0126/" class="social-circle" target="_blank">
-            <i class="fab fa-instagram"></i>
-        </a>
-        <a href="https://github.com/banza5123" class="social-circle" target="_blank">
-            <i class="fab fa-github"></i>
-        </a>
+
+<header><div class="wrap hd">
+  <div>
+    <h1 data-ja="モンシバサキ倉庫センター" data-en="Mon-Shibasaki Warehouse">Мон-Шибасаки Агуулах</h1>
+    <div class="sub" data-ja="財務モデル・ウランバートル" data-en="Financial model · Ulaanbaatar">Санхүүгийн загвар · Улаанбаатар</div>
+  </div>
+  <div class="spacer"></div>
+  <div class="seg" id="seg"></div>
+  <button class="lnk" id="bReset" data-ja="初期値に戻す" data-en="Reset to defaults">Сэргээх</button>
+  <button class="lnk" id="bShare" data-ja="現在の入力内容を再現できるリンクをコピーします" data-en="Copy a link that reproduces your current inputs">Холбоос хуулах</button>
+  <button class="lnk" id="bCsv" data-ja="CSVでダウンロード" data-en="Download as CSV">CSV татах</button>
+  <button class="lnk" id="bPrint" data-ja="印刷" data-en="Print">Хэвлэх</button>
+</div></header>
+
+<div class="ctrl">
+  <div class="wrap">
+    <div class="cg" id="ctrl"></div>
+    <div class="more">
+      <span class="hintbar" id="hintbar"></span>
+      <button id="bMore" data-ja="すべての前提条件を開く" data-en="Open all assumptions">Бүх үзүүлэлт ⚙</button>
     </div>
+  </div>
+</div>
+
+<div class="drawer" id="drawer" aria-hidden="true">
+  <div class="backdrop" id="backdrop"></div>
+  <div class="panel" role="dialog" aria-label="Бүх үзүүлэлт">
+    <div class="phead">
+      <div class="r1">
+        <h3 data-ja="すべての前提条件" data-en="All assumptions">Бүх үзүүлэлт</h3>
+        <span class="chgc" id="chgCount" data-ja="初期値から変更した項目の数" data-en="Number of fields changed from defaults"></span>
+        <button class="xclose" id="bClose" data-ja="閉じる（Escキー）" data-en="Close (Esc)">×</button>
+      </div>
+      <div class="ptabs" id="ptabs"></div>
+    </div>
+    <div class="pbody" id="pbody"></div>
+  </div>
+</div>
+
+<div class="wrap">
+  <div id="modelBody"></div>
+  <div id="formulasBody"></div>
+</div>
+
+<div id="tip"></div>
+<div id="toast"></div>
+
+<script>
+"use strict";
+/* ═════════ CONSTANTS ═════════ */
+const OPEX_KEYS=['maintenance','security','insurance','marketing','administration','accounting',
+  'internet','software','cleaning','repairs','misc','management','heating','electricity','water'];
+const OPEX_LBL={
+  maintenance:['Засвар үйлчилгээ','維持管理費','Maintenance'], security:['Хамгаалалт','警備費','Security'], insurance:['Даатгал','保険料','Insurance'],
+  marketing:['Маркетинг','マーケティング費','Marketing'], administration:['Удирдлага','管理費','Administration'], accounting:['Нягтлан бодох','会計費','Accounting'],
+  internet:['Интернэт','インターネット','Internet'], software:['Программ хангамж','ソフトウェア','Software'], cleaning:['Цэвэрлэгээ','清掃費','Cleaning'],
+  repairs:['Их засвар','修繕費','Major repairs'], misc:['Бусад','その他','Other'], management:['Барилгын менежмент','建物管理費','Building management'],
+  heating:['Халаалт','暖房費','Heating'], electricity:['Цахилгаан','電気代','Electricity'], water:['Ус','水道代','Water']};
+const UTIL={heating:1,electricity:1,water:1};
+const INF_OF={maintenance:'maintenanceInflation',insurance:'insuranceInflation',marketing:'marketingInflation',
+  heating:'utilitiesInflation',electricity:'utilitiesInflation',water:'utilitiesInflation'};
+const INF_ALL=['salaryGrowth','maintenanceInflation','insuranceInflation','marketingInflation','utilitiesInflation','otherOpexInflation'];
+function ox(m,a){const o={};OPEX_KEYS.forEach(k=>o[k]=0);o.maintenance=m;o.administration=a;
+  o.heating=40;o.electricity=8;o.water=2;return o;}
+
+/* Base-plan presets: 1 floor = Option A, 2 floors = Option B */
+const PRESETS={
+  A:{name:'Хувилбар А · 1 давхар',ground:600,second:0,construction:55,contingency:0,
+     fitout:0,equipment:0,constructionMonths:7,openingYear:2027,loanAmount:55,
+     staff:[{name:'Менежер',count:1,salary:2500000,burden:0,bonusMonths:0},
+            {name:'Агуулахын ажилтан',count:1,salary:2500000,burden:0,bonusMonths:0}],
+     opex:ox(8.6,20), tenantPaid:{heating:true,electricity:true,water:true}},
+  B:{name:'Хувилбар Б · 2 давхар',ground:600,second:450,construction:90,contingency:0,
+     fitout:0,equipment:0,constructionMonths:7,openingYear:2027,loanAmount:90,
+     staff:[{name:'Менежер',count:1,salary:2500000,burden:0,bonusMonths:0},
+            {name:'Агуулахын ажилтан',count:2,salary:1875000,burden:0,bonusMonths:0}],
+     opex:ox(17.3,20), tenantPaid:{heating:true,electricity:true,water:true}}
+};
+const clone=o=>JSON.parse(JSON.stringify(o));
+const DEF={
+  preset:'B', base:'B',
+  ext:false, extValue:false, valueGrowth:0, extTax:false, lossYears:2, extBuild:false, drawdown:50,
+  horizon:20, roiYears:0, includeTerminal:false, terminalPct:100, landValue:3,
+  fx:23, simulateFx:false, fxDep:0,
+  rent:40000, vat:10, vatInclusive:true, occupancy:75, rentablePct:100,
+  rampYears:0, rampStart:50, rentFreeMonths:0,
+  yearsFixed:3, reviewEvery:3, rentAdjustment:15, maxRentIncrease:15,
+  otherMonthlyIncome:0, otherIncomeGrowth:0, badDebt:0, avgTenantArea:30,
+  cit:10, propertyTax:1, propertyTaxBase:'construction',
+  interestDeductible:true, depreciation:false, usefulLife:30,
+  salaryGrowth:9, maintenanceInflation:9, insuranceInflation:9, marketingInflation:9,
+  utilitiesInflation:9, otherOpexInflation:9,
+  sensMin:25000, sensStep:5000,
+  loan:{rate:3,term:15,startYear:1,graceYears:0,interestOnlyYears:0,fee:0,balloon:0,method:'annuity'},
+  sc:clone(PRESETS.B)
+};
+/* ═════════ VERSION / SAVED STATE / SHARE LINK ═════════ */
+const VERSION='v02', BUILD='2026-10-02', STORE_KEY='monshibasaki_model_v02';
+/* only values that differ from DEF are saved or shared, so later default changes still reach old links */
+function diffObj(cur,def){
+  if(cur===null||typeof cur!=='object'||Array.isArray(cur)) return JSON.stringify(cur)===JSON.stringify(def)?undefined:cur;
+  const out={}; let any=false;
+  for(const k of Object.keys(cur)){ const d=diffObj(cur[k],def==null?undefined:def[k]); if(d!==undefined){ out[k]=d; any=true; } }
+  return any?out:undefined;
+}
+const okStaff=r=>r&&typeof r.name==='string'&&['count','salary','burden','bonusMonths'].every(f=>Number.isFinite(r[f]));
+function applyPatch(t,p){
+  if(!p||typeof p!=='object') return;
+  for(const k of Object.keys(p)){
+    if(!(k in t)) continue;
+    const tv=t[k], pv=p[k];
+    if(k==='preset'){ if(pv===null||typeof pv==='string') t[k]=pv; }
+    else if(Array.isArray(tv)){ if(Array.isArray(pv)&&pv.length&&pv.every(okStaff)) t[k]=pv; }
+    else if(tv!==null&&typeof tv==='object'){ applyPatch(tv,pv); }
+    else if(typeof tv===typeof pv&&(typeof pv!=='number'||Number.isFinite(pv))) t[k]=pv;
+  }
+}
+function b64enc(s){ let x=''; new TextEncoder().encode(s).forEach(c=>x+=String.fromCharCode(c));
+  return btoa(x).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,''); }
+function b64dec(s){ s=s.replace(/-/g,'+').replace(/_/g,'/'); while(s.length%4) s+='=';
+  return new TextDecoder().decode(Uint8Array.from(atob(s),c=>c.charCodeAt(0))); }
+let loadedFrom=null;
+function restoreState(){
+  const s=clone(DEF);
+  try{
+    const m=location.hash.match(/^#s=([\w-]+)$/);
+    if(m){ applyPatch(s,JSON.parse(b64dec(m[1]))); loadedFrom='link'; }
+    else{ const raw=localStorage.getItem(STORE_KEY); if(raw){ applyPatch(s,JSON.parse(raw)); loadedFrom='saved'; } }
+  }catch(e){ /* corrupt link or blocked storage: start from defaults */ }
+  if(loadedFrom==='link'){ try{ history.replaceState(null,'',location.pathname+location.search); }catch(e){} }
+  return s;
+}
+function saveState(){
+  try{ const d=diffObj(S,DEF); if(d) localStorage.setItem(STORE_KEY,JSON.stringify(d)); else localStorage.removeItem(STORE_KEY); }catch(e){}
+}
+function shareUrl(){ return location.href.split('#')[0]+'#s='+b64enc(JSON.stringify(diffObj(S,DEF)||{})); }
+let toastTimer;
+function toast(t){ const el=document.getElementById('toast'); el.textContent=t; el.classList.add('on');
+  clearTimeout(toastTimer); toastTimer=setTimeout(()=>el.classList.remove('on'),2600); }
+/* keep "which preset am I on" honest: matches again if edits are undone */
+function syncPreset(){ S.preset=JSON.stringify(S.sc)===JSON.stringify(PRESETS[S.base])?S.base:null; }
+
+let S=restoreState(), drawerOpen=false, activeTab='bld';
+
+/* ═════════ ENGINE (unchanged math; guards added) ═════════ */
+const annuity=(p,r,n)=>r===0?p/n:p*r/(1-Math.pow(1+r,-n));
+function loanYear(opening,year,L,total){
+  if(year<L.startYear||opening<=1e-9) return {interest:0,principal:0,payment:0,closing:opening};
+  if(year>L.startYear+L.term-1) return {interest:0,principal:0,payment:0,closing:opening};
+  const k=year-L.startYear+1, r=L.rate/100, interest=opening*r;
+  const io=Math.max(L.graceYears,L.interestOnlyYears), amort=Math.max(1,L.term-io);
+  let principal=0,payment=0;
+  if(k<=L.graceYears){payment=0;}
+  else if(k<=io){payment=interest;}
+  else if(L.method==='equalPrincipal'){principal=(total-L.balloon)/amort;payment=principal+interest;
+    if(k===L.term){principal+=L.balloon;payment+=L.balloon;}}
+  else if(L.method==='bullet'){payment=interest;if(k===L.term){principal=opening;payment+=principal;}}
+  else{const pmt=annuity(total-L.balloon,r,amort);payment=pmt;principal=Math.max(0,pmt-interest);
+    if(k===L.term){principal=opening;payment=principal+interest;}}
+  principal=Math.min(opening,principal);
+  return {interest,principal,payment,closing:Math.max(0,opening-principal)};
+}
+const personnel=l=>l.reduce((s,r)=>s+r.count*r.salary*(12+r.bonusMonths)*(1+r.burden/100),0)/1e6;
+function occAt(G,y){
+  if(!G.rampYears||G.rampYears<1||y>G.rampYears) return G.occupancy;
+  if(G.rampYears===1) return G.rampStart;
+  return G.rampStart+(G.occupancy-G.rampStart)*(y-1)/G.rampYears;
+}
+/* IRR by bisection on irregular timings: flows = [[years, amount], ...]; null if no sign change */
+function irrOf(flows){
+  const npv=r=>flows.reduce((a,[t,c])=>a+c/Math.pow(1+r,t),0);
+  let lo=-0.95, hi=10, flo=npv(lo);
+  if(!(flo*npv(hi)<0)) return null;
+  for(let i=0;i<200;i++){ const mid=(lo+hi)/2, fm=npv(mid); if(flo*fm<=0) hi=mid; else{ lo=mid; flo=fm; } }
+  return (lo+hi)/2;
+}
+/* rent (same units as the slider) that makes average coverage, and every year's coverage, reach 1.00 */
+function rentNeeded(G,sc){
+  const T=Math.max(1,Math.round(G.loan.term)), r1=G.rent, r2=G.rent+10000;
+  const a=calc({...G,rent:r1},sc), b=calc({...G,rent:r2},sc);
+  const idx=a.rows.map((r,i)=>i).filter(i=>a.rows[i].year<=T&&a.rows[i].payment>1e-9);
+  if(!idx.length) return null;
+  const lin=(e1,e2,pay)=>e2===e1?null:r1+(pay-e1)*(r2-r1)/(e2-e1);
+  const sum=(m,f)=>idx.reduce((t,i)=>t+m.rows[i][f],0);
+  const avg=lin(sum(a,'ebitdaJpy'),sum(b,'ebitdaJpy'),sum(a,'payment'));
+  let every=null;
+  for(const i of idx){ const x=lin(a.rows[i].ebitdaJpy,b.rows[i].ebitdaJpy,a.rows[i].payment); if(x!==null&&(every===null||x>every)) every=x; }
+  return {avg,every};
+}
+function calc(G0,sc){
+  const G={...G0, horizon:Math.max(1,Math.round(G0.horizon)), reviewEvery:Math.max(1,G0.reviewEvery),
+    loan:{...G0.loan, term:Math.max(1,Math.round(G0.loan.term)), startYear:Math.max(1,Math.round(G0.loan.startYear))}};
+  const area=(sc.ground+sc.second)*G.rentablePct/100;
+  const projectCost=sc.construction*(1+sc.contingency/100)+sc.fitout+sc.equipment;
+  const total=sc.loanAmount*(1+G.loan.fee/100);
+  /* extended model: every switch is inert unless the master switch is on */
+  const vOn=!!G.ext&&!!G.extValue, tOn=!!G.ext&&!!G.extTax, bOn=!!G.ext&&!!G.extBuild;
+  const months=Math.max(0,Number(sc.constructionMonths)||0);
+  const idc=bOn?total*(G.loan.rate/100)*(months/12)*(Math.min(100,Math.max(0,G.drawdown))/100):0;
+  const totalDebt=total+idc;
+  const baseStaff=personnel(sc.staff);
+  const ptaxBase=G.propertyTaxBase==='construction'?sc.construction:projectCost;
+  const basePtax=ptaxBase*G.fx*G.propertyTax/100;
+  const netRent0=G.vatInclusive?G.rent/(1+G.vat/100):G.rent;
+  const depr=G.depreciation?projectCost/Math.max(1,G.usefulLife):0;
+  /* fix: ROI window never exceeds the model horizon */
+  const roiYears=Math.min(G.roiYears>0?G.roiYears:G.loan.term, G.horizon);
+  const rows=[]; let bal=totalDebt,cum=-projectCost*G.fx,be=null,cash=0,totInt=0,totTax=0,
+    staffY1=0,otherY1=0,ptaxY1=0;
+  let losses=[],lossUsed=0,lossExpired=0; const lossN=Math.max(0,Math.round(G.lossYears||0));
+  for(let y=1;y<=G.horizon;y++){
+    const steps=y<=G.yearsFixed?0:1+Math.floor((y-G.yearsFixed-1)/G.reviewEvery);
+    const pct=Math.min(G.rentAdjustment,G.maxRentIncrease)/100;
+    const rent=netRent0*Math.pow(1+pct,steps);
+    const fx=G.simulateFx?G.fx*Math.pow(1+G.fxDep/100,y-1):G.fx;
+    const occ=occAt(G,y);
+    const free=y===1?Math.max(0,12-G.rentFreeMonths)/12:1;
+    const rental=area*occ/100*rent*12/1e6*free;
+    const oi=G.otherMonthlyIncome*12/1e6*Math.pow(1+G.otherIncomeGrowth/100,y-1);
+    const revenue=(rental+oi)*(1-G.badDebt/100);
+    const staff=baseStaff*Math.pow(1+G.salaryGrowth/100,y-1);
+    let other=0;
+    for(const k of OPEX_KEYS){
+      if(UTIL[k]&&sc.tenantPaid[k])continue;
+      other+=(sc.opex[k]||0)*Math.pow(1+G[INF_OF[k]||'otherOpexInflation']/100,y-1);
+    }
+    const propTax=basePtax*Math.pow(1+G.otherOpexInflation/100,y-1);
+    const opex=staff+other+propTax;
+    const ebitda=revenue-opex;
+    if(y===1){staffY1=staff;otherY1=other;ptaxY1=propTax;}
+    const d=loanYear(bal,y,G.loan,totalDebt); bal=d.closing; totInt+=d.interest;
+    const pre=ebitda-(G.interestDeductible?d.interest*fx:0)-(y<=G.usefulLife?depr*fx:0);
+    let taxable=Math.max(0,pre);
+    if(tOn){
+      if(pre<0){ losses.push({y,amt:-pre}); taxable=0; }
+      else{
+        const keep=[]; for(const l of losses){ if(y-l.y<=lossN) keep.push(l); else lossExpired+=l.amt; }
+        losses=keep; let rem=pre;
+        for(const l of losses){ const u=Math.min(l.amt,rem); l.amt-=u; rem-=u; lossUsed+=u; if(rem<=1e-12) break; }
+        losses=losses.filter(l=>l.amt>1e-12); taxable=rem;
+      }
+    }
+    const taxMnt=taxable*G.cit/100; totTax+=taxMnt/fx;
+    const netCash=ebitda/fx-d.interest-taxMnt/fx-d.principal;
+    if(y<=roiYears)cash+=netCash;
+    const prev=cum; cum+=ebitda;
+    if(be===null&&cum>=0&&ebitda>0)be=y-1+(-prev)/ebitda;
+    rows.push({year:y,fx,occ,rent,revenue,opex,otherY:other,ebitda,ebitdaJpy:ebitda/fx,interest:d.interest,
+      principal:d.principal,payment:d.payment,taxMnt,netCash,cumMnt:cum,cumJpy:cum/fx,balance:bal,
+      lossBal:losses.reduce((a,l)=>a+l.amt,0)});
+  }
+  /* value of the finished property at the end of the ROI window, net of debt still owed (extended model only) */
+  const win=Math.max(1,Math.min(roiYears,rows.length));
+  let assetV=0,debtEnd=0;
+  if(vOn){ const rw=rows[win-1]; assetV=G.landValue*1000*Math.pow(1+(G.valueGrowth||0)/100,win)/rw.fx; debtEnd=rw.balance; }
+  const terminal=vOn?assetV-debtEnd:(G.includeTerminal?projectCost*G.terminalPct/100:0);
+  /* project IRR: cost at start, yearly operating cash after tax, property value in the last year */
+  const t0=bOn?months/12:0, flows=[[0,-projectCost]];
+  rows.slice(0,win).forEach((r,i)=>flows.push([t0+i+1,r.ebitdaJpy-r.taxMnt/r.fx]));
+  flows[flows.length-1][1]+=vOn?assetV:(G.includeTerminal?projectCost*G.terminalPct/100:0);
+  const irr=irrOf(flows);
+  const f=rows[0];
+  let si=rows.findIndex(r=>r.payment>1e-9 && r.occ>=G.occupancy-1e-9 && !(r.year===1&&G.rentFreeMonths>0));
+  if(si<0) si=rows.findIndex(r=>r.payment>1e-9);
+  if(si<0) si=0;
+  const st=rows[si];
+  const cover=st.payment>1e-9?st.ebitdaJpy/st.payment:Infinity;
+  const paying=rows.filter(r=>r.year<=G.loan.term&&r.payment>1e-9);
+  const minCover=paying.length?Math.min(...paying.map(r=>r.ebitdaJpy/r.payment)):Infinity;
+  /* whole-term view: average / worst coverage, and the year cumulative after-tax profit covers every loan payment */
+  const payR=paying, covs=payR.map(r=>r.ebitdaJpy/r.payment);
+  const sumPay=payR.reduce((a,r)=>a+r.payment,0);
+  const avgCover=sumPay>1e-9?payR.reduce((a,r)=>a+r.ebitdaJpy,0)/sumPay:Infinity;
+  const yearsBelow=covs.filter(c=>c<1-1e-9).length;
+  const worstYear=covs.length?payR[covs.indexOf(Math.min(...covs))].year:null;
+  const totPay=rows.reduce((a,r)=>a+r.payment,0);
+  let cumP=0,beReal=null;
+  for(const r of rows){ const pv=cumP; cumP+=r.ebitdaJpy-r.taxMnt/r.fx;
+    if(totPay>1e-9&&beReal===null&&cumP>=totPay) beReal=(r.year-1)+(totPay-pv)/(cumP-pv); }
+  const minOcc=area>0?(st.payment*st.fx+st.opex)/(area*st.rent*12/1e6):NaN;
+  const minRent=area>0&&G.occupancy>0?(st.payment*st.fx+st.opex)/(area*G.occupancy/100*12/1e6)*(G.vatInclusive?1+G.vat/100:1):NaN;
+  return {avgCover,yearsBelow,worstYear,nPay:payR.length,totPay,beReal,cumProfit:cumP,name:sc.name,area,projectCost,total:totalDebt,totalBase:total,idc,months,vOn,tOn,bOn,assetV,debtEnd,win,irr,
+    cashOnly:cash,roiCash:projectCost>0?cash/projectCost:NaN,netWorth:vOn?cash+assetV-debtEnd:NaN,
+    beStart:(bOn&&be!==null)?be+months/12:null,lossUsed,lossExpired,lossOpen:losses.reduce((a,l)=>a+l.amt,0),rows,cover,minCover,stabYear:st.year,st,be,cash15:cash+terminal,
+    terminal,roiYears,roi:projectCost>0?(cash+terminal)/projectCost:NaN,totInt,totTax,minOcc,minRent,y1:f,staffY1,otherY1,ptaxY1,
+    netRent0,ltv:G.landValue>0?totalDebt*G.fx/1e3/G.landValue:NaN,
+    tenants:area*G.occupancy/100/Math.max(1,G.avgTenantArea)};
+}
+
+/* ═════════ FORMAT / STATE ═════════ */
+const nf=(v,d=1)=>Number.isFinite(v)?v.toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d}):'—';
+const pc=(v,d=0)=>Number.isFinite(v)?(v*100).toFixed(d)+'%':'—';
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+/* English hover-text: authors embed "::EN::<english>" inside a ja string; jaAttr splits it
+   into separate data-ja / data-en attributes at markup-build time (no runtime parsing needed) */
+const splitEN=s=>{const i=String(s).indexOf('::EN::'); return i<0?[String(s),'']:[String(s).slice(0,i),String(s).slice(i+6)];};
+const jaAttr=ja=>{const[j,e]=splitEN(ja); return e?`data-ja="${esc(j)}" data-en="${esc(e)}"`:`data-ja="${esc(j)}"`;};
+const J=(mn,ja)=>`<span ${jaAttr(ja)}>${mn}</span>`;
+/* cross-currency hover: wrap a ₮ or ¥ amount so hovering it shows the other currency */
+function mnt(v,d,isM=true){
+  const fx=S.fx;
+  if(!Number.isFinite(v)) return nf(v,d);
+  if(!(fx>0)) return nf(v,d);
+  const tip='≈ '+nf(v/fx,isM?2:0)+(isM?' сая':'')+' ¥';
+  return `<span class="cv" data-cur="${esc(tip)}">${nf(v,d)}</span>`;
+}
+function jpy(v,d,isM=true){
+  const fx=S.fx;
+  if(!Number.isFinite(v)) return nf(v,d);
+  if(!(fx>0)) return nf(v,d);
+  const tip='≈ '+nf(v*fx,isM?1:0)+(isM?' сая':'')+' ₮';
+  return `<span class="cv" data-cur="${esc(tip)}">${nf(v,d)}</span>`;
+}
+/* safety net: catch any inline "N сая ₮/¥" or "N ₮/¥" left as plain text (KPIs, formula live examples,
+   lede/verdict prose) and make those hoverable too, without having to hand-wrap every occurrence */
+const CUR_RE=/(-?[\d][\d,]*(?:\.\d+)?)(\s*сая)?(\s*)(₮|¥)/g;
+function tagCurrency(root){
+  if(!root) return;
+  const fx=S.fx;
+  const walker=document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+    acceptNode(n){
+      const p=n.parentNode;
+      if(!p||!p.closest) return NodeFilter.FILTER_REJECT;
+      const tag=p.nodeName;
+      if(tag==='SCRIPT'||tag==='STYLE'||tag==='OPTION') return NodeFilter.FILTER_REJECT;
+      if(p.closest('.cv')) return NodeFilter.FILTER_REJECT;
+      CUR_RE.lastIndex=0;
+      return CUR_RE.test(n.nodeValue)?NodeFilter.FILTER_ACCEPT:NodeFilter.FILTER_REJECT;
+    }
+  });
+  const nodes=[]; let n; while((n=walker.nextNode())) nodes.push(n);
+  nodes.forEach(node=>{
+    const text=node.nodeValue, frag=document.createDocumentFragment();
+    let last=0,m; CUR_RE.lastIndex=0;
+    while((m=CUR_RE.exec(text))){
+      if(m.index>last) frag.appendChild(document.createTextNode(text.slice(last,m.index)));
+      const num=parseFloat(m[1].replace(/,/g,'')), isM=!!m[2], sym=m[4];
+      const span=document.createElement('span'); span.className='cv';
+      if(Number.isFinite(num)&&fx>0){
+        const tip=sym==='₮'
+          ?'≈ '+nf(num/fx,isM?2:0)+(isM?' сая':'')+' ¥'
+          :'≈ '+nf(num*fx,isM?1:0)+(isM?' сая':'')+' ₮';
+        span.setAttribute('data-cur',tip);
+      }
+      span.textContent=m[0];
+      frag.appendChild(span);
+      last=m.index+m[0].length;
+    }
+    if(last<text.length) frag.appendChild(document.createTextNode(text.slice(last)));
+    node.parentNode.replaceChild(frag,node);
+  });
+}
+function get(p){ if(p==='__allInfl') return S.otherOpexInflation; return p.split('.').reduce((o,k)=>o[k],S); }
+function set(p,v){
+  if(p==='__allInfl'){ INF_ALL.forEach(k=>S[k]=v); return; }
+  const k=p.split('.'),l=k.pop(); k.reduce((o,x)=>o[x],S)[l]=v;
+}
+const CO={navy:'#2F4858',blue:'#8AA4B2',rust:'#B4713D',red:'#9C3D2E',green:'#2E6049',
+  sand:'#C9BFA8',line:'#EBE9E4',mute:'#82858B',ink:'#16181A'};
+
+/* ═════════ TOP STRIP (built once, updated in place) ═════════ */
+const CTRL=[
+  ['Түрээс','賃料（税込・㎡/月）::EN::Monthly rent per m² (incl. VAT)','rent',20000,60000,500,v=>nf(v,0)+' ₮'],
+  ['Дүүргэлт','稼働率::EN::Occupancy rate','occupancy',30,100,.5,v=>nf(v,0)+'%'],
+  ['Зардлын өсөлт','運営費の上昇率（全項目）::EN::Annual increase for all operating costs','__allInfl',0,20,.5,v=>nf(v,1)+'%/жил'],
+  ['Түрээсийн өсөлт','賃料改定率（1回あたり）::EN::Rent step-up per revision','rentAdjustment',0,30,1,
+     v=>nf(v,0)+'%'+(v>S.maxRentIncrease?` (≤${nf(S.maxRentIncrease,0)})`:'')],
+  ['Зээлийн хүү','借入金利::EN::Loan interest rate','loan.rate',0,20,.1,v=>nf(v,1)+'%'],
+  ['Зээлийн хугацаа','借入期間::EN::Loan term','loan.term',5,30,1,v=>v+' жил']
+];
+function buildCtrl(){
+  document.getElementById('ctrl').innerHTML=CTRL.map(([mn,ja,p,mn_,mx,st],i)=>
+    `<div class="c" ${jaAttr(ja)}><div class="top"><span class="lab">${mn}</span><span class="val" id="cv${i}"></span></div>
+      <input type="range" min="${mn_}" max="${mx}" step="${st}" data-p="${p}" data-min="${mn_}" id="cr${i}"></div>`).join('');
+}
+function updateCtrl(){
+  CTRL.forEach(([mn,ja,p,mn_,mx,st,f],i)=>{
+    const v=get(p), r=document.getElementById('cr'+i), t=document.getElementById('cv'+i);
+    if(r&&document.activeElement!==r) r.value=Math.min(mx,Math.max(mn_,v));
+    if(t) t.textContent=f(v);
+  });
+}
+function updateSeg(){
+  document.getElementById('seg').innerHTML=
+    [['A','1 давхар','1階建て（案A）の初期値を読み込む::EN::Load Option A (1 floor) defaults'],
+     ['B','2 давхар','2階建て（案B）の初期値を読み込む::EN::Load Option B (2 floors) defaults']]
+    .map(([k,t,ja])=>`<button data-preset="${k}" ${jaAttr(ja)} class="${S.preset===k?'on':''}">${t}</button>`).join('');
+}
+
+/* ═════════ DRAWER ═════════ */
+const TABS=[['bld','Барилга','建物::EN::Building'],['rent','Түрээс','賃料::EN::Rent'],['cost','Зардал','運営費::EN::Costs'],
+            ['loan','Зээл','借入::EN::Loan'],['tax','Татвар / бусад','税金・その他::EN::Tax / other']];
+/* default to compare against: scenario fields use the loaded preset, everything else uses DEF */
+function baseVal(p){
+  const sc=p.startsWith('sc.');
+  return (sc?p.slice(3):p).split('.').reduce((o,k)=>o==null?undefined:o[k],sc?PRESETS[S.base||'B']:DEF);
+}
+const isChanged=p=>JSON.stringify(get(p))!==JSON.stringify(baseVal(p));
+const RS='<button class="rs" data-reset-btn data-ja="初期値に戻す" data-en="Reset to default">↺</button>';
+function fn(mn,ja,p,st,min,cls){
+  const m=min===undefined?0:min;
+  return `<div class="f${isChanged(p)?' chg':''}${cls?' '+cls:''}"><label ${jaAttr(ja)}>${mn}</label>
+    <input type="number" step="${st||1}" ${m!==null?`min="${m}" data-min="${m}"`:''} value="${get(p)}" data-p="${p}">${RS}</div>`;
+}
+function ft(mn,ja,p){
+  return `<div class="f${isChanged(p)?' chg':''}"><label ${jaAttr(ja)}>${mn}</label>
+    <label class="sw"><input type="checkbox" ${get(p)?'checked':''} data-p="${p}"><i></i></label>${RS}</div>`;
+}
+function fsel(mn,ja,p,o){
+  return `<div class="f${isChanged(p)?' chg':''}"><label ${jaAttr(ja)}>${mn}</label><select data-p="${p}">${
+    o.map(([v,t])=>`<option value="${v}">${t}</option>`).join('')}</select>${RS}</div>`;
+}
+function ftxt(mn,ja,p){
+  return `<div class="f"><label ${jaAttr(ja)}>${mn}</label><input type="text" value="${esc(get(p))}" data-t="${p}"><span class="rs"></span></div>`;
+}
+function markChanged(){
+  let n=0;
+  document.querySelectorAll('#pbody .f').forEach(f=>{
+    const el=f.querySelector('[data-p]'); if(!el) return;
+    const c=isChanged(el.dataset.p); f.classList.toggle('chg',c); if(c) n++;
+  });
+  const b=document.getElementById('chgCount'); if(b) b.textContent=n?n+' өөрчлөлт':'';
+}
+const grp=(mn,ja,body)=>`<div class="grp"><h4 ${jaAttr(ja)}>${mn}</h4>${body}</div>`;
+const live=k=>`<span data-live="${k}"></span>`;
+
+function drawTabs(){
+  document.getElementById('ptabs').innerHTML=TABS.map(([k,mn,ja])=>
+    `<button data-tab="${k}" ${jaAttr(ja)} class="${activeTab===k?'on':''}">${mn}</button>`).join('');
+}
+function drawAdv(){
+  const sc=S.sc;
+  const staff=sc.staff.map((r,i)=>`<div class="stf">
+    <div class="r"><input type="text" value="${esc(r.name)}" data-t="sc.staff.${i}.name" style="flex:1;height:30px;border:1px solid var(--line);border-radius:7px;padding:0 9px;font:inherit;font-size:12.8px">
+      <button class="xb" data-sd="${i}" data-ja="この職種を削除" data-en="Remove this role">×</button></div>
+    ${fn('Ажилтны тоо','人数::EN::Head count',`sc.staff.${i}.count`,1)}
+    ${fn('Сарын цалин ₮','月給（₮）::EN::Monthly salary (₮)',`sc.staff.${i}.salary`,50000)}
+    ${fn('Ажил олгогчийн шимтгэл %','事業主負担（社会保険等）%::EN::Employer social contributions %',`sc.staff.${i}.burden`,.5)}
+    ${fn('Урамшуулал · сар','賞与（月数）::EN::Bonus, in months of salary',`sc.staff.${i}.bonusMonths`,.5)}</div>`).join('');
+
+  const panes={
+  bld:`
+    ${grp('Эхлэх загвар','初期値の選択::EN::Choose a starting scenario',`
+      <div class="preset">
+        <button data-preset="A" class="${S.preset==='A'?'on':''}" data-ja="1階建て・600㎡・建設費5,500万円（案A）の初期値" data-en="Option A defaults: 1 floor, 600 m², ¥55 million build cost"><b>1 давхар</b><span>600 м² · 55 сая ¥</span></button>
+        <button data-preset="B" class="${S.preset==='B'?'on':''}" data-ja="2階建て・1,050㎡・建設費9,000万円（案B）の初期値" data-en="Option B defaults: 2 floors, 1,050 m², ¥90 million build cost"><b>2 давхар</b><span>1,050 м² · 90 сая ¥</span></button>
+      </div>
+      <div class="note" data-ja="建物・建設費・人件費・運営費が案A／案Bの値に置き換わります。賃料や金利などの共通条件は変わりません。" data-en="Replaces building, cost, staff and operating costs with Option A/B values. Shared inputs like rent and rate are untouched.">
+        Барилга, өртөг, ажилтан, зардлыг тухайн хувилбарын утгаар солино. Түрээс, хүү зэрэг нийтлэг нөхцөл өөрчлөгдөхгүй.</div>`)}
+    ${grp('Барилга','建物::EN::Building',`
+      ${ftxt('Нэр','シナリオ名::EN::Scenario name','sc.name')}
+      ${fn('1 давхрын талбай м²','1階の面積（㎡）::EN::Ground-floor area (m²)','sc.ground',10)}
+      ${fn('2 давхрын талбай м²','2階の面積（㎡）（0＝1階建て）::EN::2nd-floor area (m²) — 0 = single-storey','sc.second',10)}
+      <div class="note" data-ja="階数と賃貸可能面積の合計は、上記の面積から自動的に計算されます（編集不可）。" data-en="Floor count and total rentable area are computed automatically from the areas above (read-only).">${live('area')}</div>
+      ${fn('Түрээслэх хувь %','賃貸比率（共用部を除く）%::EN::Share of floor area that is leasable, net of common space','rentablePct',.5)}
+      ${fn('Барилга барих хугацаа · сар<span class="reftag"> (лавлагаа)</span>','工期（月）。拡張モデルの「工期を期間に含める」をオンにした場合のみ計算に使われ、オフのときは参考情報です。::EN::Construction period in months. Used only when Extended model > Build period is on; otherwise reference only.','sc.constructionMonths',1,0,'ref')}
+      ${fn('Ашиглалтад орох он (лавлагаа)','開業年。年次スケジュール表の暦年表示にのみ使われ、収益・返済などの試算結果には影響しません。::EN::Opening year. Only labels the calendar years in the schedule; no effect on results.','sc.openingYear',1,2000,'ref')}`)}
+    ${grp('Хөрөнгө оруулалт','投資額::EN::Investment',`
+      ${fn('Барилгын өртөг · сая ¥','建設費（百万円）::EN::Construction cost, ¥ million','sc.construction',1)}
+      ${fn('Нөөц зардал %','予備費 %::EN::Contingency %','sc.contingency',1)}
+      ${fn('Дотор засал · сая ¥','内装工事（百万円）::EN::Fit-out, ¥ million','sc.fitout',1)}
+      ${fn('Тоног төхөөрөмж · сая ¥','設備・ラック（百万円）::EN::Equipment / racking, ¥ million','sc.equipment',1)}
+      <div class="note">${live('pcost')}</div>`)}`,
+  rent:`
+    ${grp('Түрээс','賃料::EN::Rent',`
+      ${fn('Нийт түрээс ₮/м²/сар','賃料（₮/㎡/月）::EN::Headline rent, ₮/m²/month','rent',500)}
+      ${ft('Түрээс НӨАТ багтсан','賃料にVATを含む::EN::Rent includes VAT','vatInclusive')}
+      ${fn('НӨАТ %','VAT（付加価値税）%::EN::VAT %','vat',.5)}
+      ${fn('Бусад орлого ₮/сар','その他収入（₮/月）::EN::Other income, ₮/month','otherMonthlyIncome',10000)}
+      ${fn('Бусад орлогын өсөлт %','その他収入の伸び率 %::EN::Growth rate of other income %','otherIncomeGrowth',.5,-50)}
+      ${fn('Төлөгдөхгүй эрсдэл %','貸倒れ引当 %::EN::Bad-debt allowance %','badDebt',.5)}
+      <div class="note">${live('netrent')}</div>`)}
+    ${grp('Түрээсийн шинэчлэл','賃料改定::EN::Rent reviews',`
+      ${fn('Үнэ тогтмол байх жил','賃料据置期間（年）::EN::Years before the first rent review','yearsFixed',1)}
+      ${fn('Шинэчлэх давтамж · жил','改定間隔（年）::EN::Years between reviews','reviewEvery',1,1)}
+      ${fn('Нэг удаагийн өсөлт %','1回あたりの改定率 %::EN::Increase per review %','rentAdjustment',.5)}
+      ${fn('Дээд хязгаар %','1回あたりの上限 %::EN::Cap per review %','maxRentIncrease',.5)}
+      <div class="note">${live('effstep')}</div>`)}
+    ${grp('Дүүргэлт ба түрээслэлт','稼働率とリースアップ::EN::Occupancy & lease-up',`
+      ${fn('Тогтвортой дүүргэлт %','安定時の稼働率 %::EN::Stabilized occupancy %','occupancy',.5)}
+      ${fn('Дүүргэх хугацаа · жил','リースアップ期間（年）::EN::Lease-up period, years','rampYears',1)}
+      ${fn('1 дэх жилийн дүүргэлт %','初年度の稼働率 %::EN::Year-1 occupancy %','rampStart',.5)}
+      ${fn('Түрээсгүй сар · 1 дэх жил','フリーレント（初年度の月数）::EN::Free-rent months in year 1','rentFreeMonths',1)}
+      ${fn('Нэг түрээслэгчийн талбай м²','1テナントあたりの面積（㎡）::EN::Average area per tenant (m²)','avgTenantArea',5,1)}
+      <div class="note">${live('ramp')}</div>`)}`,
+  cost:`
+    ${grp('Ажиллах хүч','人員::EN::Staff',`${staff}
+      <button class="addb" id="addS" data-ja="職種を追加" data-en="Add a role">+ Ажлын байр нэмэх</button>
+      <div class="note">${live('staff')}</div>`)}
+    ${grp('Үйл ажиллагааны зардал · сая ₮/жил','運営費（百万₮/年）::EN::Operating costs, ₮ million/year',
+      OPEX_KEYS.filter(k=>!UTIL[k]).map(k=>fn(OPEX_LBL[k][0],OPEX_LBL[k][1]+'（百万₮/年）::EN::'+OPEX_LBL[k][2]+', ₮ million/year',`sc.opex.${k}`,.1)).join(''))}
+    ${grp('Ашиглалтын зардал · сая ₮/жил','光熱費（百万₮/年）::EN::Utilities, ₮ million/year',`
+      ${OPEX_KEYS.filter(k=>UTIL[k]).map(k=>fn(OPEX_LBL[k][0],OPEX_LBL[k][1]+'（百万₮/年）::EN::'+OPEX_LBL[k][2]+', ₮ million/year',`sc.opex.${k}`,.1)).join('')}
+      ${ft('Халаалтыг түрээслэгч төлнө','暖房費はテナント負担::EN::Heating paid by tenant','sc.tenantPaid.heating')}
+      ${ft('Цахилгааныг түрээслэгч төлнө','電気代はテナント負担::EN::Electricity paid by tenant','sc.tenantPaid.electricity')}
+      ${ft('Усыг түрээслэгч төлнө','水道代はテナント負担::EN::Water paid by tenant','sc.tenantPaid.water')}`)}
+    ${grp('Жилийн өсөлт · %','年間上昇率 %::EN::Annual increase %',`
+      ${fn('Цалингийн өсөлт','給与の上昇率::EN::Salary growth','salaryGrowth',.5,-20)}
+      ${fn('Засвар үйлчилгээ','維持管理費の上昇率::EN::Maintenance cost growth','maintenanceInflation',.5,-20)}
+      ${fn('Даатгал','保険料の上昇率::EN::Insurance cost growth','insuranceInflation',.5,-20)}
+      ${fn('Маркетинг','マーケティング費の上昇率::EN::Marketing cost growth','marketingInflation',.5,-20)}
+      ${fn('Ашиглалт','光熱費の上昇率::EN::Utilities cost growth','utilitiesInflation',.5,-20)}
+      ${fn('Бусад бүх зардал','その他費用・固定資産税の上昇率::EN::Growth for all other costs & property tax','otherOpexInflation',.5,-20)}`)}`,
+  loan:`
+    ${grp('Зээл','借入::EN::Loan',`
+      ${fn('Зээлийн хэмжээ · сая ¥','借入額（百万円）::EN::Loan amount, ¥ million','sc.loanAmount',1)}
+      ${fn('Хүү %','金利 %::EN::Interest rate %','loan.rate',.1)}
+      ${fn('Хугацаа · жил','期間（年）::EN::Term, years','loan.term',1,1)}
+      ${fn('Төлбөр эхлэх жил','返済開始年（何年目）::EN::Year repayments start','loan.startYear',1,1)}
+      ${fn('Хөнгөлөлттэй хугацаа · жил','据置期間（返済なし・年）::EN::Grace period, no payments (years)','loan.graceYears',1)}
+      ${fn('Зөвхөн хүү төлөх · жил','利息のみ支払う期間（年）::EN::Interest-only period (years)','loan.interestOnlyYears',1)}
+      ${fn('Шимтгэл %','融資手数料 %::EN::Loan fee %','loan.fee',.1)}
+      ${fn('Эцсийн төлбөр · сая ¥','最終回一括返済（百万円）::EN::Final balloon payment, ¥ million','loan.balloon',1)}
+      ${fsel('Төлбөрийн хэлбэр','返済方法::EN::Repayment method','loan.method',
+        [['annuity','Тэнцүү төлбөр'],['equalPrincipal','Тэнцүү үндсэн'],['bullet','Эцэст нь бүтэн']])}`)}
+    ${grp('Валют','為替::EN::FX',`
+      ${fn('Ханш ₮ / 1 ¥','為替レート（1円あたり₮）::EN::Exchange rate, ₮ per ¥','fx',.1)}
+      ${ft('Төгрөгийн сулралыг тооцох','トゥグルグ安を織り込む::EN::Model tögrög depreciation','simulateFx')}
+      ${fn('Ханшийн сулрал %/жил','トゥグルグの年間下落率 %::EN::Tögrög annual depreciation %','fxDep',.5,-20)}
+      <div class="note">${live('fx')}</div>`)}`,
+  tax:`
+    ${grp('Татвар','税金::EN::Tax',`
+      ${fn('Аж ахуйн нэгжийн татвар %','法人所得税 %::EN::Corporate income tax %','cit',.5)}
+      ${fn('Үл хөдлөхийн татвар %','固定資産税 %::EN::Property tax %','propertyTax',.05)}
+      ${fsel('Татварын суурь','固定資産税の課税標準::EN::Property-tax base','propertyTaxBase',[['construction','Барилгын өртөг'],['project','Нийт өртөг']])}
+      ${ft('Хүүг татвараас хасна','支払利息を損金算入する::EN::Interest is tax-deductible','interestDeductible')}
+      ${ft('Элэгдэл тооцох','減価償却を計上する::EN::Apply depreciation','depreciation')}
+      ${fn('Ашиглалтын хугацаа · жил','耐用年数（年）::EN::Useful life, years','usefulLife',1,1)}`)}
+    ${grp('Загвар ба үр дүн','モデル設定と出力::EN::Model settings & output',`
+      ${fn('Тооцооны хугацаа · жил','試算期間（年）::EN::Model horizon, years','horizon',1,1)}
+      ${fn('Өгөөж тооцох жил (0 = зээлийн хугацаа)','ROI算定年数（0＝借入期間）::EN::ROI window in years (0 = loan term)','roiYears',1)}
+      ${ft('Барилгын үнийг өгөөжид оруулах','建物の残存価値をROIに含める::EN::Include residual building value in ROI','includeTerminal')}
+      ${fn('Үлдэх өртгийн хувь %','残存価値の割合 %::EN::Residual value, % of cost','terminalPct',5)}
+      ${fn('Мэдрэмжийн эхлэл ₮','感応度表の開始賃料（₮）::EN::Sensitivity table starting rent (₮)','sensMin',1000)}
+      ${fn('Мэдрэмжийн алхам ₮','感応度表の刻み（₮）::EN::Sensitivity table step (₮)','sensStep',1000,1)}`)}
+    ${grp('Өргөтгөсөн тооцоо','拡張モデル::EN::Extended model',`
+      ${fn('Баригдсаны дараах үнэлгээ · тэрбум ₮','完成後の不動産評価額（十億₮）。担保掛目（LTV）の計算に使われ、下の「不動産価値」をオンにすると収益にも反映されます。使われない土地は国に返還され現時点の価値はないため、建物完成後に初めて価値が生じる想定です。未確定の数値なので自由に変更できます。::EN::Property value once built, ₮ billion. Used for the loan-to-value ratio, and for returns when Property value is on. The land is worth nothing today, so value exists only after completion. Unconfirmed, so adjust freely.','landValue',.1)}
+      ${ft('Өргөтгөсөн тооцоог идэвхжүүлэх','拡張モデルを有効にします。オフのときは基本モデルで、結果はExcelモデルと完全に一致します。オンにすると下の3つの追加設定が使えます。::EN::Turn on the extended model. Off = the basic model, identical to the Excel. On = the three extra settings below become available.','ext')}
+      <div id="extBox" class="${S.ext?'':'hid'}">
+        <div class="xs ${S.extValue?'':'off'}" data-xsub="extValue">
+          ${ft('Үл хөдлөхийн үнэлгээг өгөөжид оруулах','完成後の不動産価値を収益に含めます。評価時点で未返済の借入残高を差し引いて加算し、「残存価値」の設定より優先されます。::EN::Add the completed property value to returns, minus any loan still owed at that date. Overrides the residual-value setting.','extValue')}
+          ${fn('Үнэлгээний жилийн өсөлт %','不動産価値の年間上昇率 %::EN::Property value growth per year %','valueGrowth',.5,-20)}
+          <div class="note">${live('xval')}</div>
+        </div>
+        <div class="xs ${S.extTax?'':'off'}" data-xsub="extTax">
+          ${ft('Татварын алдагдлыг шилжүүлэх','欠損金の繰越控除。赤字の年の損失を翌年以降の課税所得から差し引きます。赤字の年に税金がかからない点は基本モデルと同じです。::EN::Carry tax losses forward against later taxable profit. A loss year already pays no tax in the basic model.','extTax')}
+          ${fn('Шилжүүлэх хугацаа · жил','繰越期間（年）。未確認の仮の値です。::EN::Carry-forward period in years. Unverified placeholder.','lossYears',1)}
+          <div class="note">${live('xtax')}</div>
+        </div>
+        <div class="xs ${S.extBuild?'':'off'}" data-xsub="extBuild">
+          ${ft('Барилга барих хугацааг тооцох','工期を期間に含めます。「0年目（建設期間）」を追加し、建設中の金利を借入に上乗せします。回収年数は着工時点からも表示します。::EN::Count the build period in the timeline. Adds a Year 0; interest during construction is added to the loan. Payback is also shown from construction start.','extBuild')}
+          ${fn('Барилгын үед татсан зээлийн дундаж %','建設期間中の平均借入引出率 %。段階的に引き出す場合の平均残高の割合です。::EN::Average share of the loan drawn during the build %, for staged drawdowns.','drawdown',5)}
+          <div class="note">${live('xbuild')}</div>
+        </div>
+      </div>`)}`
+  };
+  document.getElementById('pbody').innerHTML='<div id="dWarn"></div>'+TABS.map(([k])=>
+    `<div class="pane ${activeTab===k?'on':''}" data-pane="${k}">${panes[k]}</div>`).join('');
+  document.querySelectorAll('#pbody select[data-p]').forEach(el=>el.value=get(el.dataset.p));
+  updateLive();
+}
+function updateLive(){
+  const sc=S.sc, pcost=sc.construction*(1+sc.contingency/100)+sc.fitout+sc.equipment;
+  const area=(sc.ground+sc.second)*S.rentablePct/100;
+  const eff=Math.pow(1+Math.min(S.rentAdjustment,S.maxRentIncrease)/100,1/Math.max(1,S.reviewEvery))*100-100;
+  const L={
+    area:`<b>${sc.second>0?2:1} давхар</b> · ${nf(sc.ground,0)} + ${nf(sc.second,0)} = <b>${nf(sc.ground+sc.second,0)} м²</b> · түрээслэх ${nf(S.rentablePct,0)}% → <b>${nf(area,0)} м²</b>`,
+    xval:S.ext&&S.extValue&&lastModel?`${nf(S.landValue,1)} тэрбум ₮ × (1 + ${nf(S.valueGrowth,1)}%)^${lastModel.win} ÷ ${nf(lastModel.rows[lastModel.win-1].fx,1)} ₮/¥ (${lastModel.win} дэх жилийн ханш) = <b>${nf(lastModel.assetV,1)} сая ¥</b><br>− үлдсэн зээл <b>${nf(lastModel.debtEnd,1)}</b> = цэвэр <b>${nf(lastModel.assetV-lastModel.debtEnd,1)} сая ¥</b> (${lastModel.win} дэх жилд)`:'Идэвхгүй',
+    xtax:S.ext&&S.extTax&&lastModel?`Ашигласан алдагдал <b>${nf(lastModel.lossUsed,2)} сая ₮</b> · хугацаа дууссан ${nf(lastModel.lossExpired,2)} · үлдсэн ${nf(lastModel.lossOpen,2)}`:'Идэвхгүй',
+    xbuild:S.ext&&S.extBuild&&lastModel?`Барилга <b>${nf(lastModel.months,0)} сар</b> (Барилга табаас) → барилгын хүү <b>+${nf(lastModel.idc,2)} сая ¥</b> зээлд нэмэгдэнэ`:'Идэвхгүй',
+    pcost:`Нийт өртөг <b>${nf(pcost,1)} сая ¥</b> · <b>${nf(pcost*1e6/Math.max(1,area),0)} ¥</b>/м² · түрээслэх <b>${nf(area,0)} м²</b>`,
+    netrent:`Цэвэр түрээс <b>${nf(S.vatInclusive?S.rent/(1+S.vat/100):S.rent,0)} ₮/м²/сар</b>`,
+    effstep:`Бодит өсөлт <b>${nf(eff,2)}%/жил</b> · зардлын өсөлт <b>${nf(S.otherOpexInflation,1)}%/жил</b>`,
+    ramp:S.rampYears>0?`<b>${nf(S.rampStart,0)}%</b> → <b>${nf(S.occupancy,0)}%</b> хүртэл ${S.rampYears} жилд`
+                      :`Эхнээсээ <b>${nf(S.occupancy,0)}%</b> дүүргэлттэй`,
+    staff:`1 дэх жилийн цалингийн зардал <b>${nf(personnel(sc.staff),2)} сая ₮</b>`,
+    fx:S.simulateFx?`${S.horizon} дэх жилийн ханш <b>${nf(S.fx*Math.pow(1+S.fxDep/100,S.horizon-1),1)} ₮/¥</b>`
+                   :`Ханш тогтмол <b>${nf(S.fx,1)} ₮/¥</b>`
+  };
+  document.querySelectorAll('[data-live]').forEach(el=>{ if(L[el.dataset.live]!==undefined) el.innerHTML=L[el.dataset.live]; });
+  const eb=document.getElementById('extBox'); if(eb) eb.classList.toggle('hid',!S.ext);
+  document.querySelectorAll('#pbody [data-xsub]').forEach(x=>x.classList.toggle('off',!S[x.dataset.xsub]));
+  const cm=document.querySelector('#pbody [data-p="sc.constructionMonths"]'); if(cm) cm.closest('.f').classList.toggle('ref',!(S.ext&&S.extBuild));
+  const dw=document.getElementById('dWarn'); if(dw&&lastModel) dw.innerHTML=warnHtml(getWarnings(lastModel));
+  markChanged();
+  document.querySelectorAll('#pbody .preset button').forEach(b=>b.classList.toggle('on',b.dataset.preset===S.preset));
+}
+
+/* ═════════ VALIDATION NOTES (shown above the results and at the top of the drawer) ═════════ */
+let lastModel=null;
+function getWarnings(m){
+  const W=[], G=S, L=S.loan, io=Math.max(L.graceYears,L.interestOnlyYears);
+  const add=(lvl,mn,ja,en)=>W.push({lvl,mn,ja,en});
+  if(!(G.fx>0)) add('err','Ханш 0 эсвэл сөрөг байна — иенээр хөрвүүлэх боломжгүй.','為替レートが0以下のため、円換算ができません。','Exchange rate is 0 or negative, so yen figures cannot be computed.');
+  if(!(m.area>0)) add('err','Түрээслэх талбай 0 байна — 1 эсвэл 2 давхрын талбай, түрээслэх хувийг шалгана уу.','賃貸面積が0です。1階・2階の面積と賃貸比率を確認してください。','Rentable area is 0. Check the floor areas and the leasable share.');
+  if(G.occupancy>100||G.rampStart>100) add('err','Дүүргэлт 100%-иас хэтэрсэн байна.','稼働率が100%を超えています。','Occupancy is above 100%.');
+  if(io>=L.term) add('err','Хөнгөлөлттэй болон зөвхөн хүү төлөх хугацаа зээлийн хугацаатай тэнцүү эсвэл урт тул үндсэн өр төлөгдөхгүй.','据置期間（または利息のみ期間）が借入期間以上のため、元本が返済されません。','Grace / interest-only years are not shorter than the loan term, so principal is never repaid.');
+  if(L.startYear>G.horizon) add('err','Төлбөр эхлэх жил тооцооны хугацаанаас хэтэрсэн — зээл огт төлөгдөхгүй.','返済開始年が試算期間を超えているため、返済が発生しません。','Repayments start after the model horizon, so no repayment is modelled.');
+  if(L.term>G.horizon) add('warn','Зээлийн хугацаа ('+L.term+' жил) тооцооны хугацаанаас ('+G.horizon+' жил) урт — сүүлийн жилүүд тооцоонд ороогүй.','借入期間が試算期間より長いため、後半の返済は計算に含まれません。','Loan term is longer than the model horizon, so later repayments are not modelled.');
+  if(G.rentAdjustment>G.maxRentIncrease) add('warn','Нэг удаагийн өсөлт ('+nf(G.rentAdjustment,1)+'%) дээд хязгаараас ('+nf(G.maxRentIncrease,1)+'%) өндөр тул '+nf(G.maxRentIncrease,1)+'% хэрэглэнэ.','1回あたりの改定率が上限を超えているため、上限値が適用されます。','Rent step-up is above the cap, so the cap is applied.');
+  if(G.rampYears>0&&G.rampStart>G.occupancy) add('warn','Эхний жилийн дүүргэлт тогтвортой дүүргэлтээс өндөр — дүүргэлт жил бүр буурна.','初年度の稼働率が安定時より高いため、稼働率は低下していきます。','Year-1 occupancy is higher than stabilized occupancy, so occupancy falls over time.');
+  if(G.rentFreeMonths>12) add('warn','Түрээсгүй сар 12-оос их — илүү сар дараагийн жилд шилжихгүй, 1 дэх жилийн орлого 0 болно.','フリーレントが12か月を超えています。超過分は翌年に繰り越されず、初年度売上は0になります。','Free-rent months exceed 12. The excess does not carry into year 2; year-1 rental revenue is 0.');
+  if(m.totalBase>m.projectCost+1e-9) add('warn','Зээл ('+nf(m.totalBase,1)+' сая ¥) төслийн өртгөөс ('+nf(m.projectCost,1)+' сая ¥) их байна.','借入額が総事業費を上回っています。','The loan is larger than the total project cost.');
+  if(L.balloon>G.sc.loanAmount) add('warn','Эцсийн нэг удаагийн төлбөр зээлийн дүнгээс их байна.','最終回一括返済額が借入額を上回っています。','The balloon payment is larger than the loan amount.');
+  if(G.roiYears>G.horizon) add('warn','Өгөөж тооцох жил тооцооны хугацаанаас урт тул '+G.horizon+' жил хэрэглэнэ.','ROI算定年数が試算期間を超えているため、試算期間で計算します。','ROI window is longer than the model horizon, so the horizon is used.');
+  if(m.rows.some(r=>r.ebitda>6000)) add('warn','Татвар ногдох орлого 6 тэрбум ₮-өөс хэтэрч магадгүй — 10%-ийн хувь хамаарахгүй байж болно (Excel загварын тэмдэглэл).','課税所得が60億₮を超える可能性があります。10%の税率が適用されない場合があります（Excelモデルの注記）。','Taxable income may exceed ₮6 billion, where the 10% rate may not apply (per the Excel model note).');
+  if(G.ext&&G.extValue&&!(G.landValue>0)) add('warn','Үл хөдлөхийн үнэлгээ 0 байна — үнэлгээг өгөөжид оруулах сонголт нөлөөгүй.','不動産評価額が0のため、「不動産価値」の設定は結果に影響しません。','Property value is 0, so the Property value setting has no effect.');
+  if(G.ext&&G.extValue&&G.includeTerminal) add('warn','«Барилгын үнийг өгөөжид оруулах» нь үнэлгээ асаалттай үед хэрэглэгдэхгүй.','「不動産価値」がオンの間は、「残存価値をROIに含める」設定は使われません。','The residual-value setting is ignored while Property value is on.');
+  if(G.ext&&G.extTax&&!(G.lossYears>=1)) add('warn','Шилжүүлэх хугацаа 0 жил — алдагдал шилжихгүй.','繰越期間が0年のため、損失は繰り越されません。','Carry-forward period is 0 years, so no loss is carried.');
+  if(G.ext&&G.extBuild&&!(m.months>0)) add('warn','Барилга барих хугацаа 0 сар — барилга барих хугацаа нөлөөгүй.','工期が0か月のため、工期の設定は結果に影響しません。','Build period is 0 months, so it has no effect.');
+  return W;
+}
+const warnHtml=ws=>ws.length?`<div class="warns">${ws.map(w=>
+  `<div class="wn ${w.lvl}" ${jaAttr(w.ja+'::EN::'+w.en)}><b>${w.lvl==='err'?'!':'△'}</b>${w.mn}</div>`).join('')}</div>`:'';
+function openDrawer(){ drawerOpen=true; drawTabs(); drawAdv();
+  document.getElementById('drawer').classList.add('open'); document.body.classList.add('noscroll');
+  document.getElementById('drawer').setAttribute('aria-hidden','false'); }
+function closeDrawer(){ drawerOpen=false;
+  document.getElementById('drawer').classList.remove('open'); document.body.classList.remove('noscroll');
+  document.getElementById('drawer').setAttribute('aria-hidden','true'); hideTip(); }
+function loadPreset(k){
+  S.sc=clone(PRESETS[k]); S.preset=k; S.base=k;
+  if(drawerOpen){ const sc=document.getElementById('pbody').scrollTop; drawAdv(); document.getElementById('pbody').scrollTop=sc; }
+  render();
+}
+
+/* ═════════ CHARTS ═════════ */
+function grid(w,h,p,yt,fy){
+  return yt.map(t=>`<line x1="${p.l}" y1="${t.y}" x2="${w-p.r}" y2="${t.y}" stroke="${CO.line}"/>
+    <text x="${p.l-10}" y="${t.y+4}" text-anchor="end" font-size="11" fill="${CO.mute}">${fy(t.v)}</text>`).join('');
+}
+const ticks=(a,b,n)=>Array.from({length:n+1},(_,i)=>a+(b-a)*i/n);
+const sensRents=()=>Array.from({length:6},(_,i)=>Math.max(0,S.sensMin)+i*Math.max(1,S.sensStep));
+
+function figCum(m100,mCur,label){
+  const w=920,h=290,p={l:60,r:14,t:20,b:34};
+  const n=Math.min(S.loan.term,S.horizon,m100.rows.length);
+  const a=m100.rows.slice(0,n).map(r=>r.cumJpy), b=mCur.rows.slice(0,n).map(r=>r.cumJpy);
+  const max=Math.max(0,...a,...b)*1.12, min=Math.min(0,...a,...b)*1.1;
+  const X=i=>p.l+(w-p.l-p.r)*(i+.5)/n, Y=v=>h-p.b-(v-min)/((max-min)||1)*(h-p.t-p.b);
+  const bw=(w-p.l-p.r)/n*.33;
+  let g=grid(w,h,p,ticks(min,max,4).map(v=>({v,y:Y(v)})),v=>nf(v,0));
+  for(let i=0;i<n;i+=2)g+=`<text x="${X(i)}" y="${h-p.b+17}" text-anchor="middle" font-size="11" fill="${CO.mute}">${i+1}</text>`;
+  a.forEach((v,i)=>{const y0=Y(0),y1=Y(v);
+    g+=`<rect x="${X(i)-bw*1.05}" y="${Math.min(y0,y1)}" width="${bw}" height="${Math.abs(y1-y0)}" rx="1.5" fill="${CO.navy}"/>`;});
+  b.forEach((v,i)=>{const y0=Y(0),y1=Y(v);
+    g+=`<rect x="${X(i)+bw*.05}" y="${Math.min(y0,y1)}" width="${bw}" height="${Math.abs(y1-y0)}" rx="1.5" fill="${CO.blue}"/>`;});
+  g+=`<line x1="${p.l}" y1="${Y(0)}" x2="${w-p.r}" y2="${Y(0)}" stroke="${CO.ink}" stroke-width="1.2"/>`;
+  [[m100.be,CO.navy,-bw*.55,.9],[mCur.be,CO.blue,bw*.55,.62]].forEach(([be,c,off,t])=>{
+    if(be&&be<=n){const x=p.l+(w-p.l-p.r)*(be-.5)/n+off;
+      g+=`<line x1="${x}" y1="${Y(0)}" x2="${x}" y2="${Y(max*t)}" stroke="${c}" stroke-width="1.2" stroke-dasharray="3 3"/>
+        <text x="${x}" y="${Y(max*t)-6}" text-anchor="middle" font-size="11.5" font-weight="700" fill="${c}">${be.toFixed(1)} жил</text>`;}
+  });
+  return `<svg viewBox="0 0 ${w} ${h}">${g}</svg>
+    <div class="lg"><span data-ja="稼働率100%" data-en="100% occupancy"><i style="background:${CO.navy}"></i>100% дүүрэн</span>
+    <span data-ja="現在の稼働率" data-en="Current occupancy"><i style="background:${CO.blue}"></i>${nf(S.occupancy,0)}% дүүрэн</span>
+    <span style="color:${CO.mute}" data-ja="百万円。ゼロを上回ると建設費を回収済み" data-en="¥ million. Above zero means the build cost is recovered">${label} · сая ¥ · тэгээс дээш гарвал өртөг нөхөгдөнө</span></div>`;
+}
+function figReal(m100,mCur,label){
+  if(mCur.totPay<=1e-9) return `<div class="figcap" data-ja="借入がないため、この図は該当しません" data-en="No loan, so this chart does not apply">Зээлгүй тул энэ график хамаарахгүй.</div>`;
+  const w=920,h=290,p={l:60,r:14,t:20,b:34};
+  const n=Math.min(S.horizon,mCur.rows.length,m100.rows.length);
+  const ser=m=>{let c=0; return m.rows.slice(0,n).map(r=>{ c+=r.ebitdaJpy-r.taxMnt/r.fx; return c-m.totPay; });};
+  const a=ser(m100), b=ser(mCur);
+  const max=Math.max(0,...a,...b)*1.12, min=Math.min(0,...a,...b)*1.1;
+  const X=i=>p.l+(w-p.l-p.r)*(i+.5)/n, Y=v=>h-p.b-(v-min)/((max-min)||1)*(h-p.t-p.b);
+  const bw=(w-p.l-p.r)/n*.33;
+  let g=grid(w,h,p,ticks(min,max,4).map(v=>({v,y:Y(v)})),v=>nf(v,0));
+  for(let i=0;i<n;i+=2)g+=`<text x="${X(i)}" y="${h-p.b+17}" text-anchor="middle" font-size="11" fill="${CO.mute}">${i+1}</text>`;
+  a.forEach((v,i)=>{const y0=Y(0),y1=Y(v);
+    g+=`<rect x="${X(i)-bw*1.05}" y="${Math.min(y0,y1)}" width="${bw}" height="${Math.abs(y1-y0)}" rx="1.5" fill="${CO.navy}"/>`;});
+  b.forEach((v,i)=>{const y0=Y(0),y1=Y(v);
+    g+=`<rect x="${X(i)+bw*.05}" y="${Math.min(y0,y1)}" width="${bw}" height="${Math.abs(y1-y0)}" rx="1.5" fill="${CO.blue}"/>`;});
+  g+=`<line x1="${p.l}" y1="${Y(0)}" x2="${w-p.r}" y2="${Y(0)}" stroke="${CO.ink}" stroke-width="1.2"/>`;
+  [[m100.beReal,CO.navy,-bw*.55,.9],[mCur.beReal,CO.blue,bw*.55,.62]].forEach(([be,c,off,t])=>{
+    if(be&&be<=n){const x=p.l+(w-p.l-p.r)*(be-.5)/n+off;
+      g+=`<line x1="${x}" y1="${Y(0)}" x2="${x}" y2="${Y(max*t)}" stroke="${c}" stroke-width="1.2" stroke-dasharray="3 3"/>
+        <text x="${x}" y="${Y(max*t)-6}" text-anchor="middle" font-size="11.5" font-weight="700" fill="${c}">${be.toFixed(1)} жил</text>`;}
+  });
+  return `<svg viewBox="0 0 ${w} ${h}">${g}</svg>
+    <div class="lg"><span data-ja="稼働率100%" data-en="100% occupancy"><i style="background:${CO.navy}"></i>100% дүүрэн${m100.beReal===null?' · хүрэхгүй':''}</span>
+    <span data-ja="現在の稼働率" data-en="Current occupancy"><i style="background:${CO.blue}"></i>${nf(S.occupancy,0)}% дүүрэн${mCur.beReal===null?` · <b style="color:${CO.red}">${n} жилд хүрэхгүй</b>`:''}</span>
+    <span style="color:${CO.mute}" data-ja="百万円。ゼロを上回ると、税引後の利益で借入の元本と利息を全額まかなえた状態" data-en="¥ million. Above zero means after-tax profit has covered all principal and interest">${label} · сая ¥ · тэгээс дээш гарвал зээл, хүү ашгаар бүрэн нөхөгдөнө</span></div>`;
+}
+function figSens(){
+  const w=920,h=300,p={l:56,r:104,t:18,b:46};
+  const rents=sensRents();
+  let defs=[[100,CO.navy],[S.occupancy,CO.blue]];
+  if(S.occupancy>=99.99)defs=[defs[0]];
+  const ser=defs.map(([o,c])=>({o,c,pts:rents.map(r=>calc({...S,rent:r,occupancy:o},S.sc).cover)}));
+  const fin=ser.flatMap(s=>s.pts.filter(Number.isFinite));
+  const max=Math.max(2.4,...fin)*1.06;
+  const X=i=>p.l+(w-p.l-p.r)*i/(rents.length-1), Y=v=>h-p.b-Math.max(0,Math.min(Number.isFinite(v)?v:max,max))/max*(h-p.t-p.b);
+  let g=grid(w,h,p,ticks(0,max,4).map(v=>({v,y:Y(v)})),v=>v.toFixed(1)+'x');
+  rents.forEach((r,i)=>g+=`<text x="${X(i)}" y="${h-p.b+18}" text-anchor="middle" font-size="11" fill="${CO.mute}">${nf(r/1000,0)} мян</text>`);
+  g+=`<line x1="${p.l}" y1="${Y(1)}" x2="${w-p.r}" y2="${Y(1)}" stroke="${CO.ink}" stroke-width="1.2" stroke-dasharray="4 4"/>
+    <text x="${p.l+8}" y="${Y(1)-8}" font-size="11" fill="${CO.ink}">1.00 — төлбөртэй яг тэнцүү</text>`;
+  const ci=rents.indexOf(S.rent);
+  if(ci>=0)g+=`<line x1="${X(ci)}" y1="${p.t}" x2="${X(ci)}" y2="${h-p.b}" stroke="${CO.rust}" stroke-dasharray="3 3" opacity=".7"/>`;
+  ser.forEach(s=>{
+    g+=`<polyline fill="none" stroke="${s.c}" stroke-width="2.2" stroke-linejoin="round" points="${s.pts.map((v,i)=>X(i)+','+Y(v)).join(' ')}"/>`;
+    s.pts.forEach((v,i)=>g+=`<circle cx="${X(i)}" cy="${Y(v)}" r="3" fill="#fff" stroke="${s.c}" stroke-width="2"/>`);
+    g+=`<text x="${w-p.r+10}" y="${Y(s.pts[s.pts.length-1])+4}" font-size="11.5" font-weight="600" fill="${s.c}">${nf(s.o,0)}% дүүрэн</text>`;
+  });
+  g+=`<text x="${(p.l+w-p.r)/2}" y="${h-6}" text-anchor="middle" font-size="11.5" fill="${CO.mute}">Нийт түрээс ₮/м²/сар${S.vatInclusive?' · НӨАТ багтсан':''}</text>`;
+  return `<svg viewBox="0 0 ${w} ${h}">${g}</svg>`;
+}
+function figAmort(m){
+  const w=920,h=290,p={l:60,r:56,t:20,b:34};
+  const n=Math.max(1,Math.min(S.loan.term,m.rows.length));
+  const bal=m.rows.slice(0,n).map(r=>r.balance), pr=m.rows.slice(0,n).map(r=>r.principal);
+  const max=Math.max(m.total,...bal,1e-9)*1.1;
+  const X=i=>p.l+(w-p.l-p.r)*(i+.5)/n, Y=v=>h-p.b-v/max*(h-p.t-p.b);
+  const bw=(w-p.l-p.r)/n*.5;
+  let g=grid(w,h,p,ticks(0,max,4).map(v=>({v,y:Y(v)})),v=>nf(v,0));
+  for(let i=0;i<n;i+=2)g+=`<text x="${X(i)}" y="${h-p.b+17}" text-anchor="middle" font-size="11" fill="${CO.mute}">${i+1}</text>`;
+  const pmax=Math.max(...pr,1e-9)*1.4;
+  pr.forEach((v,i)=>{const hh=v/pmax*(h-p.t-p.b)*.38;
+    g+=`<rect x="${X(i)-bw/2}" y="${h-p.b-hh}" width="${bw}" height="${hh}" rx="1.5" fill="${CO.sand}"/>`;});
+  g+=`<polyline fill="none" stroke="${CO.navy}" stroke-width="2.2" stroke-linejoin="round" points="${bal.map((v,i)=>X(i)+','+Y(v)).join(' ')}"/>`;
+  bal.forEach((v,i)=>g+=`<circle cx="${X(i)}" cy="${Y(v)}" r="2.6" fill="#fff" stroke="${CO.navy}" stroke-width="2"/>`);
+  g+=`<line x1="${p.l}" y1="${Y(0)}" x2="${w-p.r}" y2="${Y(0)}" stroke="${CO.ink}" stroke-width="1.2"/>`;
+  return `<svg viewBox="0 0 ${w} ${h}">${g}</svg>
+    <div class="lg"><span data-ja="借入残高（百万円）" data-en="Loan balance, ¥ million"><i style="background:${CO.navy}"></i>Зээлийн үлдэгдэл · сая ¥</span>
+    <span data-ja="元本返済額" data-en="Principal repaid"><i style="background:${CO.sand}"></i>Үндсэн төлбөр</span>
+    <span style="color:${CO.mute}" data-ja="期間中の支払利息合計" data-en="Total interest paid over the term">Нийт хүү ${nf(m.totInt,1)} сая ¥ · зээл ${nf(m.total,0)} сая ¥</span></div>`;
+}
+
+/* ═════════ SECTION 1 — MODEL ═════════ */
+function renderModel(){
+  const cur=calc(S,S.sc), c100=calc({...S,occupancy:100},S.sc);
+  lastModel=cur;
+  const oc=nf(S.occupancy,0);
+  const K=(v,mn,ja,t,sub)=>`<div class="k ${t||''}" ${jaAttr(ja)}><div class="v">${v}</div><div class="l">${mn}</div>${sub?`<div class="s">${sub}</div>`:''}</div>`;
+  const ok=cur.cover>=1&&(cur.vOn?cur.roiCash:cur.roi)>=0&&cur.be!==null&&cur.be<=S.loan.term;
+  const row=(mn,ja,v1,v2,hl)=>`<tr class="${hl?'hl':''}"><td>${J(mn,ja)}</td><td>${v1}</td>${v2!==undefined?`<td>${v2}</td>`:''}</tr>`;
+  const cvx=x=>`<span style="color:${x>=1?CO.green:CO.red};font-weight:600">${Number.isFinite(x)?x.toFixed(2)+'x':'—'}</span>`;
+  const be=m=>m.be?(m.be<=S.loan.term?m.be.toFixed(1)+' жил':`<span class="neg">${m.be.toFixed(1)} жил</span>`):'<span class="neg">нөхөгдөхгүй</span>';
+  const brl=m=>m.totPay<=1e-9?'зээлгүй':(m.beReal!==null?m.beReal.toFixed(1)+' жил':`<span class="neg">${m.rows.length} жилд хүрэхгүй</span>`);
+  const ro=m=>`<span class="${m.roi>=0?'pos':'neg'}">${m.roi>=0?'+':''}${pc(m.roi)}</span>`;
+  const pn=(v,d)=>`<span class="${v>=0?'pos':'neg'}">${jpy(v,d,true)}</span>`;
+  const y1=cur.y1;
+  const sensRows=sensRents().map(r=>{
+    const a=calc({...S,rent:r,occupancy:100},S.sc), b=calc({...S,rent:r},S.sc);
+    const c=m=>Number.isFinite(m.cover)?(m.cover>=1?m.cover.toFixed(2)+'x':`<span class="neg">${m.cover.toFixed(2)}x</span>`):'—';
+    return `<tr class="${r===S.rent?'hl':''}"><td>${mnt(r,0,false)} ₮${r===S.rent?' — одоогийн':''}</td><td>${c(a)}</td><td>${c(b)}</td></tr>`;}).join('');
+  const schedRows=cur.rows.map(r=>`<tr>
+    <td>${r.year} <span style="color:var(--faint)">(${S.sc.openingYear-1+r.year})</span></td>
+    <td>${mnt(r.rent,0,false)}</td><td>${pc(r.occ/100,1)}</td>
+    <td>${mnt(r.revenue,1)}</td><td>${mnt(r.opex,1)}</td>
+    <td>${pn(r.ebitdaJpy,2)}</td>
+    <td>${r.payment>0?jpy(r.payment,2):'—'}</td>
+    <td>${r.principal>0?jpy(r.principal,2):'—'}</td>
+    <td>${pn(r.netCash,2)}</td>
+    <td>${jpy(r.balance,1)}</td></tr>`).join('');
+
+  const rv=x=>Number.isFinite(x)?`<span class="${x>=0?'pos':'neg'}">${x>=0?'+':''}${pc(x)}</span>`:'—';
+  const irrc=m=>m.irr===null||m.irr===undefined?'—':pc(m.irr,1);
+  const beS=m=>m.beStart!==null?m.beStart.toFixed(1)+' жил':'—';
+  const xnote=S.ext?(()=>{
+    const b0=calc({...S,ext:false},S.sc);
+    const tags=[cur.vOn&&'үл хөдлөхийн үнэлгээ',cur.tOn&&'алдагдал шилжүүлэх',cur.bOn&&'барилга барих хугацаа'].filter(Boolean);
+    return `<div class="xnote" data-ja="拡張モデルが有効です。基本モデル（Excelと同じ）と比較した結果を表示しています。" data-en="Extended model is on. Results are compared with the basic model, which matches the Excel.">
+      <b>Өргөтгөсөн тооцоо идэвхтэй</b> ${tags.length?'· '+tags.join(', '):'· (дэд сонголт асаагаагүй)'} — үр дүн Excel загвараас ялгаатай байж болно.
+ ${cur.vOn?`<div style="margin-top:4px" data-ja="ROIの大部分は、未確定の不動産評価額に左右されます。「ROI：現金部分」と分けてご確認ください。" data-en="Most of the ROI comes from the unconfirmed property value. Check it against the cash-only part of ROI.">△ Өгөөжийн ихэнх нь баталгаажаагүй үнэлгээнээс хамаарна — «мөнгөн хэсэг»-ийг тусад нь харна уу.</div>`:''}
+      <table class="sm"><thead><tr><th></th><th data-ja="基本モデル" data-en="Basic model">Стандарт</th><th data-ja="拡張モデル" data-en="Extended model">Өргөтгөсөн</th></tr></thead><tbody>
+        ${row(cur.roiYears+' жилийн өгөөж (ROI)',cur.roiYears+'年間ROI::EN::'+cur.roiYears+'-year ROI',rv(b0.roi),rv(cur.roi))}
+        ${row('Өртөг нөхөх жил','投資回収年数::EN::Payback period',be(b0),be(cur))}
+        ${row('Зээл төлөх харьцаа','返済余裕率::EN::Debt-service coverage',cvx(b0.cover),cvx(cur.cover))}
+        ${row('Төслийн IRR','プロジェクトIRR::EN::Project IRR',irrc(b0),irrc(cur))}
+        ${row('Нийт татвар · сая ¥','法人税合計（百万円）::EN::Total corporate tax',jpy(b0.totTax,1),jpy(cur.totTax,1))}
+      </tbody></table></div>`;
+  })():'';
+
+  /* verdict: one explanation per real cause, with the right numbers */
+  const verdictHtml=(()=>{
+    const B=(t,ja,en)=>`<b data-ja="${esc(ja)}" data-en="${esc(en)}">${t}</b>`;
+    const T=S.loan.term, H=cur.rows.length, stab=cur.stabYear, s1=cur.st, cov=cur.cover, hasLoan=cur.nPay>0;
+    const trend=hasLoan&&(cur.yearsBelow>0||cur.avgCover<1);
+    const sYear=`${stab} дэх жилд ашиг ${B(nf(s1.ebitdaJpy,2)+' сая ¥','営業利益','operating profit')} нь төлбөр ${B(nf(s1.payment,2)+' сая ¥','年間返済額','annual payment')}-ээс`;
+    const avgTxt=hasLoan?`Зээлийн ${cur.nPay} жилийн дундаж харьцаа ${cur.avgCover<1?'ердөө ':''}${B(cur.avgCover.toFixed(2)+'x','借入期間全体の平均返済余裕率','average coverage over the loan term')}, хамгийн муу нь ${cur.worstYear} дахь жилд ${B(cur.minCover.toFixed(2)+'x','最も低い年の返済余裕率','coverage in the weakest year')}${cur.yearsBelow>0?`; ${cur.nPay} жилийн ${B(String(cur.yearsBelow),'返済余裕率が1.00を下回る年数','years with coverage below 1.00')}-д нь 1.00-ээс доогуур`:''}.`:'';
+    if(ok){
+      return `<div class="vd"><div class="dot"></div><div>
+      <h3 data-ja="この条件では事業が成立します" data-en="This scenario works">Энэ хувилбар үр дүнтэй</h3>
+      <p>${hasLoan?`${sYear} ${B(pc(cov-1),'返済額に対する余裕','margin over the payment')} илүү (харьцаа ${B(cov.toFixed(2)+'x','返済余裕率（この年のみ）','coverage, this year only')}).`:`Зээлгүй тул төлбөр байхгүй; ${stab} дэх жилийн ашиг ${B(nf(s1.ebitdaJpy,2)+' сая ¥','営業利益','operating profit')}.`}
+        ${avgTxt}
+        Барилгын өртөг ${B((cur.be?cur.be.toFixed(1):'—')+' жилд','投資回収年数（借入返済・税金の前）','payback, before loan payments and tax')} нөхөгдөх бөгөөд энэ нь ${T} жилийн зээлийн хугацаанд багтана (зээл, татвар тооцохоос өмнөх тоо). ${cur.roiYears} жилийн өгөөж ${B(pc(cur.roi),'ROI','ROI')}.
+        ${cur.beReal!==null?`Бодит тэнцэх цэг (зээл, хүү ашгаар бүрэн нөхөгдөх) ${B(cur.beReal.toFixed(1)+' жил','実質損益分岐点','actual break-even')}.`:''}
+        Зөвхөн ${stab} дэх жилийн хувьд дүүргэлт ${B(pc(cur.minOcc,1),'初年度の損益分岐稼働率','first-year break-even occupancy')} эсвэл түрээс ${B(nf(cur.minRent,0)+' ₮/м²','初年度の最低賃料','first-year minimum rent')} хүртэл буурахад ашиг төлбөртэй тэнцнэ${cur.yearsBelow>0?' — дараагийн жилүүдэд илүү өндөр түрээс хэрэгтэй':''}.</p>
+    </div></div>`;
+    }
+    const r1=cov<1, roiV=cur.vOn?cur.roiCash:cur.roi;
+    const head=r1?['Энэ хувилбар зээлээ төлж чадахгүй','この条件では営業利益で借入を返済できません','This scenario cannot repay the loan']
+      :trend?['Энэ хувилбар эхний жилд зээлээ төлөх боловч хугацааны туршид төлж чадахгүй','初年度は返済できますが、借入期間を通じては営業利益で返済しきれません','Repayment works in the first year but not across the whole loan term']
+      :['Энэ хувилбар зээлийн хугацаанд өртгөө нөхөхгүй','借入期間内に投資額を回収できません','The build cost is not recovered within the loan term'];
+    const Nn=Math.min(T,H), gr=(a,b)=>Nn>1&&a>0&&b>0?(Math.pow(b/a,1/(Nn-1))-1)*100:NaN;
+    const cg=gr(cur.rows[0].opex,cur.rows[Nn-1].opex), rg=gr(cur.rows[0].rent,cur.rows[Nn-1].rent);
+    const parts=[];
+    if(r1){
+      parts.push(`${nf(cur.area,0)} м²-ээс зөвхөн ${B(nf(cur.area*S.occupancy/100,0)+' м²','賃料を生む面積','rent-generating area')} нь орлого олно. ${sYear} ${B(nf(s1.payment-s1.ebitdaJpy,2)+' сая ¥','資金不足額','shortfall')} бага (харьцаа ${B(cov.toFixed(2)+'x','返済余裕率（この年のみ）','coverage, this year only')}). Энэ жилийг нөхөхөд ${cur.minOcc<=1?`дүүргэлт ${B(pc(cur.minOcc,1),'初年度の損益分岐稼働率','first-year break-even occupancy')} эсвэл `:`(дүүргэлтээр ганцаараа нөхөх боломжгүй — ${B(pc(cur.minOcc,0),'初年度の損益分岐稼働率','first-year break-even occupancy')} шаардлагатай) `}түрээс ${B(nf(cur.minRent,0)+' ₮/м²','初年度の最低賃料','first-year minimum rent')} хэрэгтэй (зөвхөн ${stab} дэх жилийн хувьд).`);
+    }else{
+      parts.push(`${sYear} ${B(pc(cov-1),'返済額に対する余裕','margin over the payment')} их (харьцаа ${B(cov.toFixed(2)+'x','返済余裕率（この年のみ）','coverage, this year only')}) тул энэ жилдээ зээл төлөгдөнө.`);
+    }
+    if(Number.isFinite(cg)&&Number.isFinite(rg)&&cg>rg+0.5) parts.push(`${r1?'Зардал':'Гэвч зардал'} жилд ≈${B(nf(cg,1)+'%','運営費の実質年間上昇率','effective yearly cost growth')}-иар өсөхөд түрээс ≈${B(nf(rg,1)+'%','賃料の実質年間上昇率','effective yearly rent growth')}-иар л өсдөг тул ашиг жил бүр буурна.`);
+    if(trend) parts.push(avgTxt);
+    if(roiV<0) parts.push(`Үр дүнд ${cur.roiYears} жилд зээл, хүү, татвар төлсний дараах цэвэр мөнгө ${B(nf(cur.cashOnly,1)+' сая ¥','ローン返済・税金後の純キャッシュ','net cash after loan payments and tax')} (${B(pc(roiV),'ROI（現金ベース）','ROI, cash basis')}) болно — дутууг өөр эх үүсвэрээс нөхөх шаардлагатай.`);
+    if(cur.be===null) parts.push(`Барилгын өртөг ${H} жилд ч нөхөгдөхгүй (зээл, татвар тооцохоос өмнөх тоо).`);
+    else if(cur.be>T) parts.push(`Барилгын өртөг ${B(cur.be.toFixed(1)+' жилд','投資回収年数（借入返済・税金の前）','payback, before loan payments and tax')} нөхөгдөх нь зээлийн хугацаанаас (${T} жил) урт (зээл, татвар тооцохоос өмнөх тоо).`);
+    if(cur.totPay>1e-9&&cur.beReal===null) parts.push(`Зээл, хүү (нийт ${B(nf(cur.totPay,1)+' сая ¥','返済総額（元本＋利息）','total loan payments')}) ${H} жилд ашгаар бүрэн нөхөгдөхгүй.`);
+    else if(cur.beReal!==null&&cur.beReal>T) parts.push(`Бодит тэнцэх цэг ${B(cur.beReal.toFixed(1)+' жил','実質損益分岐点','actual break-even')} нь зээлийн хугацаанаас (${T} жил) хойш байна.`);
+    if(hasLoan){
+      const rn=rentNeeded(S,S.sc), up=x=>x!==null&&Number.isFinite(x)&&x>S.rent?Math.ceil(x/100)*100:null;
+      const ra=rn&&up(rn.avg), re=rn&&up(rn.every);
+      if(ra||re) parts.push(`${ra?`Дундаж харьцааг 1.00 болгоход түрээс ≈${B(nf(ra,0)+' ₮/м²','平均返済余裕率を1.00にするための賃料','rent for an average coverage of 1.00')}`:''}${ra&&re?', ':''}${re?`жил бүр 1.00-ээс дээш байлгахад ≈${B(nf(re,0)+' ₮/м²','全ての年で1.00以上にするための賃料','rent for coverage of at least 1.00 in every year')}`:''} байх шаардлагатай (одоо ${nf(S.rent,0)} ₮).`);
+    }
+    return `<div class="vd no"><div class="dot"></div><div>
+      <h3 data-ja="${esc(head[1])}" data-en="${esc(head[2])}">${head[0]}</h3>
+      <p>${parts.join(' ')}</p>
+    </div></div>`;
+  })();
+
+  document.getElementById('hintbar').innerHTML=
+    `<span data-ja="シナリオ名・賃貸面積・事業費・テナント数・担保掛目" data-en="Scenario name · rentable area · project cost · tenants · loan/collateral ratio">${esc(cur.name)} · ${nf(cur.area,0)} м² · ${nf(cur.projectCost,0)} сая ¥ · ${nf(cur.tenants,0)} түрээслэгч · Зээл/барьцаа ${pc(cur.ltv)}</span>${S.ext?' &nbsp;<span class="xtag" data-ja="拡張モデルが有効です" data-en="Extended model is on">Өргөтгөсөн</span>':''}
+     &nbsp;·&nbsp; <span data-ja="マウスを重ねると日本語の説明が表示されます" data-en="Hover any label for an explanation">ⓘ 日本語 / EN</span>`;
+
+  document.getElementById('modelBody').innerHTML=`
+ <section style="padding-top:36px">
+    ${warnHtml(getWarnings(cur))}
+    ${xnote}
+    <div class="eyebrow" data-ja="あなたのシナリオ" data-en="Your scenario">Таны хувилбар</div>
+    <h2 data-ja="${esc(cur.name)}・稼働率${oc}%" data-en="${esc(cur.name)} · ${oc}% occupancy">${esc(cur.name)} · ${oc}% дүүргэлт</h2>
+    <p class="lede">${nf(cur.area,0)} м² түрээслэх · ${nf(cur.projectCost,0)} сая ¥ өртөг ·
+      ${nf(S.rent,0)} ₮/м²${S.vatInclusive?' НӨАТ багтсан':''} · хүү ${nf(S.loan.rate,1)}% · ${S.loan.term} жил
+      ${S.rampYears>0?` · дүүргэлт ${nf(S.rampStart,0)}%→${oc}% ${S.rampYears} жилд`:''}
+      ${S.rentFreeMonths>0?` · ${S.rentFreeMonths} сар түрээсгүй`:''}</p>
+    <div class="kpis">
+      ${K(nf(cur.y1.revenue,1)+' сая ₮','1 дэх жилийн орлого','初年度売上（百万₮）::EN::Year-1 revenue')}
+      ${K(nf(cur.st.ebitdaJpy,1)+' сая ¥','Үйл ажиллагааны ашиг'+(cur.stabYear>1?' · '+cur.stabYear+' дэх жил':''),'営業利益（百万円）::EN::Operating profit (EBITDA)',cur.st.ebitdaJpy>0?'good':'bad')}
+      ${K(Number.isFinite(cur.cover)?cur.cover.toFixed(2)+'x':'төлбөргүй',
+          'Зээл төлөх харьцаа · '+cur.stabYear+' дэх жил','返済余裕率＝営業利益÷年間返済額。最初の通常年（通常は初年度）だけの数値です。1.00以上ならその年は返済可能。借入期間全体は下の「平均」をご覧ください。::EN::Debt-service coverage = operating profit ÷ annual payment, for the first normal year only (usually year 1). 1.00+ means that year can repay. See the whole-term average below.',cur.cover>=1?(cur.avgCover<1?'warn':'good'):'bad')}
+      ${K(cur.be?cur.be.toFixed(1)+' жил':'Нөхөгдөхгүй','Өртөг нөхөлт','投資回収年数（累積営業利益が建設費に達する年）。借入の元利返済と税金は差し引く前の数値です。::EN::Payback period — when cumulative operating profit reaches the build cost. Before loan payments and tax.',cur.be&&cur.be<=S.loan.term?'good':'bad')}
+      ${K((cur.roi>=0?'+':'')+pc(cur.roi),cur.roiYears+' жилийн өгөөж (ROI)'+(cur.vOn?' · үнэлгээтэй':''),cur.roiYears+(cur.vOn?'年間のROI（完成後の不動産価値を含む）::EN::'+cur.roiYears+'-year ROI (includes the completed property value)':'年間のROI（土地・建物の価値を除く）::EN::'+cur.roiYears+'-year ROI (excludes land/building value)'),cur.roi>=0?'good':'bad')}
+    </div>
+    <div class="kpis two">
+      ${K(cur.nPay?cur.avgCover.toFixed(2)+'x':'төлбөргүй','Зээл төлөх харьцаа · бүх хугацаа (дундаж)','借入期間全体の平均返済余裕率＝期間中の営業利益合計÷返済額合計。最低値の年と、1.00を下回る年数を下に表示します。::EN::Average debt-service coverage over the whole loan term = total operating profit ÷ total payments. The lowest year and the number of years below 1.00 are shown underneath.',
+          !cur.nPay||(cur.avgCover>=1&&cur.minCover>=1)?'good':(cur.avgCover>=1?'warn':'bad'),
+          cur.nPay?`хамгийн муу ${cur.minCover.toFixed(2)}x (${cur.worstYear} дэх жил) · ${cur.nPay} жилийн ${cur.yearsBelow}-д нь 1.00-ээс доогуур`:'')}
+      ${K(cur.totPay<=1e-9?'зээлгүй':(cur.beReal!==null?cur.beReal.toFixed(1)+' жил':cur.rows.length+' жилд хүрэхгүй'),'Бодит тэнцэх цэг · зээл, хүү ашгаар бүрэн нөхөгдөх','実質損益分岐点。税引後の営業利益の累計が、借入の元本と利息の返済総額に達する年です。これ以降の利益が実質的な利益になります。::EN::Actual break-even: the year when cumulative after-tax operating profit reaches total loan payments (principal + interest). Profit after this point is real profit.',
+          cur.totPay<=1e-9?'good':(cur.beReal===null?'bad':(cur.beReal<=S.loan.term?'good':'warn')),
+          cur.totPay<=1e-9?'':`нийт төлбөр ${nf(cur.totPay,1)} сая ¥ (зээл + хүү) · татварын дараах ашиг ${cur.rows.length} жилд ${nf(cur.cumProfit,1)} сая ¥`)}
+    </div>
+    ${verdictHtml}
+  </section>
+
+  <section>
+    <div class="eyebrow" data-ja="分析" data-en="Analysis">Шинжилгээ</div><h2 data-ja="主要指標" data-en="Key metrics">Гол үзүүлэлтүүд</h2>
+    <div class="tbl"><table>
+      <thead><tr><th data-ja="指標" data-en="Metric">Үзүүлэлт</th><th data-ja="現在の稼働率" data-en="Current occupancy">${oc}% дүүрэн</th><th data-ja="稼働率100%" data-en="100% occupancy">100% дүүрэн</th></tr></thead>
+      <tbody>
+        ${row('Түрээслэх талбай','賃貸面積::EN::Rentable area',nf(cur.area,0)+' м²',nf(c100.area,0)+' м²')}
+        ${row('Төслийн өртөг','総事業費::EN::Total project cost',jpy(cur.projectCost,1)+' сая ¥',jpy(c100.projectCost,1)+' сая ¥')}
+        ${row('1 дэх жилийн орлого · сая ₮','初年度売上（百万₮）::EN::Year-1 revenue',mnt(cur.y1.revenue,1),mnt(c100.y1.revenue,1))}
+        ${row('1 дэх жилийн зардал · сая ₮','初年度運営費（百万₮）::EN::Year-1 operating costs',mnt(cur.y1.opex,1),mnt(c100.y1.opex,1))}
+        ${row('1 дэх жилийн ашиг · сая ¥','初年度営業利益（百万円）::EN::Year-1 operating profit',pn(cur.y1.ebitdaJpy,2),pn(c100.y1.ebitdaJpy,2))}
+        ${row('Жилийн зээлийн төлбөр · сая ¥','年間返済額（百万円）::EN::Annual loan payment',jpy(cur.st.payment,2),jpy(c100.st.payment,2))}
+        ${row('Зээл төлөх харьцаа · '+cur.stabYear+' дэх жил','返済余裕率（最初の通常年のみ）::EN::Debt-service coverage, first normal year only',cvx(cur.cover),cvx(c100.cover),1)}
+        ${row('Хугацааны хамгийн бага харьцаа','期間中の最低返済余裕率::EN::Lowest coverage ratio over the loan term',cvx(cur.minCover),cvx(c100.minCover))}
+        ${row('Хугацааны дундаж харьцаа','期間中の平均返済余裕率::EN::Average coverage over the loan term',cvx(cur.avgCover),cvx(c100.avgCover),1)}
+        ${row('Шаардагдах доод дүүргэлт','損益分岐稼働率::EN::Break-even occupancy',pc(cur.minOcc,1),pc(c100.minOcc,1))}
+        ${row('1.00x хүрэх доод түрээс','返済余裕率1.00となる最低賃料（税込）::EN::Minimum rent (incl. VAT) for a 1.00x coverage ratio',mnt(cur.minRent,0,false)+' ₮',mnt(c100.minRent,0,false)+' ₮')}
+        ${row('Өртөг нөхөх жил','投資回収年数（借入返済・税金の前）::EN::Payback period, before loan payments and tax',be(cur),be(c100),1)}
+        ${row('Бодит тэнцэх цэг (зээл, хүү нөхөгдөх)','実質損益分岐点::EN::Actual break-even: profit covers all principal and interest',brl(cur),brl(c100),1)}
+        ${row('Хугацааны цэвэр мөнгө · сая ¥','期間累計の純キャッシュ（百万円）::EN::Cumulative net cash over the window',pn(cur.cash15,1),pn(c100.cash15,1))}
+        ${row(cur.roiYears+' жилийн өгөөж (ROI)',cur.roiYears+'年間ROI::EN::'+cur.roiYears+'-year ROI',ro(cur),ro(c100),1)}
+        ${row('Нийт хүү · сая ¥','支払利息合計（百万円）::EN::Total interest paid',jpy(cur.totInt,1),jpy(c100.totInt,1))}
+        ${row('Нийт татвар · сая ¥','法人税合計（百万円）::EN::Total corporate tax',jpy(cur.totTax,1),jpy(c100.totTax,1))}
+        ${row('Зээл/барьцааны харьцаа','担保掛目（LTV）::EN::Loan-to-value (vs. land collateral)',pc(cur.ltv),pc(c100.ltv))}
+        ${S.ext?row('Төслийн IRR','プロジェクトIRR（借入条件に左右されない年利回り）::EN::Project IRR, independent of financing',irrc(cur),irrc(c100)):''}
+        ${cur.vOn?row('ROI · мөнгөн хэсэг','ROI：現金部分（営業キャッシュ）::EN::ROI: cash part',rv(cur.roiCash),rv(c100.roiCash))+
+          row('ROI · үнэлгээний хэсэг','ROI：不動産価値部分（評価額−未返済残高）::EN::ROI: property-value part (value minus debt owed)',rv(cur.terminal/cur.projectCost),rv(c100.terminal/c100.projectCost))+
+          row('Цэвэр хөрөнгийн өсөлт · сая ¥','純資産の増加額＝現金＋評価額−未返済残高（百万円）::EN::Net worth created = cash + value − debt owed',pn(cur.netWorth,1),pn(c100.netWorth,1),1):''}
+        ${cur.bOn?row('Өртөг нөхөх жил (барилга эхэлснээс)','投資回収年数（着工時点から）::EN::Payback from construction start',beS(cur),beS(c100)):''}
+      </tbody></table></div>
+  </section>
+
+  <section><div class="eyebrow" data-ja="図1" data-en="Figure 1">Зураг 1</div>
+    <h2 data-ja="累積キャッシュポジション" data-en="Cumulative cash position">Хуримтлагдсан мөнгөн урсгал</h2>
+    <div class="fig">${figCum(c100,cur,esc(cur.name))}</div></section>
+
+  <section><div class="eyebrow" data-ja="図2" data-en="Figure 2">Зураг 2</div>
+    <h2 data-ja="実質損益分岐点（税引後の利益で借入の元本と利息を全額まかなう時点）" data-en="Actual break-even: when after-tax profit has covered all principal and interest">Бодит тэнцэх цэг — зээл, хүү ашгаар нөхөгдөх</h2>
+    <div class="fig">${figReal(c100,cur,esc(cur.name))}</div>
+    <div class="figcap" data-ja="税引後利益の累計から返済総額（元本＋利息）を差し引いた額。ゼロを超えた年が実質損益分岐点で、それ以降の利益が実質的な利益です" data-en="Cumulative after-tax profit minus total loan payments. The year it crosses zero is the actual break-even; profit after that is real profit">Татварын дараах ашгийн хуримтлалаас зээл, хүүгийн нийт төлбөрийг хассан дүн. Тэгийг давсан жил нь бодит тэнцэх цэг — үүнээс хойших ашиг бодит ашиг.</div></section>
+
+  <section><div class="eyebrow" data-ja="図3" data-en="Figure 3">Зураг 3</div>
+    <h2 data-ja="賃料感応度（返済余裕率）" data-en="Rent sensitivity (coverage ratio)">Түрээсийн мэдрэмж — зээл төлөх харьцаа</h2>
+    <div class="fig">${figSens()}</div>
+    <div class="figcap" data-ja="賃料水準ごとの初年度返済余裕率。点線は返済額とちょうど同額になる水準" data-en="Year-1 coverage ratio at each rent level. Dashed line = profit exactly equal to the payment">Түрээсийн түвшин бүрийн эхний жилийн харьцаа. Тасархай шугам нь ашиг төлбөртэй яг тэнцэх түвшин.</div></section>
+
+  <section><div class="eyebrow" data-ja="図4" data-en="Figure 4">Зураг 4</div>
+    <h2 data-ja="借入の返済スケジュール" data-en="Loan repayment schedule">Зээлийн эргэн төлөлт</h2>
+    <div class="fig">${figAmort(cur)}</div></section>
+
+  <section>
+    <div class="eyebrow" data-ja="初年度の詳細" data-en="Year-1 detail">Эхний жилийн задаргаа</div>
+    <h2 data-ja="初年度の数値の内訳" data-en="Where the year-1 numbers come from">Эхний жилийн тоо хаанаас гарч байна</h2>
+    <div class="tbl"><table class="sm">
+      <caption data-ja="初年度の運営費（百万₮）" data-en="Year-1 operating costs (₮ million)">1 дэх жилийн үйл ажиллагааны зардал — сая ₮</caption>
+      <thead><tr><th data-ja="項目" data-en="Item">Зүйл</th><th data-ja="金額" data-en="Amount">Дүн</th></tr></thead>
+      <tbody>
+        ${row('Цалин ('+S.sc.staff.map(r=>r.count+'× '+esc(r.name)).join(', ')+')','人件費::EN::Payroll',mnt(cur.staffY1,2))}
+        ${row('Засвар, удирдлага, бусад зардал','維持管理・管理・その他::EN::Maintenance, admin & other',mnt(cur.otherY1,2))}
+        ${row('Үл хөдлөх хөрөнгийн татвар','固定資産税::EN::Property tax',mnt(cur.ptaxY1,2))}
+        ${row('Нийт зардал','運営費合計::EN::Total operating costs',nf(y1.opex,2)+'  ('+nf(y1.opex/S.fx,2)+' сая ¥)',undefined,1)}
+      </tbody></table></div>
+    <div class="tbl"><table class="sm">
+      <caption data-ja="初年度の損益とキャッシュフロー" data-en="Year-1 profit & cash flow">1 дэх жилийн ашиг, мөнгөн урсгал</caption>
+      <thead><tr><th data-ja="項目" data-en="Item">Зүйл</th><th>сая ₮</th><th>сая ¥</th></tr></thead>
+      <tbody>
+        ${row('Түрээсийн орлого ('+nf(cur.area*occAt(S,1)/100,0)+' м² × '+nf(y1.rent,0)+' ₮ × 12)','賃料収入::EN::Rental income',nf(y1.revenue,1),nf(y1.revenue/y1.fx,2))}
+        ${row('Үйл ажиллагааны зардал','運営費::EN::Operating costs','−'+nf(y1.opex,1),'−'+nf(y1.opex/y1.fx,2))}
+        ${row('Үйл ажиллагааны ашиг (EBITDA)','営業利益::EN::Operating profit (EBITDA)',nf(y1.ebitda,1),`<b>${nf(y1.ebitdaJpy,2)}</b>`,1)}
+        ${row('Зээлийн хүү','支払利息::EN::Interest paid','−'+nf(y1.interest*y1.fx,1),'−'+nf(y1.interest,2))}
+        ${row('Орлогын татвар ('+S.cit+'%)','法人所得税::EN::Corporate income tax','−'+nf(y1.taxMnt,1),'−'+nf(y1.taxMnt/y1.fx,2))}
+        ${row('Зээлийн үндсэн төлбөр','元本返済::EN::Principal repayment','—','−'+nf(y1.principal,2))}
+        ${row('Цэвэр мөнгөн урсгал','純キャッシュフロー::EN::Net cash flow','—',`<b>${pn(y1.netCash,2)}</b>`,1)}
+      </tbody></table></div>
+  </section>
+
+  <section>
+    <div class="eyebrow" data-ja="感応度表" data-en="Sensitivity table">Мэдрэмжийн хүснэгт</div>
+    <h2 data-ja="賃料感応度（初年度の返済余裕率）" data-en="Rent sensitivity (year-1 coverage ratio)">Түрээсийн мэдрэмж — эхний жилийн харьцаа</h2>
+    <div class="tbl"><table class="sm">
+      <thead><tr><th data-ja="賃料（税込・₮/㎡/月）" data-en="Rent, ₮/m²/month (incl. VAT)">Нийт түрээс ₮/м²/сар</th><th data-ja="稼働率100%の返済余裕率" data-en="Coverage ratio at 100% occupancy">Харьцаа · 100%</th><th data-ja="現在の稼働率の返済余裕率" data-en="Coverage ratio at current occupancy">Харьцаа · ${oc}%</th></tr></thead>
+      <tbody>${sensRows}
+        <tr class="hl"><td data-ja="返済余裕率1.00となる最低賃料" data-en="Minimum rent for a 1.00x coverage ratio">1.00x хүрэх доод түрээс</td><td>${nf(c100.minRent,0)} ₮</td><td>${nf(cur.minRent,0)} ₮</td></tr>
+      </tbody></table></div>
+  </section>
+
+  <section>
+    <div class="eyebrow" data-ja="年次スケジュール" data-en="Annual schedule">Хуваарь</div>
+    <h2 data-ja="${S.horizon}年間の年次試算" data-en="${S.horizon}-year annual projection">${S.horizon} жилийн дэлгэрэнгүй тооцоо</h2>
+    <div class="tbl"><table class="sm">
+      <thead><tr><th data-ja="年" data-en="Year">Жил</th><th data-ja="純賃料（₮/㎡）" data-en="Net rent (₮/m²)">Түрээс ₮/м²</th><th data-ja="稼働率" data-en="Occupancy">Дүүрэлт</th>
+      <th data-ja="売上（百万₮）" data-en="Revenue (₮ million)">Орлого сая ₮</th><th data-ja="運営費（百万₮）" data-en="Costs (₮ million)">Зардал сая ₮</th>
+      <th data-ja="営業利益（百万円）" data-en="Profit (¥ million)">Ашиг сая ¥</th><th data-ja="返済額（百万円）" data-en="Payment (¥ million)">Төлбөр сая ¥</th>
+      <th data-ja="元本返済（百万円）" data-en="Principal (¥ million)">Үндсэн сая ¥</th><th data-ja="純キャッシュ（百万円）" data-en="Net cash (¥ million)">Цэвэр мөнгө ¥</th>
+      <th data-ja="借入残高（百万円）" data-en="Balance (¥ million)">Үлдэгдэл сая ¥</th></tr></thead>
+      <tbody>${cur.bOn?`<tr><td>0 <span style="color:var(--faint)">(барилга)</span></td><td colspan="8" style="text-align:left;color:var(--mute)">${nf(cur.months,0)} сар · барилгын үеийн хүү +${nf(cur.idc,2)} сая ¥ зээлд нэмэгдсэн</td><td>${jpy(cur.total,1)}</td></tr>`:''}${schedRows}</tbody></table></div>
+  </section>`;
+}
+
+/* ═════════ SECTION 2 — FORMULAS ═════════ */
+function renderFormulas(){
+  const m=calc(S,S.sc), y1=m.y1, st=m.st, fx=S.fx, sc=S.sc;
+  const stepPct=Math.min(S.rentAdjustment,S.maxRentIncrease);
+  const rentAt=yy=>m.netRent0*Math.pow(1+stepPct/100,yy<=S.yearsFixed?0:1+Math.floor((yy-S.yearsFixed-1)/Math.max(1,S.reviewEvery)));
+  const amortN=Math.max(1,S.loan.term-Math.max(S.loan.graceYears,S.loan.interestOnlyYears));
+  const pmtShown=S.loan.method==='annuity'?annuity(m.total,S.loan.rate/100,amortN):null;
+  const H=Math.min(S.horizon,m.rows.length);
+  /* chip: [mn, ja, down?] */
+  const chips=cs=>cs&&cs.length?`<div class="chips">${cs.map(([mn,ja,dn])=>
+    `<span class="chip ${dn?'dn':''}" ${jaAttr(ja)}>${mn}</span>`).join('')}</div>`:'';
+  const FC=(mn,ja,f,exMn,exJa,lv,cs)=>{
+    const[jaT,enT]=splitEN(ja),[jaE,enE]=splitEN(exJa);
+    const enC=(enT||enE)?(enT+(enT&&enE?'\n':'')+enE):'';
+    const headAttr=enC?`data-ja="${esc(jaT+'\n'+jaE)}" data-en="${esc(enC)}"`:`data-ja="${esc(jaT+'\n'+jaE)}"`;
+    const expAttr=enE?`data-ja="${esc(jaE)}" data-en="${esc(enE)}"`:`data-ja="${esc(jaE)}"`;
+    return `<div class="fc"><h4 ${headAttr}>${mn}</h4><div class="fx">${f}</div>
+    ${chips(cs)}<div class="exp" ${expAttr}>${exMn}</div>${lv?`<div class="live" data-ja="現在の入力値で計算した結果" data-en="Calculated from your current inputs">${lv}</div>`:''}</div>`;
+  };
+  const stepH=(n,mn,ja)=>`<div class="fstep"><div class="n">${n}</div><h3 ${jaAttr(ja)}>${mn}</h3></div>`;
+  const TN='Таны оруулснаар: ';
+
+  const c1=[
+    FC('Түрээслэх талбай','賃貸面積::EN::Rentable area','<b>талбай</b> = (1 давхрын м² + 2 давхрын м²) × түрээслэх % / 100',
+      'Бодитоор түрээслэх боломжтой талбай. Нийтийн талбайг хасах бол түрээслэх хувийг бууруулна.',
+      '実際に賃貸できる面積。共用部分を除く場合は賃貸比率を下げます。::EN::The area you can actually lease out. Lower the leasable % if you exclude common space.',
+      TN+`<b>${nf(m.area,0)} м²</b>`,
+      [['талбай ↑ → орлого ↑','面積↑ → 売上↑::EN::area↑ → revenue↑']]),
+    FC('Төслийн нийт өртөг','総事業費::EN::Total project cost','<b>өртөг</b> = барилга × (1 + нөөц%) + дотор засал + тоног төхөөрөмж',
+      'Нийт хөрөнгө оруулалт, сая иенээр. Бусад бүх үзүүлэлтийг үүнтэй харьцуулна — мөнгөн урсгал энэ дүнг нөхөх ёстой. Барилга барих хугацаа загварт орохгүй: орлого, зээл 1 дэх жилээс эхэлнэ.',
+      '総投資額（百万円）。他のすべての指標はこの金額と比較されます。キャッシュフローでこの金額を回収する必要があります。工期はモデルに含まれず、売上・借入とも初年度から始まります。::EN::Total investment, ¥ million. Every other metric is measured against this — cash flow must recover it. Construction time is not modelled: revenue and the loan both start in year 1.',
+      TN+`<b>${nf(m.projectCost,1)} сая ¥</b> (${nf(m.projectCost*1e6/Math.max(1,m.area),0)} ¥/м²) · ${nf(fx,0)} ₮/¥ ханшаар <b>${nf(m.projectCost*fx,0)} сая ₮</b>`,
+      [['өртөг ↑ → нөхөх хугацаа ↑','事業費↑ → 回収年数↑::EN::cost↑ → payback↑',1],['өртөг ↑ → өгөөж ↓','事業費↑ → ROI↓::EN::cost↑ → ROI↓',1]]),
+    FC('Зээлийн хэмжээ','借入額::EN::Loan amount','<b>зээл</b> = зээлийн дүн × (1 + шимтгэл%)',
+      'Шимтгэлийг нэмсэн зээлийн дүн — хүүг энэ дүнгээс тооцно. Шимтгэл бэлнээр төлөгдөхгүй, зээлийн үндсэн дүнд нэмэгдэнэ.',
+      '手数料を加えた借入額。利息はこの金額に対して計算されます。手数料は現金で支払わず、借入元本に上乗せされます。::EN::Loan amount including the fee — interest is calculated on this figure. The fee is not paid in cash; it is added to the principal.',
+      TN+`<b>${nf(m.total,1)} сая ¥</b>`,
+      [['зээл ↑ → жилийн төлбөр ↑','借入↑ → 年間返済額↑::EN::loan↑ → annual payment↑',1],['шимтгэл ↑ → зээл ↑','手数料↑ → 借入額↑::EN::fee↑ → loan amount↑',1]]),
+    FC('Валют','為替::EN::FX','<b>сая ¥</b> = сая ₮ ÷ ханш',
+      'Орлого, зардлыг төгрөгөөр тооцоод ханшаар хувааж иен болгоно. «Төгрөгийн сулрал»-ыг асаавал ханш жил бүр өснө: ханш_y = ханш × (1+сулрал%)^(y−1).',
+      '売上・費用はトゥグルグで計算し、為替レートで割って円に換算します。「トゥグルグ安」をオンにすると毎年レートが上昇します。::EN::Revenue and costs are computed in tögrög, then divided by the rate to get yen. With the "tögrög depreciation" switch on, the rate rises every year.',
+      TN+`1 ¥ = <b>${nf(fx,1)} ₮</b>${S.simulateFx?`, ${S.horizon} дэх жилд ${nf(fx*Math.pow(1+S.fxDep/100,S.horizon-1),1)} ₮`:''}`,
+      [['₮ суларвал → иенээр ашиг ↓','₮安 → 円換算の利益↓::EN::₮ weakens → yen profit↓',1]])
+  ];
+  const c2=[
+    FC('Цэвэр түрээс','純賃料::EN::Net rent',
+      S.vatInclusive?'<b>цэвэр түрээс</b> = нийт түрээс / (1 + НӨАТ%)':'<b>цэвэр түрээс</b> = нийт түрээс',
+      S.vatInclusive?'Түрээслэгч НӨАТ төлдөг ч тэр нь улсад шилждэг тул компанид үлдэх орлого нь НӨАТ-гүй дүн.':'Зарласан түрээсийг шууд ашиглана.',
+      (S.vatInclusive?'テナントはVAT込みで支払いますが、VATは国に納付されるため、会社に残る収入はVAT抜きの金額です。':'表示賃料をそのまま使用します。')+
+      (S.vatInclusive?'::EN::The tenant pays VAT, but it goes to the state, so the company keeps only the VAT-exclusive amount.':'::EN::The headline rent is used as-is.'),
+      TN+`${nf(S.rent,0)} ÷ ${nf(1+S.vat/100,2)} = <b>${nf(m.netRent0,0)} ₮/м²/сар</b>`,
+      [['НӨАТ ↑ → цэвэр түрээс ↓','VAT↑ → 純賃料↓::EN::VAT↑ → net rent↓',1]]),
+    FC('Түрээсийн өсөлтийн хуваарь','賃料改定スケジュール::EN::Rent review schedule',
+      'алхам(y) = 0 &nbsp;&nbsp;y ≤ тогтмол жил\nалхам(y) = 1 + ⌊(y − тогтмол − 1) / давтамж⌋\n<b>түрээс(y)</b> = цэвэр түрээс × (1 + өсөлт%)^алхам(y)\nөсөлт% = min(өсөлт, дээд хязгаар)',
+      'Эхний хэдэн жил түрээс өөрчлөгдөхгүй, дараа нь тодорхой жил тутамд шатлалтай нэмэгдэнэ. Жил бүр биш — 3 жил тутам 15% нь жилд ≈4.8%.',
+      '最初の数年間は賃料を据え置き、その後一定年数ごとに段階的に改定します。毎年ではなく、3年ごとに15%は年平均約4.8%に相当します。::EN::Rent is flat for the first years, then steps up on a fixed cycle — not every year. E.g. 15% every 3 years ≈ 4.8%/year on average.',
+      TN+`1 дэх жил <b>${nf(rentAt(1),0)} ₮</b> → ${S.yearsFixed+1} дэх жил <b>${nf(rentAt(S.yearsFixed+1),0)} ₮</b> → ${H} дэх жил <b>${nf(rentAt(H),0)} ₮</b>`,
+      [['өсөлт% ↑ → урт хугацааны орлого ↑','改定率↑ → 長期の売上↑::EN::step-up%↑ → long-run revenue↑'],['тогтмол жил ↑ → орлого ↓','据置期間↑ → 売上↓::EN::fixed years↑ → revenue↓',1]]),
+    FC('Дүүргэлт','稼働率::EN::Occupancy',
+      'дүүргэлт(y) = эхний + (тогтвортой − эхний) × (y−1)/дүүргэх жил\nдүүргэлт(y) = тогтвортой &nbsp;(дүүргэх хугацааны дараа)',
+      'Дүүргэх хугацаа тохируулсан бол дүүргэлт эхний жилийн түвшнээс тогтвортой түвшин хүртэл шулуунаар өснө. Үгүй бол эхнээсээ тогтмол.',
+      'リースアップ期間を設定すると、稼働率は初年度の水準から安定時の水準まで直線的に上昇します。設定しない場合は初年度から一定です。::EN::With a lease-up period set, occupancy rises in a straight line from the year-1 level to the stabilized level. Otherwise it is constant from day one.',
+      S.rampYears>0?TN+`1 дэх жил <b>${pc(occAt(S,1)/100,1)}</b> → ${S.rampYears} дэх жилээс <b>${pc(S.occupancy/100,1)}</b>`
+                   :TN+`эхнээсээ <b>${pc(S.occupancy/100,1)}</b>`,
+      [['дүүргэлт ↑ → орлого ↑','稼働率↑ → 売上↑::EN::occupancy↑ → revenue↑'],['дүүргэх хугацаа ↑ → эхний жилүүдийн орлого ↓','リースアップ期間↑ → 初期の売上↓::EN::lease-up period↑ → early revenue↓',1]]),
+    FC('Жилийн орлого','年間売上::EN::Annual revenue',
+      '<b>орлого(y)</b> = [ талбай × дүүргэлт(y)% × түрээс(y) × 12\n&nbsp;&nbsp;+ бусад орлого × 12 × (1+өсөлт)^(y−1) ] / 10⁶\n× (1 − төлөгдөхгүй%) × түрээсгүй(y)',
+      'Түрээслэсэн м² × сарын цэвэр түрээс × 12 сар, дээр нь бусад орлого, төлөгдөхгүй эрсдэлийг хасна. Түрээсгүй сар зөвхөн 1 дэх жилд нөлөөлнө.',
+      '賃貸面積×月額純賃料×12か月にその他収入を加え、貸倒れ引当を差し引きます。フリーレントは初年度のみに影響します。::EN::Leased m² × monthly net rent × 12, plus other income, minus the bad-debt allowance. Free rent only affects year 1.',
+      TN+`1 дэх жил: ${nf(m.area*occAt(S,1)/100,0)} м² × ${nf(y1.rent,0)} ₮ × 12 / 10⁶ = <b>${nf(y1.revenue,2)} сая ₮</b>`,
+      [['түрээсгүй сар ↑ → 1 дэх жилийн орлого ↓','フリーレント↑ → 初年度売上↓::EN::free-rent months↑ → year-1 revenue↓',1],['төлөгдөхгүй% ↑ → орлого ↓','貸倒れ↑ → 売上↓::EN::bad debt%↑ → revenue↓']]),
+    FC('Түрээслэгчийн тоо','テナント数::EN::Number of tenants','түрээслэгч = талбай × дүүргэлт% / нэг түрээслэгчийн талбай',
+      'Төлөвлөлтийн энгийн тоо: түрээслэсэн талбайг дундаж талбайд хуваана.',
+      '計画用の目安：賃貸中の面積を1テナントあたりの平均面積で割ります。::EN::A planning estimate: leased area divided by the average area per tenant.',
+      TN+`<b>${nf(m.tenants,0)} түрээслэгч</b>`,
+      [['нэг түрээслэгчийн талбай ↓ → түрээслэгч ↑','1社あたり面積↓ → テナント数↑::EN::area per tenant↓ → tenant count↑']])
+  ];
+  const c3=[
+    FC('Цалин','人件費::EN::Payroll',
+      '<b>цалин(y)</b> = Σ ( тоо × сарын цалин × (12 + урамшуулал)\n&nbsp;&nbsp;× (1 + шимтгэл%) ) / 10⁶ × (1 + цалингийн өсөлт)^(y−1)',
+      'Ажлын байр бүр: ажилтны тоо × сарын цалин × жилд олгох сар × ажил олгогчийн шимтгэл. Нийт дүн жил бүр цалингийн өсөлтөөр нэмэгдэнэ.',
+      '職種ごとに「人数×月給×年間支給月数×事業主負担」を計算し、合計は毎年給与上昇率で増加します。::EN::For each role: headcount × monthly salary × months paid per year × employer contribution. The total grows every year with salary growth.',
+      TN+`1 дэх жил ${sc.staff.map(r=>`${r.count}×${esc(r.name)}`).join(' + ')} = <b>${nf(m.staffY1,2)} сая ₮</b>`,
+      [['ажилтан ↑ → зардал ↑','人数↑ → 費用↑::EN::headcount↑ → cost↑',1],['цалингийн өсөлт ↑ → урт хугацааны зардал ↑','給与上昇率↑ → 長期費用↑::EN::salary growth↑ → long-run cost↑',1]]),
+    FC('Зардлын мөрүүд','費用項目::EN::Cost line items','<b>зардал_k(y)</b> = суурь_k × (1 + инфляци_k)^(y−1)',
+      'Зардал бүр 1 дэх жилийн дүнгээсээ өөрийн инфляциар өснө. «Түрээслэгч төлнө» гэж тэмдэглэсэн ашиглалтын зардал тооцоонд орохгүй.',
+      '各費用は初年度の金額からそれぞれの上昇率で増加します。「テナント負担」とした光熱費は計算に含みません。::EN::Each cost line grows from its year-1 value at its own rate. Utilities marked "tenant paid" are excluded.',
+      TN+`1 дэх жилд нийт <b>${nf(m.otherY1,2)} сая ₮</b>${H>1?`; ${H} дэх жилд ≈ ${nf(m.rows[H-1].otherY,1)} сая ₮`:''}`,
+      [['инфляци ↑ → зардал жил бүр ↑','上昇率↑ → 毎年の費用↑::EN::growth rate↑ → cost every year↑',1],['түрээслэгч төлбөл → зардал 0','テナント負担 → 費用ゼロ::EN::tenant-paid → cost is zero']]),
+    FC('Үл хөдлөхийн татвар','固定資産税::EN::Property tax','<b>татвар(y)</b> = суурь өртөг × ханш × татвар% / 100 × (1 + бусад инфляци)^(y−1)',
+      'Барилгын (эсвэл нийт) өртгийн тодорхой хувь, төгрөгт шилжүүлж, ерөнхий зардлын инфляциар өсгөнө.',
+      '建設費（または総事業費）の一定割合をトゥグルグ換算し、一般的な費用上昇率で増加させます。::EN::A fixed share of construction (or total project) cost, converted to tögrög and grown at the general cost inflation rate.',
+      TN+`${nf(S.propertyTaxBase==='construction'?sc.construction:m.projectCost,0)} сая ¥ × ${nf(fx,0)} × ${S.propertyTax}% = <b>${nf(m.ptaxY1,2)} сая ₮</b>`,
+      [['татварын хувь ↑ → зардал ↑','税率↑ → 費用↑::EN::tax rate↑ → cost↑',1]]),
+    FC('Нийт зардал','運営費合計::EN::Total operating costs','<b>зардал(y)</b> = цалин(y) + Σ зардал_k(y) + татвар(y)',
+      'Анхаарах зүйл: цалин, засвар, удирдлагын зардал хоосон талбайтай үед ч буурдаггүй. Тиймээс дүүргэлт бага байх нь маш их хохирол учруулна.',
+      '人件費・維持費・管理費は空室があっても減りません。そのため稼働率の低下は大きな打撃となります。::EN::Payroll, maintenance and admin do not shrink when units sit empty — so lower occupancy hurts disproportionately.',
+      TN+`${nf(m.staffY1,2)} + ${nf(m.otherY1,2)} + ${nf(m.ptaxY1,2)} = <b>${nf(y1.opex,2)} сая ₮</b> (${nf(y1.opex/fx,2)} сая ¥)`,
+      [['зардал ↑ → ашиг ↓','運営費↑ → 営業利益↓::EN::costs↑ → profit↓',1],['дүүргэлт ↓ → зардал бараг өөрчлөгдөхгүй','稼働率↓でも費用はほぼ不変::EN::occupancy↓ → costs barely move',1]])
+  ];
+  const c4=[
+    FC('Үйл ажиллагааны ашиг','営業利益（EBITDA）::EN::Operating profit (EBITDA)','<b>ашиг(y)</b> = орлого(y) − зардал(y) &nbsp;[сая ₮]\nашиг¥(y) = ашиг(y) / ханш',
+      'Санхүүжилтийн өмнөх үйл ажиллагааны мөнгө. Банк үүнийг хардаг — зээлийн төлбөрийг илүүтэйгээр даах ёстой.',
+      '資金調達前の事業キャッシュ。銀行が注目する数字で、返済額を余裕をもって上回る必要があります。::EN::Operating cash before financing. This is what the bank watches — it must comfortably exceed the loan payment.',
+      TN+`${nf(y1.revenue,2)} − ${nf(y1.opex,2)} = <b>${nf(y1.ebitda,2)} сая ₮ = ${nf(y1.ebitdaJpy,2)} сая ¥</b>`,
+      [['орлого ↑ → ашиг ↑','売上↑ → 営業利益↑::EN::revenue↑ → profit↑'],['зардал ↑ → ашиг ↓','運営費↑ → 営業利益↓::EN::costs↑ → profit↓',1]]),
+    FC('Тогтворжсон жил','安定稼働年::EN::Stabilized year','бүрэн төлбөртэй, дүүргэлт тогтвортой болсон эхний жил',
+      'Зээл төлөх харьцааг «хэвийн» эхний жилээр үнэлнэ: түрээсгүй сар байхгүй, дүүргэлт тогтвортой түвшинд хүрсэн.',
+      '返済余裕率は「通常の」最初の年で評価します。フリーレントがなく、稼働率が安定水準に達した年です。::EN::The coverage ratio is judged in the first "normal" year — no free rent, occupancy already at its stabilized level.',
+      TN+`<b>${m.stabYear} дэх жил</b> (ашиг ${nf(st.ebitdaJpy,2)} сая ¥, төлбөр ${nf(st.payment,2)} сая ¥)`)
+  ];
+  const c5=[
+    FC('Тэнцүү төлбөр','元利均等返済::EN::Equal (annuity) payment','<b>PMT</b> = P × r / (1 − (1+r)^(−n))',
+      'Зээлийн стандарт томьёо: n жилд r хүүтэйгээр P үндсэн дүнг тэнцүү жилийн төлбөрөөр хаана.',
+      '標準的な返済式：元本Pを金利rでn年間、毎年同額の返済で完済します。::EN::The standard loan formula: repays principal P at rate r over n years in equal annual payments.',
+      pmtShown!==null?TN+`${nf(m.total,1)} × ${(S.loan.rate/100).toFixed(3)} / (1 − ${(1+S.loan.rate/100).toFixed(3)}^(−${amortN})) = <b>${nf(pmtShown,3)} сая ¥ / жил</b>`
+        :'Энэ нь «Тэнцүү төлбөр» хэлбэрт хамаарна.',
+      [['хүү ↑ → төлбөр ↑','金利↑ → 返済額↑::EN::rate↑ → payment↑',1],['хугацаа ↑ → жилийн төлбөр ↓','期間↑ → 年間返済額↓::EN::term↑ → annual payment↓'],['хугацаа ↑ → нийт хүү ↑','期間↑ → 利息総額↑::EN::term↑ → total interest↑',1]]),
+    FC('Жил бүрийн эргэн төлөлт','年次の元本・利息::EN::Annual principal & interest split','<b>хүү(y)</b> = үлдэгдэл(y−1) × r\n<b>үндсэн(y)</b> = PMT − хүү(y)\nүлдэгдэл(y) = үлдэгдэл(y−1) − үндсэн(y)',
+      'Төлбөр эхлээд эхний үлдэгдлийн хүүг төлж, үлдсэн нь үндсэн өрийг бууруулна. Эхний жилүүдэд төлбөрийн ихэнх нь хүү байдаг.',
+      '返済額はまず期首残高の利息に充てられ、残りが元本を減らします。初期の返済は大部分が利息です。::EN::Each payment covers the interest on the opening balance first; the rest reduces principal. Early payments are mostly interest.',
+      TN+`1 дэх жил хүү ${nf(y1.interest,2)} + үндсэн ${nf(y1.principal,2)} = <b>${nf(y1.payment,2)} сая ¥</b> · ${S.loan.term} жилийн нийт хүү <b>${nf(m.totInt,1)} сая ¥</b>`),
+    FC('Бусад хэлбэр','その他の返済方法::EN::Other repayment methods','тэнцүү үндсэн: жил бүр P/n (төлбөр аажмаар буурна)\nэцэст нь бүтэн: зөвхөн хүү, үндсэн дүн эцэст нь',
+      'Хөнгөлөлттэй жилд төлбөр 0, зөвхөн хүү төлөх жилд төлбөр = хүү. Үндсэн өр төлөх хугацаа = нийт хугацаа − эдгээр жил.',
+      '据置期間は返済ゼロ、利息のみ期間は利息のみ支払います。元本返済期間＝全期間−これらの年数です。::EN::Grace years have no payment; interest-only years pay just the interest. The principal amortizes over the remaining years.',
+      TN+`хэлбэр <b>${{annuity:'тэнцүү төлбөр',equalPrincipal:'тэнцүү үндсэн',bullet:'эцэст нь бүтэн'}[S.loan.method]}</b>, хөнгөлөлт ${S.loan.graceYears} жил, зөвхөн хүү ${S.loan.interestOnlyYears} жил`,
+      [['зөвхөн хүү → эхний жилүүдэд төлбөр ↓','利息のみ期間 → 初期の返済額↓::EN::interest-only → early payments↓'],['гэхдээ дараа нь төлбөр ↑','ただし後の返済額↑::EN::but later payments↑',1]])
+  ];
+  const dep=S.depreciation?m.projectCost/Math.max(1,S.usefulLife)*fx:0;
+  const taxable1=Math.max(0,y1.ebitda-(S.interestDeductible?y1.interest*y1.fx:0)-dep);
+  const c6=[
+    FC('Татвар ногдох орлого','課税所得::EN::Taxable income','<b>татвар ногдох</b> = max( 0, ашиг − хүү×ханш − элэгдэл×ханш )',
+      'Ашгаас зээлийн хүү (хасагдах бол) болон элэгдэл (асаасан бол)-ийг хасна. Сөрөг гарахгүй — алдагдлыг дараа жилд шилжүүлэхгүй.',
+      '営業利益から支払利息（損金算入の場合）と減価償却（オンの場合）を差し引きます。マイナスにはならず、欠損金の繰越はしません。::EN::Operating profit minus deductible interest and depreciation, if enabled. Never negative — losses do not carry forward.',
+      TN+`${nf(y1.ebitda,2)} − ${nf(S.interestDeductible?y1.interest*y1.fx:0,2)} − ${nf(dep,2)} = <b>${nf(taxable1,2)} сая ₮</b>`,
+      [['хүү хасагдана → татвар ↓','利息の損金算入 → 税金↓::EN::interest deductible → tax↓'],['элэгдэл → татвар ↓','減価償却 → 税金↓::EN::depreciation → tax↓']]),
+    FC('Аж ахуйн нэгжийн татвар','法人所得税::EN::Corporate income tax','<b>татвар</b> = татвар ногдох × ААНОАТ%',
+      'Монголын аж ахуйн нэгжийн орлогын албан татвар, тухайн жилдээ бэлнээр төлнө. Excel загварын тэмдэглэл: 10% нь татвар ногдох орлого 6 тэрбум ₮-өөс доош үед хамаарна.',
+      'モンゴルの法人所得税。同じ年に現金で支払います。Excelモデルの注記：10%は課税所得が60億₮未満の場合の税率です。::EN::Mongolian corporate income tax, paid in cash the same year. Per the Excel model, 10% applies to taxable income below ₮6 billion.',
+      TN+`${S.cit}% × ${nf(taxable1,2)} сая ₮ = <b>${nf(y1.taxMnt,2)} сая ₮ (${nf(y1.taxMnt/y1.fx,2)} сая ¥)</b>`,
+      [['татварын хувь ↑ → цэвэр мөнгө ↓','税率↑ → 純キャッシュ↓::EN::tax rate↑ → net cash↓',1]])
+  ];
+  const c7=[
+    FC('Цэвэр мөнгөн урсгал','純キャッシュフロー::EN::Net cash flow','<b>цэвэр(y)</b> = ашиг/ханш − хүү − татвар/ханш − үндсэн',
+      'Бүгдийг иенээр: үйл ажиллагааны ашгаас зээлийн төлбөр (хүү + үндсэн), татварыг хасна. Эерэг жил хөрөнгө оруулалтаа нөхнө, сөрөг жил алдагдал.',
+      'すべて円換算：営業利益から借入返済（利息＋元本）と税金を差し引きます。プラスの年は投資を回収し、マイナスの年は資金が流出します。::EN::All in yen: operating profit minus the loan payment (interest + principal) minus tax. Positive years recover capital, negative years drain it.',
+      TN+`${nf(y1.ebitdaJpy,2)} − ${nf(y1.interest,2)} − ${nf(y1.taxMnt/y1.fx,2)} − ${nf(y1.principal,2)} = <b>${nf(y1.netCash,2)} сая ¥</b>`,
+      [['зээлийн төлбөр ↑ → цэвэр мөнгө ↓','返済額↑ → 純キャッシュ↓::EN::payment↑ → net cash↓',1]]),
+    FC('Хуримтлагдсан байдал','累積ポジション::EN::Cumulative position','<b>хуримтлал(y)</b> = хуримтлал(y−1) + ашиг(y), &nbsp;хуримтлал(0) = −өртөг × ханш',
+      'Төсөл барилгын бүх өртгийн өртэй эхэлдэг тул эхлэл нь сөрөг. Жил бүр ашгийг нэмнэ — тэгийг давахад барилга өөрийнхөө үнийг нөхсөн гэсэн үг.',
+      '事業は建設費全額のマイナスから始まり、毎年の営業利益を加えていきます。ゼロを超えた時点で建物が自らの建設費を回収したことになります。::EN::The project starts owing the full build cost, then adds each year of profit. Crossing zero means the building has paid for itself.',
+      TN+`эхлэл <b>−${nf(m.projectCost,1)} сая ¥</b> · тэгийг <b>${m.be?m.be.toFixed(2)+' жилд':'давахгүй'}</b> давна`)
+  ];
+  const c8=[
+    FC('Зээл төлөх харьцаа','返済余裕率::EN::Debt-service coverage ratio','<b>харьцаа</b> = ашиг¥(тогтвортой) / төлбөр(тогтвортой)',
+      'Үйл ажиллагааны ашиг жилийн зээлийн төлбөрийг хэдэн дахин даах вэ. Банкууд 1.00-аас дээш, нөөцтэй байхыг хүсдэг; 1.00-аас бага бол үйл ажиллагаанаасаа зээлээ төлж чадахгүй.',
+      '営業利益が年間返済額の何倍あるか。銀行は1.00以上かつ余裕を求めます。1.00未満では事業収益で返済できません。::EN::How many times operating profit covers the annual payment. Banks want 1.00 or higher with margin; below 1.00, operations alone cannot repay the loan.',
+      TN+`${nf(st.ebitdaJpy,2)} ÷ ${nf(st.payment,2)} = <b>${Number.isFinite(m.cover)?m.cover.toFixed(2):'—'}x</b>${Number.isFinite(m.minCover)?` · хамгийн муу жил ${m.minCover.toFixed(2)}x`:''}`,
+      [['≥ 1.00 → зээлээ төлж чадна','1.00以上 → 返済可能::EN::≥ 1.00 → can repay'],['< 1.00 → дутагдал үүснэ','1.00未満 → 資金不足::EN::< 1.00 → shortfall',1]]),
+    FC('Шаардагдах доод дүүргэлт','損益分岐稼働率::EN::Break-even occupancy','<b>доод дүүргэлт</b> = ( төлбөр×ханш + зардал ) / ( талбай × цэвэр түрээс × 12 / 10⁶ )',
+      'Ашиг = төлбөр болох дүүргэлтийн түвшин. Үүнээс доош бол бизнес мөнгө алдана.',
+      '営業利益＝返済額となる稼働率。これを下回ると資金が不足します。::EN::The occupancy level where profit exactly equals the payment. Below it, the business loses money.',
+      TN+`(${nf(st.payment,2)} × ${nf(st.fx,0)} + ${nf(st.opex,1)}) ÷ (${nf(m.area,0)} × ${nf(st.rent,0)} × 12 / 10⁶) = <b>${pc(m.minOcc,1)}</b>`,
+      [['зардал ↓ → доод дүүргэлт ↓','運営費↓ → 必要稼働率↓::EN::costs↓ → required occupancy↓'],['түрээс ↑ → доод дүүргэлт ↓','賃料↑ → 必要稼働率↓::EN::rent↑ → required occupancy↓']]),
+    FC('Доод түрээс','最低賃料::EN::Minimum rent','<b>доод түрээс</b> = ( төлбөр×ханш + зардал ) / ( талбай × дүүргэлт% × 12 / 10⁶ ) × (1+НӨАТ%)',
+      'Одоогийн дүүргэлтээр харьцааг яг 1.00 болгох НӨАТ-тай түрээс. Зах зээлийн түрээстэй харьцуулж нөөцөө харна.',
+      '現在の稼働率で返済余裕率がちょうど1.00となる税込賃料。市場賃料と比べて安全余裕を確認します。::EN::The VAT-inclusive rent that puts the coverage ratio at exactly 1.00 at current occupancy. Compare it with market rent to see the safety margin.',
+      TN+`<b>${nf(m.minRent,0)} ₮/м²/сар</b> · таны ${nf(S.rent,0)} ₮-тэй харьцуулахад нөөц ${pc(1-m.minRent/S.rent,0)}`),
+    FC('Өртөг нөхөх жил','投資回収年数::EN::Payback period','<b>нөхөх жил</b> = y − 1 + |хуримтлал(y−1)| / ашиг(y)',
+      'Хуримтлал эерэг болох жилийн дотор шугаман интерполяци хийнэ. Энэ нь зээлийн нөхцөл биш — хөрөнгө хэр удаан эрсдэлд байгааг харуулна.',
+      '累積がプラスになる年の中で直線補間します。借入の条件ではなく、資金がリスクにさらされる期間を示します。::EN::Linear interpolation within the year the cumulative total turns positive. Not a loan condition — it shows how long capital is at risk.',
+      TN+`<b>${m.be?m.be.toFixed(2)+' жил':S.horizon+' жилд нөхөгдөхгүй'}</b> (${S.loan.term} жилийн зээлийн ${m.be&&m.be<=S.loan.term?'дотор':'гадна'})`),
+    FC('Хөрөнгийн өгөөж (ROI)','投資収益率（ROI）::EN::Return on investment (ROI)','<b>ROI</b> = ( Σ цэвэр мөнгө N жилд + үлдэх үнэ ) / өртөг',
+      'Цэвэр мөнгийг (ашиг − хүү − татвар − үндсэн) өгөөжийн хугацаанд нэмж өртөгт хуваана. Үлдэх үнэ зөвхөн «Барилгын үнийг өгөөжид оруулах»-ыг асаасан үед нэмэгдэнэ. Анхаар: хуваагч нь өмчийн хөрөнгө биш, төслийн нийт өртөг.',
+      '純キャッシュ（営業利益−利息−税金−元本）をROI期間で合計し、事業費で割ります。残存価値は設定をオンにした場合のみ加算します。注意：分母は自己資本ではなく総事業費です。::EN::Sums net cash (profit minus interest, tax and principal) over the ROI window and divides by project cost. Residual value is added only if enabled. Note: the denominator is total project cost, not equity.',
+      TN+`${m.roiYears} жилийн цэвэр мөнгө <b>${nf(m.cash15-m.terminal,1)} сая ¥</b>${m.terminal?` + ${m.vOn?'өмчийн цэвэр үнэлгээ':'үлдэх үнэ'} ${nf(m.terminal,1)}`:''} ÷ ${nf(m.projectCost,1)} = <b>${(m.roi>=0?'+':'')+pc(m.roi)}</b>`,
+      [['зардлын өсөлт ↑ → ROI ↓','費用上昇率↑ → ROI↓::EN::cost growth↑ → ROI↓',1],['түрээсийн өсөлт ↑ → ROI ↑','賃料改定率↑ → ROI↑::EN::rent step-up↑ → ROI↑']]),
+    FC('Зээл / барьцааны харьцаа','担保掛目（LTV）::EN::Loan-to-value (LTV)','<b>LTV</b> = зээл¥ × ханш / 1000 / газрын үнэлгээ (тэрбум ₮)',
+      'Зээлийг (төгрөгөөр) барьцаа болох газрын үнэлгээтэй харьцуулна. Банк газрыг барьцаалдаг тул энэ нь бодит хязгаар.',
+      '借入額（₮換算）を担保となる土地評価額と比較します。銀行は土地を担保に融資するため、これが実質的な上限です。::EN::Compares the loan (in tögrög) to the land value pledged as collateral. Since the bank lends against the land, this is the practical ceiling.',
+      TN+`${nf(m.total,1)} × ${nf(fx,0)} ÷ ${S.landValue} тэрбум ₮ = <b>${pc(m.ltv,0)}</b>`),
+    FC('Хугацааны дундаж харьцаа','借入期間の平均返済余裕率::EN::Average coverage over the loan term','<b>дундаж</b> = Σ ашиг¥(y) / Σ төлбөр(y)  (зээл төлөх жилүүд)\nхамгийн муу = min( ашиг¥(y) / төлбөр(y) )',
+      'Эхний жилийн харьцаа зөвхөн нэг жилийг харуулдаг. Зардал түрээснээс хурдан өсвөл ашиг буурч, сүүлийн жилүүдэд төлбөрөө даахгүй болно — тиймээс бүх хугацааны дундаж болон хамгийн муу жилийг хамт харна.',
+      '最初の年の返済余裕率は1年分だけの数値です。費用が賃料より速く上がると利益が減り、後半の年には返済できなくなります。そのため借入期間全体の平均と最も低い年を併せて確認します。::EN::The first-year ratio covers one year only. If costs grow faster than rent, profit shrinks and later years cannot carry the payment, so check the whole-term average and the weakest year too.',
+      m.nPay?TN+`дундаж <b>${m.avgCover.toFixed(2)}x</b> · хамгийн муу <b>${m.minCover.toFixed(2)}x</b> (${m.worstYear} дахь жил) · ${m.nPay} жилийн ${m.yearsBelow}-д нь 1.00-ээс доогуур`:'Зээлгүй',
+      [['зардлын өсөлт ↑ → дундаж ↓','費用上昇率↑ → 平均↓::EN::cost growth↑ → average↓',1],['түрээс ↑ → дундаж ↑','賃料↑ → 平均↑::EN::rent↑ → average↑']]),
+    FC('Бодит тэнцэх цэг','実質損益分岐点::EN::Actual break-even','<b>бодит тэнцэх цэг</b> = эхний y, үүнд Σ ( ашиг¥ − татвар¥ ) ≥ Σ төлбөр (зээл + хүү)',
+      'Татварын дараах ашгийн хуримтлал зээлийн үндсэн дүн болон хүүгийн нийт төлбөрт хүрсэн жил. Үүнээс хойших ашиг бодит ашиг. Өртөг нөхөх жилээс ялгаатай: энэ нь зээл, хүү, татварыг тооцдог.',
+      '税引後の営業利益の累計が、借入の元本と利息の返済総額に達した年です。これ以降の利益が実質的な利益になります。投資回収年数と異なり、借入返済・利息・税金を考慮します。::EN::The year when cumulative after-tax operating profit reaches the total of principal and interest. Profit after it is real profit. Unlike payback, it accounts for the loan, interest and tax.',
+      m.totPay>1e-9?TN+`нийт төлбөр ${nf(m.totPay,1)} сая ¥ · татварын дараах ашиг ${m.rows.length} жилд ${nf(m.cumProfit,1)} сая ¥ → <b>${m.beReal!==null?m.beReal.toFixed(2)+' жил':'хүрэхгүй'}</b>`:'Зээлгүй',
+      [['төлбөр ↑ → тэнцэх цэг хожуу','返済総額↑ → 損益分岐点が遅くなる::EN::payments↑ → break-even later',1],['ашиг ↑ → тэнцэх цэг эрт','利益↑ → 損益分岐点が早まる::EN::profit↑ → break-even earlier']])
+  ];
+
+  const off='Идэвхгүй';
+  const c9=S.ext?[
+    FC('Үл хөдлөхийн үнэлгээ ба цэвэр хөрөнгө','不動産価値と純資産::EN::Property value and net worth',
+      '<b>үнэлгээ(N)</b> = үнэлгээ₮ × (1 + өсөлт%)^N / ханш(N)\n<b>цэвэр хөрөнгө</b> = үнэлгээ(N) − үлдсэн зээл(N) + Σ цэвэр мөнгө',
+      'Барилга баригдаагүй газар улсад буцдаг тул өнөөдөр үнэ цэнэгүй; баригдсаны дараа л үнэлгээ бий болно. Үнэлгээ баталгаажаагүй тул өгөөжийг «мөнгөн хэсэг» ба «үнэлгээний хэсэг» гэж тусад нь харуулна.',
+      '使われない土地は国に返還されるため現時点の価値はなく、建物が完成して初めて評価額が生じます。評価額は未確定のため、ROIを「現金部分」と「資産価値部分」に分けて表示します。::EN::Unused land reverts to the state, so it has no value today; value exists only once built. Because the figure is unconfirmed, ROI is split into a cash part and an asset-value part.',
+      m.vOn?TN+`${nf(S.landValue,1)} тэрбум ₮ → ${nf(m.assetV,1)} сая ¥ − зээл ${nf(m.debtEnd,1)} = <b>${nf(m.assetV-m.debtEnd,1)} сая ¥</b>; цэвэр мөнгө ${nf(m.cashOnly,1)} → цэвэр хөрөнгө <b>${nf(m.netWorth,1)} сая ¥</b>`:off,
+      [['үнэлгээ ↑ → өгөөж ↑','評価額↑ → ROI↑::EN::value↑ → ROI↑'],['үлдсэн зээл ↑ → цэвэр хөрөнгө ↓','未返済残高↑ → 純資産↓::EN::debt owed↑ → net worth↓',1]]),
+    FC('Татварын алдагдал шилжүүлэх','欠損金の繰越控除::EN::Tax-loss carry-forward',
+      'татвар ногдох(y) = max( 0, ашиг − хүү − элэгдэл − өмнөх алдагдал )\nалдагдал дараагийн N жилд ашиглагдана',
+      'Алдагдалтай жил татвар төлөхгүй (үндсэн загварт мөн адил). Нэмэлтээр тэр алдагдал дараагийн N жилийн ашгаас хасагдаж татварыг бууруулна. Татвар жилээр тооцогддог, сараар биш.',
+      '赤字の年に税金がかからない点は基本モデルと同じです。追加で、その損失が翌年以降N年間の課税所得から差し引かれ、税額が減ります。法人税は月次ではなく年単位で計算されます。::EN::A loss year pays no tax, as in the basic model. In addition, the loss is deducted from taxable profit in the next N years. Tax is assessed per year, not per month.',
+      m.tOn?TN+`ашигласан алдагдал <b>${nf(m.lossUsed,2)} сая ₮</b> · хугацаа дууссан ${nf(m.lossExpired,2)} · үлдсэн ${nf(m.lossOpen,2)}`:off,
+      [['шилжүүлэх жил ↑ → татвар ↓','繰越期間↑ → 税額↓::EN::carry years↑ → tax↓',1]]),
+    FC('Барилга барих хугацаа','工期と建設中の金利::EN::Build period and interest during construction',
+      '<b>барилгын хүү</b> = зээл × хүү% × (сар/12) × татсан%\nзээл(эхлэл) = зээл + шимтгэл + барилгын хүү',
+      'Барилгын үед орлого байхгүй, зээлийн хүү хуримтлагдаж зээлийн үндсэн дүнд нэмэгдэнэ. Нэмэлт «0 дэх жил» мөр гарч, өртөг нөхөх хугацааг барилга эхэлсэн цагаас мөн харуулна.',
+      '建設中は収入がなく、借入金利が積み上がって元本に上乗せされます。「0年目」の行が追加され、回収年数は着工時点からも表示されます。::EN::There is no income during the build; interest accrues and is added to the loan principal. A Year 0 row is added and payback is also shown from construction start.',
+      m.bOn?TN+`${nf(m.months,0)} сар → барилгын хүү <b>+${nf(m.idc,2)} сая ¥</b> → зээл ${nf(m.totalBase,1)} → ${nf(m.total,1)}${m.beStart!==null?` · өртөг нөхөлт барилгын эхлэлээс <b>${m.beStart.toFixed(1)} жил</b>`:''}`:off,
+      [['барилга барих хугацаа ↑ → зээл ↑','工期↑ → 借入残高↑::EN::build months↑ → loan↑',1]]),
+    FC('Төслийн IRR','プロジェクトIRR::EN::Project IRR',
+      '0 = −өртөг + Σ ( ашиг¥(y) − татвар¥(y) ) / (1+IRR)^t + үнэлгээ / (1+IRR)^T',
+      'Зээлийн нөхцөлөөс үл хамаарах төслийн жилийн өгөөж. Хугацааны үнэ цэнийг тооцдог тул энгийн ROI-оос найдвартай. Үнэлгээ асаалттай бол сүүлийн жилд нэмэгдэнэ.',
+      '借入条件に左右されない、プロジェクト自体の年利回り。時間価値を考慮するため、単純なROIより信頼できます。「不動産価値」をオンにすると最終年に評価額が加算されます。::EN::Yearly return of the project itself, independent of financing. It accounts for timing, so it is more reliable than plain ROI. With Property value on, the value is added in the final year.',
+      TN+`IRR <b>${m.irr===null?'—':pc(m.irr,1)}</b>`,
+      [['ашиг ↑ → IRR ↑','営業利益↑ → IRR↑::EN::profit↑ → IRR↑'],['өртөг ↑ → IRR ↓','事業費↑ → IRR↓::EN::cost↑ → IRR↓',1]])
+  ]:[];
+
+  document.getElementById('formulasBody').innerHTML=`
+  <section style="padding-top:64px;border-top:1px solid var(--line);margin-top:44px">
+    <div class="eyebrow" data-ja="計算方法" data-en="Methodology">Хэрхэн тооцдог вэ</div>
+    <h2 data-ja="モデルのすべての計算式" data-en="All formulas in the model">Загварын бүх томьёо</h2>
+    <p class="lede" data-ja="計算の順序：規模→賃料・売上→運営費→営業利益→借入→税金→キャッシュフロー→主要指標。各カードの下段は現在の入力値で計算した結果で、入力を変えると即時に更新されます。矢印のチップは各変数が結果にどう影響するかを示します。" data-en="Calculation order: size → rent & revenue → costs → profit → loan → tax → cash flow → key metrics. Each card's bottom line uses your current inputs and updates live. Arrow chips show how each variable affects the result.">
+      Тооцооны дараалал: хэмжээ → түрээс, орлого → зардал → ашиг → зээл → татвар → мөнгөн урсгал → гол үзүүлэлтүүд.
+      Карт бүрийн доод мөр нь <b>таны одоогийн утгаар</b> тооцсон үр дүн — оролтыг өөрчлөхөд шууд шинэчлэгдэнэ.
+      Сумтай шошго нь хувьсагч үр дүнд хэрхэн нөлөөлөхийг харуулна.</p>
+    ${stepH(1,'Хэмжээ, мөнгө, валют','規模・金額・為替::EN::Size, money & FX')}<div class="fcards">${c1.join('')}</div>
+    ${stepH(2,'Түрээс ба орлого','賃料と売上::EN::Rent & revenue')}<div class="fcards">${c2.join('')}</div>
+    ${stepH(3,'Үйл ажиллагааны зардал','運営費::EN::Operating costs')}<div class="fcards">${c3.join('')}</div>
+    ${stepH(4,'Үйл ажиллагааны ашиг','営業利益::EN::Operating profit')}<div class="fcards">${c4.join('')}</div>
+    ${stepH(5,'Зээл','借入::EN::Loan')}<div class="fcards">${c5.join('')}</div>
+    ${stepH(6,'Татвар','税金::EN::Tax')}<div class="fcards">${c6.join('')}</div>
+    ${stepH(7,'Мөнгөн урсгал','キャッシュフロー::EN::Cash flow')}<div class="fcards">${c7.join('')}</div>
+    ${stepH(8,'Гол үзүүлэлтүүд','主要指標::EN::Key metrics')}<div class="fcards">${c8.join('')}</div>
+    ${c9.length?stepH(9,'Өргөтгөсөн тооцоо','拡張モデル::EN::Extended model')+`<div class="fcards">${c9.join('')}</div>`:''}
+  </section>
+  <footer>
+    <div data-ja="初期値は案B（2階建て）の事業計画と一致します。入力内容はこのブラウザに自動保存され、「リンクをコピー」で他の人と共有できます。「初期値に戻す」で保存内容も消去されます。" data-en="Defaults match the Option B (2-floor) business plan. Inputs are saved automatically in this browser and can be shared with Copy link. Reset clears the saved inputs too.">
+    Анхны утгууд нь Хувилбар Б (2 давхар)-ийн бизнес төлөвлөгөөтэй тохирно. «1 давхар» товчоор Хувилбар А-г ачаална.
+    Өөрчлөлт энэ хөтөч дээр автоматаар хадгалагдана; «Холбоос хуулах» товчоор бусадтай хуваалцана. «Сэргээх» нь хадгалсан утгыг мөн устгана.</div>
+    <div style="margin-top:8px" data-ja="財務モデル ${VERSION} ・ ${BUILD}。計算ロジックは Excel モデル（МонШибасаки_Агуулах_Санхүүгийн_загвар_MN.xlsx）の基本ケース4通りと一致することを確認済みです。" data-en="Financial model ${VERSION} · ${BUILD}. Calculations verified against the four base cases of the Excel model.">
+    Загвар ${VERSION} · ${BUILD}. Тооцоо нь Excel загварын 4 үндсэн хувилбартай тулгасан (өргөтгөсөн тооцоо унтраалттай үед).</div>
+    <details class="cl"><summary data-ja="更新履歴" data-en="Change log">Өөрчлөлтийн түүх</summary><ul>
+      <li>v02 — ${BUILD}: зээл төлөх харьцаа «1 дэх жил»-ийн гэж тодотгосон · шинэ хоёр блок (бүх хугацааны дундаж харьцаа, бодит тэнцэх цэг) · бодит тэнцэх цэгийн график · бүтэлгүйтлийн тайлбарыг шалтгаанаар нь, зөв тоогоор харуулдаг болсон (хамгийн муу жил, 1.00-ээс доогуур жилийн тоо, шаардлагатай түрээс)</li>
+      <li>v01 — ${BUILD}: Япон, Англи hover тайлбар · 1/2 давхрын талбайгаас нийт талбайг автоматаар тооцно · автомат хадгалалт, холбоос хуваалцах · шалгалтын тэмдэглэл · өөрчилсөн талбарын тэмдэг ба ↺ · 3 хэлтэй CSV · «Өргөтгөсөн тооцоо» (үл хөдлөхийн үнэлгээ, татварын алдагдал шилжүүлэх, барилга барих хугацаа, IRR) · элэгдлийг ашиглалтын хугацаанд хязгаарлав</li>
+    </ul></details>
+  </footer>`;
+}
+
+/* ═════════ CSV ═════════ */
+function exportCsv(){
+  const m=calc(S,S.sc);
+  const H=[['Хувилбар','シナリオ','Scenario'],['Жил','年','Year'],['Түрээс ₮/м²','純賃料 ₮/㎡','Net rent ₮/m²'],['Дүүргэлт %','稼働率 %','Occupancy %'],
+    ['Орлого сая ₮','売上 百万₮','Revenue ₮M'],['Зардал сая ₮','運営費 百万₮','Operating costs ₮M'],['Ашиг сая ¥','営業利益 百万円','Operating profit ¥M'],
+    ['Хүү сая ¥','利息 百万円','Interest ¥M'],['Үндсэн сая ¥','元本 百万円','Principal ¥M'],['Төлбөр сая ¥','返済額 百万円','Payment ¥M'],
+    ['Татвар сая ₮','法人税 百万₮','Tax ₮M'],['Цэвэр мөнгө сая ¥','純キャッシュ 百万円','Net cash ¥M'],['Хуримтлал сая ¥','累積 百万円','Cumulative ¥M'],
+    ['Үлдэгдэл сая ¥','借入残高 百万円','Loan balance ¥M']];
+  const L=[H.map(h=>'"'+h.join(' / ')+'"').join(',')];
+  m.rows.forEach(r=>L.push(['"'+m.name.replace(/"/g,'""')+'"',r.year,r.rent.toFixed(2),r.occ.toFixed(2),r.revenue.toFixed(3),r.opex.toFixed(3),
+    r.ebitdaJpy.toFixed(4),r.interest.toFixed(4),r.principal.toFixed(4),r.payment.toFixed(4),r.taxMnt.toFixed(3),
+    r.netCash.toFixed(4),r.cumJpy.toFixed(2),r.balance.toFixed(2)].join(',')));
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob(['\uFEFF'+L.join('\n')],{type:'text/csv;charset=utf-8'}));
+  a.download='monshibasaki_model_'+VERSION+'.csv'; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+
+/* ═════════ TOOLTIP ═════════ */
+const tip=document.getElementById('tip');
+function hideTip(){ tip.classList.remove('on'); }
+document.addEventListener('mousemove',e=>{
+  const jaEl=e.target.closest&&e.target.closest('[data-ja]');
+  const curEl=e.target.closest&&e.target.closest('[data-cur]');
+  if(!jaEl&&!curEl){ hideTip(); return; }
+  let html='';
+  if(jaEl) html+='<span class="jl">日本語</span>'+esc(jaEl.dataset.ja);
+  if(jaEl&&jaEl.dataset.en) html+='<span class="en"><span class="el">English</span>'+esc(jaEl.dataset.en)+'</span>';
+  if(curEl&&curEl.dataset.cur) html+=(html?'<br>':'')+esc(curEl.dataset.cur);
+  if(!html){ hideTip(); return; }
+  tip.innerHTML=html;
+  tip.classList.add('on');
+  const w=tip.offsetWidth, h=tip.offsetHeight;
+  let x=e.clientX+14, y=e.clientY+16;
+  if(x+w>window.innerWidth-8) x=e.clientX-w-14;
+  if(y+h>window.innerHeight-8) y=e.clientY-h-14;
+  tip.style.left=Math.max(8,x)+'px'; tip.style.top=Math.max(8,y)+'px';
+});
+document.addEventListener('mouseleave',hideTip);
+window.addEventListener('scroll',hideTip,{passive:true});
+
+/* ═════════ RENDER + EVENTS ═════════ */
+function render(){
+  updateCtrl(); updateSeg(); renderModel(); renderFormulas();
+  tagCurrency(document.getElementById('modelBody')); tagCurrency(document.getElementById('formulasBody'));
+  if(drawerOpen) updateLive();
+  saveState();
+}
+let timer;
+function commitNumber(t){
+  let v=Number(t.value);
+  if(!Number.isFinite(v)) return false;
+  if(t.dataset.min!==undefined && v<+t.dataset.min) v=+t.dataset.min;
+  set(t.dataset.p,v);
+  if(t.dataset.p.startsWith('sc.')) syncPreset();
+  return true;
+}
+document.addEventListener('input',e=>{
+  const t=e.target;
+  if(t.dataset.p){
+    if(t.type==='checkbox'){ set(t.dataset.p,t.checked); if(t.dataset.p.startsWith('sc.'))syncPreset(); }
+    else if(t.tagName==='SELECT'){ return; }
+    else if(!commitNumber(t)) return;
+    clearTimeout(timer); timer=setTimeout(render,t.type==='range'?60:240);
+  } else if(t.dataset.t){
+    set(t.dataset.t,t.value); if(t.dataset.t.startsWith('sc.'))syncPreset();
+    clearTimeout(timer); timer=setTimeout(render,400);
+  }
+});
+document.addEventListener('change',e=>{
+  const t=e.target;
+  if(t.tagName==='SELECT'&&t.dataset.p){ set(t.dataset.p,t.value); render(); return; }
+  if(t.type==='number'&&t.dataset.p){ if(commitNumber(t)){ t.value=get(t.dataset.p); render(); } }
+});
+document.addEventListener('click',e=>{
+  const rb=e.target.closest('[data-reset-btn]');
+  if(rb){
+    const el=rb.parentNode.querySelector('[data-p]'), p=el.dataset.p, bv=baseVal(p);
+    set(p,bv===undefined?get(p):(typeof bv==='object'?clone(bv):bv));
+    if(el.type==='checkbox') el.checked=!!get(p); else el.value=get(p);
+    if(p.startsWith('sc.')) syncPreset();
+    render(); return;
+  }
+  const pr=e.target.closest('[data-preset]'); if(pr){ loadPreset(pr.dataset.preset); return; }
+  const tb=e.target.closest('[data-tab]');
+  if(tb){ activeTab=tb.dataset.tab;
+    document.querySelectorAll('#ptabs button').forEach(b=>b.classList.toggle('on',b.dataset.tab===activeTab));
+    document.querySelectorAll('#pbody .pane').forEach(p=>p.classList.toggle('on',p.dataset.pane===activeTab));
+    document.getElementById('pbody').scrollTop=0; return; }
+  const d=e.target.closest('[data-sd]');
+  if(d){ if(S.sc.staff.length>1){ S.sc.staff.splice(+d.dataset.sd,1); syncPreset();
+      const sc=document.getElementById('pbody').scrollTop; drawAdv(); document.getElementById('pbody').scrollTop=sc; render(); }
+    return; }
+  if(e.target.id==='addS'){
+    S.sc.staff.push({name:'Шинэ ажлын байр',count:1,salary:1800000,burden:0,bonusMonths:0}); syncPreset();
+    const sc=document.getElementById('pbody').scrollTop; drawAdv(); document.getElementById('pbody').scrollTop=sc; render(); return; }
+});
+document.getElementById('bMore').onclick=openDrawer;
+document.getElementById('bClose').onclick=closeDrawer;
+document.getElementById('backdrop').onclick=closeDrawer;
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&drawerOpen) closeDrawer(); });
+document.getElementById('bReset').onclick=()=>{
+  if(confirm('Бүх үзүүлэлтийг анхны төлөвлөгөөнд (2 давхар) сэргээх үү? Хадгалсан өөрчлөлт устна.')){
+    S=clone(DEF); if(drawerOpen) drawAdv(); render(); toast('Анхны утгад сэргээлээ · 初期値に戻しました · Reset to defaults'); }
+};
+document.getElementById('bShare').onclick=()=>{
+  const url=shareUrl(), done=()=>toast('Холбоос хуулагдлаа · リンクをコピーしました · Link copied');
+  if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(done,()=>window.prompt('Copy / コピー / Хуулах:',url));
+  else window.prompt('Copy / コピー / Хуулах:',url);
+};
+document.getElementById('bPrint').onclick=()=>window.print();
+document.getElementById('bCsv').onclick=exportCsv;
+
+buildCtrl(); render();
+if(loadedFrom==='link') toast('Хуваалцсан холбоосоос ачааллаа · 共有リンクから読み込みました · Loaded from shared link');
+else if(loadedFrom==='saved') toast('Хадгалсан утгуудыг сэргээлээ · 保存した入力を復元しました · Restored your saved inputs');
+</script>
 </body>
 </html>
