@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Мон-Шибасаки Агуулах — Санхүүгийн загвар · v02</title>
+<style>
+:root{
+  --ink:#16181A; --mute:#82858B; --faint:#B4B7BC; --line:#EBE9E4; --bg:#FCFBF9;
+  --navy:#2F4858; --rust:#B4713D; --red:#9C3D2E; --green:#2E6049; --sand:#C9BFA8; --blue:#8AA4B2;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0; background:var(--bg); color:var(--ink);
+  font:400 15px/1.55 ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI","Helvetica Neue",Arial,"Noto Sans",sans-serif;
+  -webkit-font-smoothing:antialiased; font-variant-numeric:tabular-nums}
+body.noscroll{overflow:hidden}
+h1,h2,h3{margin:0; font-weight:600; letter-spacing:-.018em}
+button{font:inherit; cursor:pointer}
+[data-ja],[data-cur]{cursor:help}
+.wrap{max-width:1080px; margin:0 auto; padding:0 28px}
+@media(max-width:640px){.wrap{padding:0 18px}}
+
+/* header */
+header{border-bottom:1px solid var(--line); background:#fff}
+.hd{display:flex; align-items:center; gap:16px; padding:18px 0; flex-wrap:wrap}
+.hd h1{font-size:17px}
+.hd .sub{font-size:13px; color:var(--mute); margin-top:1px}
+.spacer{flex:1}
+.seg{display:flex; background:#F2F0EC; border-radius:9px; padding:3px}
+.seg button{border:0; background:transparent; color:var(--mute); font-size:13px; font-weight:500;
+  padding:6px 13px; border-radius:7px; white-space:nowrap}
+.seg button.on{background:#fff; color:var(--ink); font-weight:600; box-shadow:0 1px 2px rgba(0,0,0,.07)}
+.lnk{border:0; background:transparent; color:var(--mute); font-size:13px; padding:6px 4px}
+.lnk:hover{color:var(--ink)}
+
+/* sticky slider strip — sliders only */
+.ctrl{position:sticky; top:0; z-index:40; background:rgba(255,255,255,.94);
+  backdrop-filter:saturate(180%) blur(12px); border-bottom:1px solid var(--line)}
+.cg{display:grid; grid-template-columns:repeat(6,1fr); gap:24px; padding:14px 0 12px}
+@media(max-width:1000px){.cg{grid-template-columns:repeat(3,1fr); gap:18px}}
+@media(max-width:620px){.cg{grid-template-columns:repeat(2,1fr)}}
+.c .top{display:flex; justify-content:space-between; align-items:baseline; gap:6px}
+.c .lab{font-size:11px; color:var(--mute); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.c .val{font-size:13.5px; font-weight:600; white-space:nowrap}
+input[type=range]{-webkit-appearance:none; appearance:none; width:100%; height:3px; margin:9px 0 0;
+  border-radius:2px; background:#E4E1DA; outline:0}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none; width:14px; height:14px; border-radius:50%;
+  background:var(--navy); border:2.5px solid #fff; box-shadow:0 1px 3px rgba(0,0,0,.25); cursor:pointer}
+input[type=range]::-moz-range-thumb{width:11px;height:11px;border-radius:50%;background:var(--navy);
+  border:2.5px solid #fff; cursor:pointer}
+.more{display:flex; justify-content:space-between; align-items:center; padding-bottom:10px; gap:12px}
+.more .hintbar{font-size:11.5px; color:var(--faint)}
+.more button{border:1px solid var(--navy); background:var(--navy); color:#fff; font-size:12px;
+  padding:6px 14px; border-radius:20px}
+.more button:hover{background:#243844}
+
+/* drawer */
+.drawer{position:fixed; inset:0; z-index:100; display:none}
+.drawer.open{display:block}
+.backdrop{position:absolute; inset:0; background:rgba(22,24,26,.34); animation:fade .18s ease}
+.panel{position:absolute; top:0; right:0; bottom:0; width:min(560px,100%); background:#FDFCFA;
+  display:flex; flex-direction:column; box-shadow:-12px 0 40px rgba(0,0,0,.14); animation:slide .22s ease}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@keyframes slide{from{transform:translateX(40px);opacity:.4}to{transform:none;opacity:1}}
+.phead{padding:18px 22px 0; border-bottom:1px solid var(--line); background:#fff}
+.phead .r1{display:flex; align-items:center; gap:10px}
+.phead h3{font-size:16px}
+.xclose{margin-left:auto; width:32px; height:32px; border:1px solid var(--line); border-radius:8px;
+  background:#fff; font-size:18px; line-height:1; color:var(--mute)}
+.xclose:hover{color:var(--ink); border-color:var(--faint)}
+.ptabs{display:flex; gap:2px; margin-top:14px; overflow-x:auto}
+.ptabs button{border:0; background:transparent; padding:9px 12px; font-size:13px; color:var(--mute);
+  border-bottom:2px solid transparent; white-space:nowrap}
+.ptabs button.on{color:var(--ink); font-weight:600; border-bottom-color:var(--rust)}
+.pbody{flex:1; overflow-y:auto; padding:18px 22px 60px; overscroll-behavior:contain}
+.pane{display:none} .pane.on{display:block}
+.grp{margin-bottom:24px}
+.grp h4{font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--rust);
+  font-weight:700; margin:0 0 8px}
+.preset{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:6px}
+.preset button{border:1px solid var(--line); background:#fff; border-radius:11px; padding:12px 14px;
+  text-align:left; transition:.12s}
+.preset button b{display:block; font-size:14px}
+.preset button span{font-size:11.5px; color:var(--mute)}
+.preset button.on{border-color:var(--navy); box-shadow:0 0 0 1px var(--navy); background:#F5F8F9}
+.f{display:flex; justify-content:space-between; align-items:center; gap:10px; padding:4px 0}
+.f label{font-size:12.8px; color:#4E5155; flex:1; min-width:0}
+.f input[type=number]{width:108px; flex:none; height:30px; text-align:right; font:inherit; font-size:12.8px;
+  border:1px solid var(--line); border-radius:7px; padding:0 8px; background:#fff; color:var(--ink)}
+.f input[type=text]{flex:1; min-width:0; height:30px; font:inherit; font-size:12.8px;
+  border:1px solid var(--line); border-radius:7px; padding:0 9px; background:#fff}
+.f input:focus{outline:2px solid var(--navy); outline-offset:-1px}
+.f select{height:30px; font:inherit; font-size:12.8px; border:1px solid var(--line); border-radius:7px;
+  padding:0 5px; background:#fff; max-width:180px}
+.sw,.f label.sw{position:relative; width:36px; height:20px; flex:none}
+.sw input{position:absolute; opacity:0; width:0; height:0}
+.sw i{position:absolute; inset:0; background:#DBD8D1; border-radius:20px; transition:.16s; cursor:pointer}
+.sw i::after{content:""; position:absolute; width:14px; height:14px; top:3px; left:3px; background:#fff;
+  border-radius:50%; transition:.16s}
+.sw input:checked + i{background:var(--green)}
+.sw input:checked + i::after{transform:translateX(16px)}
+.stf{border:1px solid var(--line); border-radius:10px; padding:9px 11px; margin-bottom:8px; background:#fff}
+.stf .r{display:flex; gap:7px; margin-bottom:4px}
+.xb{width:30px; height:30px; flex:none; border:1px solid var(--line); background:#fff; border-radius:7px;
+  color:var(--red); font-size:14px; line-height:1}
+.xb:hover{background:#FDF3F1}
+.addb{width:100%; padding:8px; font-size:12.5px; color:var(--rust); background:#fff;
+  border:1px dashed #E0D3BE; border-radius:8px}
+.addb:hover{background:#FFFBF4}
+.note{font-size:11.8px; color:var(--mute); margin-top:8px; line-height:1.55; background:#F4F2EC;
+  border-radius:8px;
+padding:7px 10px}
+.note b{color:var(--ink)}
+
+/* body */
+section{padding:52px 0 0}
+.eyebrow{font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--rust); font-weight:700}
+section h2{font-size:23px; margin:7px 0 4px}
+.lede{font-size:14px; color:var(--mute); max-width:700px; line-height:1.6}
+.figcap{font-size:12px; color:var(--mute); margin-top:12px; font-style:italic}
+.kpis{display:grid; grid-template-columns:repeat(5,1fr); gap:1px; background:var(--line);
+  border:1px solid var(--line); border-radius:13px; overflow:hidden; margin-top:24px}
+@media(max-width:900px){.kpis{grid-template-columns:repeat(2,1fr)}}
+.k{background:#fff; padding:17px 18px}
+.k .v{font-size:25px; font-weight:600; letter-spacing:-.03em; line-height:1.15}
+.k .l{font-size:11.5px; color:var(--mute); margin-top:4px}
+.k.good .v{color:var(--green)} .k.bad .v{color:var(--red)} .k.warn .v{color:#A8741A}
+.k .s{font-size:11.5px; color:var(--mute); margin-top:3px; line-height:1.45}
+.kpis.two{grid-template-columns:repeat(2,1fr); margin-top:12px}
+@media(max-width:700px){.kpis.two{grid-template-columns:1fr}}
+.vd{display:flex; gap:13px; align-items:flex-start; margin-top:22px; padding:19px 21px;
+  border-radius:13px; border:1px solid var(--line); background:#fff}
+.vd.no{border-color:#EBD3CC; background:#FDF6F4}
+.vd .dot{width:9px; height:9px; border-radius:50%; margin-top:7px; flex:none; background:var(--green)}
+.vd.no .dot{background:var(--red)}
+.vd h3{font-size:15px; margin-bottom:5px}
+.vd.no h3{color:#7E2F22}
+.vd p{margin:0; font-size:13.5px; line-height:1.75; color:#55585C}
+.vd.no p{color:#6E3428}
+.vd b{color:var(--ink)} .vd.no b{color:#5A241A}
+.fig{margin-top:26px}
+svg{display:block; width:100%; height:auto; overflow:visible}
+.lg{display:flex; gap:18px; flex-wrap:wrap; margin-top:14px; font-size:12px; color:var(--mute)}
+.lg i{display:inline-block; width:10px; height:10px; border-radius:2.5px; margin-right:7px; vertical-align:-1px}
+.tbl{margin-top:22px; overflow-x:auto; -webkit-overflow-scrolling:touch}
+table{width:100%; border-collapse:collapse; font-size:13px}
+caption{text-align:left; font-size:13px; font-weight:600; padding-bottom:11px; color:var(--ink)}
+th{font-size:10.5px; letter-spacing:.04em; text-transform:uppercase; color:var(--mute); font-weight:600;
+  text-align:right; padding:0 0 9px 16px; border-bottom:1px solid var(--ink); white-space:nowrap}
+th:first-child{text-align:left; padding-left:0}
+td{text-align:right; padding:9px 0 9px 16px; border-bottom:1px solid var(--line); white-space:nowrap}
+td:first-child{text-align:left; padding-left:0; color:#4E5155}
+tr.hl td{background:#F7F5F1; font-weight:600}
+tr.hl td:first-child{color:var(--ink)}
+.neg{color:var(--red); font-weight:600} .pos{color:var(--green); font-weight:600}
+.sm{font-size:12px} .sm td,.sm th{padding-left:13px}
+
+/* formulas */
+.fstep{display:flex; align-items:baseline; gap:12px; margin:36px 0 4px}
+.fstep .n{width:26px; height:26px; flex:none; border-radius:50%; background:var(--navy); color:#fff;
+  font-size:13px; font-weight:700; display:flex; align-items:center; justify-content:center; transform:translateY(4px)}
+.fstep h3{font-size:17px}
+.fcards{display:grid; grid-template-columns:repeat(2,1fr); gap:16px; margin-top:14px}
+@media(max-width:820px){.fcards{grid-template-columns:1fr}}
+.fc{background:#fff; border:1px solid var(--line); border-radius:13px; padding:17px 19px}
+.fc h4{font-size:13.8px; margin:0 0 8px}
+.fc .fx{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:12.3px; line-height:1.75;
+  background:#F7F5F1; border:1px solid var(--line); border-radius:8px; padding:10px 13px; white-space:pre-wrap;
+  color:#23303A}
+.fc .fx b{color:var(--rust); font-weight:600}
+.chips{display:flex; flex-wrap:wrap; gap:6px; margin-top:10px}
+.chip{font-size:11.5px; padding:3px 9px; border-radius:20px; background:#EEF3F5; color:#2F4858;
+  border:1px solid #DCE6EA; white-space:nowrap}
+.chip.dn{background:#FBF0EC; color:#8A3526; border-color:#F0D9D1}
+.fc .exp{font-size:12.6px; color:#55585C; margin-top:10px; line-height:1.62}
+.fc .live{font-size:12px; color:var(--mute); margin-top:9px; padding-top:9px; border-top:1px dashed var(--line); line-height:1.6}
+.fc .live b{color:var(--green); font-weight:600}
+footer{margin:60px 0 40px; padding-top:20px; border-top:1px solid var(--line);
+  font-size:12px; color:var(--faint); line-height:1.7}
+
+/* tooltip */
+#tip{position:fixed; z-index:300; max-width:320px; background:#1F2A31; color:#fff; font-size:12.5px; line-height:1.6;
+  padding:8px 11px; border-radius:8px; pointer-events:none; opacity:0; transition:opacity .1s; white-space:pre-line;
+  font-family:"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic UI","Yu Gothic","Meiryo",sans-serif;
+  box-shadow:0 6px 18px rgba(0,0,0,.2)}
+#tip.on{opacity:1}
+#tip .jl{font-size:10px; letter-spacing:.1em; color:#C9BFA8; display:block; margin-bottom:2px}
+#tip .en{display:block; margin-top:6px; padding-top:6px; border-top:1px solid rgba(255,255,255,.18);
+  font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}
+#tip .el{font-size:10px; letter-spacing:.1em; color:#8AA4B2; display:block; margin-bottom:2px}
+
+/* validation notes, change markers, toast, changelog */
+.warns{display:grid; gap:6px; margin:0 0 18px}
+.wn{font-size:12.8px; line-height:1.5; padding:8px 12px; border-radius:9px; border:1px solid #EAD9B5; background:#FFFAEE; color:#6B5219}
+.wn.err{border-color:#EBD3CC; background:#FDF6F4; color:#7E2F22}
+.wn b{display:inline-block; width:16px; font-weight:700}
+#dWarn:not(:empty){margin-bottom:18px}
+.f .rs{width:22px; height:22px; flex:none; border:0; background:transparent; color:var(--rust); font-size:14px; line-height:1; padding:0; visibility:hidden}
+.f.chg .rs{visibility:visible}
+.f.chg > label:first-child::before{content:""; display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--rust); margin-right:6px; vertical-align:1px}
+.f.ref > label:first-child{color:var(--faint)}
+.hid{display:none!important}
+.xs{border-left:2px solid #E0D3BE; padding-left:10px; margin:10px 0 14px}
+.xs.off{opacity:.5}
+.f:not(.ref) .reftag{display:none}
+.xnote{border:1px solid #E0D3BE; background:#FFFBF4; border-radius:12px; padding:12px 16px; margin:0 0 18px; font-size:13px; color:#55585C}
+.xnote b{color:var(--ink)}
+.xnote table{margin-top:8px; max-width:520px}
+.xtag{font-size:10.5px; color:var(--rust); background:#FBF3E8; border:1px solid #EFDDC2; border-radius:20px; padding:1px 8px}
+.chgc{font-size:11px; color:var(--rust); background:#FBF3E8; border:1px solid #EFDDC2; border-radius:20px; padding:1px 9px}
+.chgc:empty{display:none}
+#toast{position:fixed; left:50%; bottom:28px; transform:translateX(-50%); z-index:400; background:#1F2A31; color:#fff;
+  font-size:12.5px; padding:9px 16px; border-radius:20px; opacity:0; pointer-events:none; transition:opacity .2s}
+#toast.on{opacity:1}
+details.cl{margin-top:10px} details.cl summary{cursor:pointer; color:var(--mute)} details.cl ul{margin:6px 0 0; padding-left:18px}
+
+@media print{.ctrl,.drawer,.lnk,.more,.seg,#tip,#toast,.rs,.chgc{display:none!important}
+  section{padding-top:30px; break-inside:avoid} body{background:#fff}}
+</style>
+</head>
+<body>
+
+<header><div class="wrap hd">
+  <div>
+    <h1 data-ja="モンシバサキ倉庫センター" data-en="Mon-Shibasaki Warehouse">Мон-Шибасаки Агуулах</h1>
+    <div class="sub" data-ja="財務モデル・ウランバートル" data-en="Financial model · Ulaanbaatar">Санхүүгийн загвар · Улаанбаатар</div>
+  </div>
+  <div class="spacer"></div>
+  <div class="seg" id="seg"></div>
+  <button class="lnk" id="bReset" data-ja="初期値に戻す" data-en="Reset to defaults">Сэргээх</button>
+  <button class="lnk" id="bShare" data-ja="現在の入力内容を再現できるリンクをコピーします" data-en="Copy a link that reproduces your current inputs">Холбоос хуулах</button>
+  <button class="lnk" id="bCsv" data-ja="CSVでダウンロード" data-en="Download as CSV">CSV татах</button>
+  <button class="lnk" id="bPrint" data-ja="印刷" data-en="Print">Хэвлэх</button>
+</div></header>
+
+<div class="ctrl">
+  <div class="wrap">
+    <div class="cg" id="ctrl"></div>
+    <div class="more">
+      <span class="hintbar" id="hintbar"></span>
+      <button id="bMore" data-ja="すべての前提条件を開く" data-en="Open all assumptions">Бүх үзүүлэлт ⚙</button>
+    </div>
+  </div>
+</div>
+
+<div class="drawer" id="drawer" aria-hidden="true">
+  <div class="backdrop" id="backdrop"></div>
+  <div class="panel" role="dialog" aria-label="Бүх үзүүлэлт">
+    <div class="phead">
+      <div class="r1">
+        <h3 data-ja="すべての前提条件" data-en="All assumptions">Бүх үзүүлэлт</h3>
+        <span class="chgc" id="chgCount" data-ja="初期値から変更した項目の数" data-en="Number of fields changed from defaults"></span>
+        <button class="xclose" id="bClose" data-ja="閉じる（Escキー）" data-en="Close (Esc)">×</button>
+      </div>
+      <div class="ptabs" id="ptabs"></div>
+    </div>
+    <div class="pbody" id="pbody"></div>
+  </div>
+</div>
+
+<div class="wrap">
+  <div id="modelBody"></div>
+  <div id="formulasBody"></div>
+</div>
+
+<div id="tip"></div>
+<div id="toast"></div>
+
+<script>
+"use strict";
+/* ═════════ CONSTANTS ═════════ */
+const OPEX_KEYS=['maintenance','security','insurance','marketing','administration','accounting',
+  'internet','software','cleaning','repairs','misc','management','heating','electricity','water'];
+const OPEX_LBL={
+  maintenance:['Засвар үйлчилгээ','維持管理費','Maintenance'], security:['Хамгаалалт','警備費','Security'], insurance:['Даатгал','保険料','Insurance'],
+  marketing:['Маркетинг','マーケティング費','Marketing'], administration:['Удирдлага','管理費','Administration'], accounting:['Нягтлан бодох','会計費','Accounting'],
+  internet:['Интернэт','インターネット','Internet'], software:['Программ хангамж','ソフトウェア','Software'], cleaning:['Цэвэрлэгээ','清掃費','Cleaning'],
+  repairs:['Их засвар','修繕費','Major repairs'], misc:['Бусад','その他','Other'], management:['Барилгын менежмент','建物管理費','Building management'],
+  heating:['Халаалт','暖房費','Heating'], electricity:['Цахилгаан','電気代','Electricity'], water:['Ус','水道代','Water']};
+const UTIL={heating:1,electricity:1,water:1};
+const INF_OF={maintenance:'maintenanceInflation',insurance:'insuranceInflation',marketing:'marketingInflation',
+  heating:'utilitiesInflation',electricity:'utilitiesInflation',water:'utilitiesInflation'};
+const INF_ALL=['salaryGrowth','maintenanceInflation','insuranceInflation','marketingInflation','utilitiesInflation','otherOpexInflation'];
+function ox(m,a){const o={};OPEX_KEYS.forEach(k=>o[k]=0);o.maintenance=m;o.administration=a;
+  o.heating=40;o.electricity=8;o.water=2;return o;}
+/* Base-plan presets: 1 floor = Option A, 2 floors = Option B */
+const PRESETS={
+  A:{name:'Хувилбар А · 1 давхар',ground:600,second:0,construction:55,contingency:0,
+     fitout:0,equipment:0,constructionMonths:7,openingYear:2027,loanAmount:55,
+     staff:[{name:'Менежер',count:1,salary:2500000,burden:0,bonusMonths:0},
+            {name:'Агуулахын ажилтан',count:1,salary:2500000,burden:0,bonusMonths:0}],
+     opex:ox(8.6,20), tenantPaid:{heating:true,electricity:true,water:true}},
+  B:{name:'Хувилбар Б · 2 давхар',ground:600,second:450,construction:90,contingency:0,
+     fitout:0,equipment:0,constructionMonths:7,openingYear:2027,loanAmount:90,
+     staff:[{name:'Менежер',count:1,salary:2500000,burden:0,bonusMonths:0},
+            {name:'Агуулахын ажилтан',count:2,salary:1875000,burden:0,bonusMonths:0}],
+     opex:ox(17.3,20), tenantPaid:{heating:true,electricity:true,water:true}}
+};
+const clone=o=>JSON.parse(JSON.stringify(o));
+const DEF={
+  preset:'B', base:'B',
+  ext:false, extValue:false, valueGrowth:0, extTax:false, lossYears:2, extBuild:false, drawdown:50,
+  horizon:20, roiYears:0, includeTerminal:false, terminalPct:100, landValue:3,
+  fx:23, simulateFx:false, fxDep:0,
+  rent:40000, vat:10, vatInclusive:true, occupancy:75, rentablePct:100,
+  rampYears:0, rampStart:50, rentFreeMonths:0,
+  yearsFixed:3, reviewEvery:3, rentAdjustment:15, maxRentIncrease:15,
+  otherMonthlyIncome:0, otherIncomeGrowth:0, badDebt:0, avgTenantArea:30,
+  cit:10, propertyTax:1, propertyTaxBase:'construction',
+  interestDeductible:true, depreciation:false, usefulLife:30,
+  salaryGrowth:9, maintenanceInflation:9, insuranceInflation:9, marketingInflation:9,
+  utilitiesInflation:9, otherOpexInflation:9,
+  sensMin:25000, sensStep:5000,
+  loan:{rate:3,term:15,startYear:1,graceYears:0,interestOnlyYears:0,fee:0,balloon:0,method:'annuity'},
+  sc:clone(PRESETS.B)
+};
+/* ═════════ VERSION / SAVED STATE / SHARE LINK ═════════ */
+const VERSION='v02', BUILD='2026-10-02', STORE_KEY='monshibasaki_model_v02';
+/* only values that differ from DEF are saved or shared, so later default changes still reach old links */
+function diffObj(cur,def){
+  if(cur===null||typeof cur!=='object'||Array.isArray(cur)) return JSON.stringify(cur)===JSON.stringify(def)?undefined:cur;
+  const out={}; let any=false;
+  for(const k of Object.keys(cur)){ const d=diffObj(cur[k],def==null?undefined:def[k]); if(d!==undefined){ out[k]=d; any=true; } }
+  return any?out:undefined;
+}
+const okStaff=r=>r&&typeof r.name==='string'&&['count','salary','burden','bonusMonths'].every(f=>Number.isFinite(r[f]));
+function applyPatch(t,p){
+  if(!p||typeof p!=='object') return;
+  for(const k of Object.keys(p)){
+    if(!(k in t)) continue;
+    const tv=t[k], pv=p[k];
+    if(k==='preset'){ if(pv===null||typeof pv==='string') t[k]=pv; }
+    else if(Array.isArray(tv)){ if(Array.isArray(pv)&&pv.length&&pv.every(okStaff)) t[k]=pv; }
+    else if(tv!==null&&typeof tv==='object'){ applyPatch(tv,pv); }
+    else if(typeof tv===typeof pv&&(typeof pv!=='number'||Number.isFinite(pv))) t[k]=pv;
+  }
+}
+function b64enc(s){ let x=''; new TextEncoder().encode(s).forEach(c=>x+=String.fromCharCode(c));
+  return btoa(x).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,''); }
+function b64dec(s){ s=s.replace(/-/g,'+').replace(/_/g,'/'); while(s.length%4) s+='=';
+  return new TextDecoder().decode(Uint8Array.from(atob(s),c=>c.charCodeAt(0))); }
+let loadedFrom=null;
+function restoreState(){
+  const s=clone(DEF);
+  try{
+    const m=location.hash.match(/^#s=([\w-]+)$/);
+    if(m){ applyPatch(s,JSON.parse(b64dec(m[1]))); loadedFrom='link'; }
+    else{ const raw=localStorage.getItem(STORE_KEY); if(raw){ applyPatch(s,JSON.parse(raw)); loadedFrom='saved'; } }
+  }catch(e){ /* corrupt link or blocked storage: start from defaults */ }
+  if(loadedFrom==='link'){ try{ history.replaceState(null,'',location.pathname+location.search); }catch(e){} }
+  return s;
+}
+function saveState(){
+  try{ const d=diffObj(S,DEF); if(d) localStorage.setItem(STORE_KEY,JSON.stringify(d)); else localStorage.removeItem(STORE_KEY); }catch(e){}
+}
+function shareUrl(){ return location.href.split('#')[0]+'#s='+b64enc(JSON.stringify(diffObj(S,DEF)||{})); }
+let toastTimer;
+function toast(t){ const el=document.getElementById('toast'); el.textContent=t; el.classList.add('on');
+  clearTimeout(toastTimer); toastTimer=setTimeout(()=>el.classList.remove('on'),2600); }
+/* keep "which preset am I on" honest: matches again if edits are undone */
+function syncPreset(){ S.preset=JSON.stringify(S.sc)===JSON.stringify(PRESETS[S.base])?S.base:null; }
+
+let S=restoreState(), drawerOpen=false, activeTab='bld';
+
+/* ═════════ ENGINE (unchanged math; guards added) ═════════ */
+const annuity=(p,r,n)=>r===0?p/n:p*r/(1-Math.pow(1+r,-n));
+function loanYear(opening,year,L,total){
+  if(year<L.startYear||opening<=1e-9) return {interest:0,principal:0,payment:0,closing:opening};
+  if(year>L.startYear+L.term-1) return {interest:0,principal:0,payment:0,closing:opening};
+  const k=year-L.startYear+1, r=L.rate/100, interest=opening*r;
+  const io=Math.max(L.graceYears,L.interestOnlyYears), amort=Math.max(1,L.term-io);
+  let principal=0,payment=0;
+  if(k<=L.graceYears){payment=0;}
+  else if(k<=io){payment=interest;}
+  else if(L.method==='equalPrincipal'){principal=(total-L.balloon)/amort;payment=principal+interest;
+    if(k===L.term){principal+=L.balloon;payment+=L.balloon;}}
+  else if(L.method==='bullet'){payment=interest;if(k===L.term){principal=opening;payment+=principal;}}
+  else{const pmt=annuity(total-L.balloon,r,amort);payment=pmt;principal=Math.max(0,pmt-interest);
+    if(k===L.term){principal=opening;payment=principal+interest;}}
+  principal=Math.min(opening,principal);
+  return {interest,principal,payment,closing:Math.max(0,opening-principal)};
+}
+const personnel=l=>l.reduce((s,r)=>s+r.count*r.salary*(12+r.bonusMonths)*(1+r.burden/100),0)/1e6;
+function occAt(G,y){
+  if(!G.rampYears||G.rampYears<1||y>G.rampYears) return G.occupancy;
+  if(G.rampYears===1) return G.rampStart;
+  return G.rampStart+(G.occupancy-G.rampStart)*(y-1)/G.rampYears;
+}
+/* IRR by bisection on irregular timings: flows = [[years, amount], ...]; null if no sign change */
+function irrOf(flows){
+  const npv=r=>flows.reduce((a,[t,c])=>a+c/Math.pow(1+r,t),0);
+  let lo=-0.95, hi=10, flo=npv(lo);
+  if(!(flo*npv(hi)<0)) return null;
+  for(let i=0;i<200;i++){ const mid=(lo+hi)/2, fm=npv(mid); if(flo*fm<=0) hi=mid; else{ lo=mid; flo=fm; } }
+  return (lo+hi)/2;
+}
+/* rent (same units as the slider) that makes average coverage, and every year's coverage, reach 1.00 */
+function rentNeeded(G,sc){
+  const T=Math.max(1,Math.round(G.loan.term)), r1=G.rent, r2=G.rent+10000;
+  const a=calc({...G,rent:r1},sc), b=calc({...G,rent:r2},sc);
+  const idx=a.rows.map((r,i)=>i).filter(i=>a.rows[i].year<=T&&a.rows[i].payment>1e-9);
+  if(!idx.length) return null;
+  const lin=(e1,e2,pay)=>e2===e1?null:r1+(pay-e1)*(r2-r1)/(e2-e1);
+  const sum=(m,f)=>idx.reduce((t,i)=>t+m.rows[i][f],0);
+  const avg=lin(sum(a,'ebitdaJpy'),sum(b,'ebitdaJpy'),sum(a,'payment'));
+  let every=null;
+  for(const i of idx){ const x=lin(a.rows[i].ebitdaJpy,b.rows[i].ebitdaJpy,a.rows[i].payment); if(x!==null&&(every===null||x>every)) every=x; }
+  return {avg,every};
+}
+function calc(G0,sc){
+  const G={...G0, horizon:Math.max(1,Math.round(G0.horizon)), reviewEvery:Math.max(1,G0.reviewEvery),
+    loan:{...G0.loan, term:Math.max(1,Math.round(G0.loan.term)), startYear:Math.max(1,Math.round(G0.loan.startYear))}};
+  const area=(sc.ground+sc.second)*G.rentablePct/100;
+  const projectCost=sc.construction*(1+sc.contingency/100)+sc.fitout+sc.equipment;
+  const total=sc.loanAmount*(1+G.loan.fee/100);
+  /* extended model: every switch is inert unless the master switch is on */
+  const vOn=!!G.ext&&!!G.extValue, tOn=!!G.ext&&!!G.extTax, bOn=!!G.ext&&!!G.extBuild;
+  const months=Math.max(0,Number(sc.constructionMonths)||0);
+  const idc=bOn?total*(G.loan.rate/100)*(months/12)*(Math.min(100,Math.max(0,G.drawdown))/100):0;
+  const totalDebt=total+idc;
+  const baseStaff=personnel(sc.staff);
+  const ptaxBase=G.propertyTaxBase==='construction'?sc.construction:projectCost;
+  const basePtax=ptaxBase*G.fx*G.propertyTax/100;
+  const netRent0=G.vatInclusive?G.rent/(1+G.vat/100):G.rent;
+  const depr=G.depreciation?projectCost/Math.max(1,G.usefulLife):0;
+  /* fix: ROI window never exceeds the model horizon */
+  const roiYears=Math.min(G.roiYears>0?G.roiYears:G.loan.term, G.horizon);
+  const rows=[]; let bal=totalDebt,cum=-projectCost*G.fx,be=null,cash=0,totInt=0,totTax=0,
+    staffY1=0,otherY1=0,ptaxY1=0;
+  let losses=[],lossUsed=0,lossExpired=0; const lossN=Math.max(0,Math.round(G.lossYears||0));
+  for(let y=1;y<=G.horizon;y++){
+    const steps=y<=G.yearsFixed?0:1+Math.floor((y-G.yearsFixed-1)/G.reviewEvery);
+    const pct=Math.min(G.rentAdjustment,G.maxRentIncrease)/100;
+    const rent=netRent0*Math.pow(1+pct,steps);
+    const fx=G.simulateFx?G.fx*Math.pow(1+G.fxDep/100,y-1):G.fx;
+    const occ=occAt(G,y);
+    const free=y===1?Math.max(0,12-G.rentFreeMonths)/12:1;
+    const rental=area*occ/100*rent*12/1e6*free;
+    const oi=G.otherMonthlyIncome*12/1e6*Math.pow(1+G.otherIncomeGrowth/100,y-1);
+    const revenue=(rental+oi)*(1-G.badDebt/100);
+    const staff=baseStaff*Math.pow(1+G.salaryGrowth/100,y-1);
+    let other=0;
+    for(const k of OPEX_KEYS){
+      if(UTIL[k]&&sc.tenantPaid[k])continue;
+      other+=(sc.opex[k]||0)*Math.pow(1+G[INF_OF[k]||'otherOpexInflation']/100,y-1);
+    }
+    const propTax=basePtax*Math.pow(1+G.otherOpexInflation/100,y-1);
+    const opex=staff+other+propTax;
+    const ebitda=revenue-opex;
+    if(y===1){staffY1=staff;otherY1=other;ptaxY1=propTax;}
+    const d=loanYear(bal,y,G.loan,totalDebt); bal=d.closing; totInt+=d.interest;
+    const pre=ebitda-(G.interestDeductible?d.interest*fx:0)-(y<=G.usefulLife?depr*fx:0);
+    let taxable=Math.max(0,pre);
+    if(tOn){
+      if(pre<0){ losses.push({y,amt:-pre}); taxable=0; }
+      else{
+        const keep=[]; for(const l of losses){ if(y-l.y<=lossN) keep.push(l); else lossExpired+=l.amt; }
+        losses=keep; let rem=pre;
+        for(const l of losses){ const u=Math.min(l.amt,rem); l.amt-=u; rem-=u; lossUsed+=u; if(rem<=1e-12) break; }
+        losses=losses.filter(l=>l.amt>1e-12); taxable=rem;
+      }
+    }
+    const taxMnt=taxable*G.cit/100; totTax+=taxMnt/fx;
+    const netCash=ebitda/fx-d.interest-taxMnt/fx-d.principal;
+    if(y<=roiYears)cash+=netCash;
+    const prev=cum; cum+=ebitda;
+    if(be===null&&cum>=0&&ebitda>0)be=y-1+(-prev)/ebitda;
+    rows.push({year:y,fx,occ,rent,revenue,opex,otherY:other,ebitda,ebitdaJpy:ebitda/fx,interest:d.interest,
+      principal:d.principal,payment:d.payment,taxMnt,netCash,cumMnt:cum,cumJpy:cum/fx,balance:bal,
+      lossBal:losses.reduce((a,l)=>a+l.amt,0)});
+  }
+  /* value of the finished property at the end of the ROI window, net of debt still owed (extended model only) */
+  const win=Math.max(1,Math.min(roiYears,rows.length));
+  let assetV=0,debtEnd=0;
+  if(vOn){ const rw=rows[win-1]; assetV=G.landValue*1000*Math.pow(1+(G.valueGrowth||0)/100,win)/rw.fx; debtEnd=rw.balance; }
+  const terminal=vOn?assetV-debtEnd:(G.includeTerminal?projectCost*G.terminalPct/100:0);
+  /* project IRR: cost at start, yearly operating cash after tax, property value in the last year */
+  const t0=bOn?months/12:0, flows=[[0,-projectCost]];
+  rows.slice(0,win).forEach((r,i)=>flows.push([t0+i+1,r.ebitdaJpy-r.taxMnt/r.fx]));
+  flows[flows.length-1][1]+=vOn?assetV:(G.includeTerminal?projectCost*G.terminalPct/100:0);
+  const irr=irrOf(flows);
+  const f=rows[0];
+  let si=rows.findIndex(r=>r.payment>1e-9 && r.occ>=G.occupancy-1e-9 && !(r.year===1&&G.rentFreeMonths>0));
+  if(si<0) si=rows.findIndex(r=>r.payment>1e-9);
+  if(si<0) si=0;
+  const st=rows[si];
+  const cover=st.payment>1e-9?st.ebitdaJpy/st.payment:Infinity;
+  const paying=rows.filter(r=>r.year<=G.loan.term&&r.payment>1e-9);
+  const minCover=paying.length?Math.min(...paying.map(r=>r.ebitdaJpy/r.payment)):Infinity;
+  /* whole-term view: average / worst coverage, and the year cumulative after-tax profit covers every loan payment */
+  const payR=paying, covs=payR.map(r=>r.ebitdaJpy/r.payment);
+  const sumPay=payR.reduce((a,r)=>a+r.payment,0);
+  const avgCover=sumPay>1e-9?payR.reduce((a,r)=>a+r.ebitdaJpy,0)/sumPay:Infinity;
+  const yearsBelow=covs.filter(c=>c<1-1e-9).length;
+  const worstYear=covs.length?payR[covs.indexOf(Math.min(...covs))].year:null;
+  const totPay=rows.reduce((a,r)=>a+r.payment,0);
+  let cumP=0,beReal=null;
+  for(const r of rows){ const pv=cumP; cumP+=r.ebitdaJpy-r.taxMnt/r.fx;
+    if(totPay>1e-9&&beReal===null&&cumP>=totPay) beReal=(r.year-1)+(totPay-pv)/(cumP-pv); }
+  const minOcc=area>0?(st.payment*st.fx+st.opex)/(area*st.rent*12/1e6):NaN;
+  const minRent=area>0&&G.occupancy>0?(st.payment*st.fx+st.opex)/(area*G.occupancy/100*12/1e6)*(G.vatInclusive?1+G.vat/100:1):NaN;
+  return {avgCover,yearsBelow,worstYear,nPay:payR.length,totPay,beReal,cumProfit:cumP,name:sc.name,area,projectCost,total:totalDebt,totalBase:total,idc,months,vOn,tOn,bOn,assetV,debtEnd,win,irr,
+    cashOnly:cash,roiCash:projectCost>0?cash/projectCost:NaN,netWorth:vOn?cash+assetV-debtEnd:NaN,
+    beStart:(bOn&&be!==null)?be+months/12:null,lossUsed,lossExpired,lossOpen:losses.reduce((a,l)=>a+l.amt,0),rows,cover,minCover,stabYear:st.year,st,be,cash15:cash+terminal,
+    terminal,roiYears,roi:projectCost>0?(cash+terminal)/projectCost:NaN,totInt,totTax,minOcc,minRent,y1:f,staffY1,otherY1,ptaxY1,
+    netRent0,ltv:G.landValue>0?totalDebt*G.fx/1e3/G.landValue:NaN,
+    tenants:area*G.occupancy/100/Math.max(1,G.avgTenantArea)};
+}
+/* ═════════ FORMAT / STATE ═════════ */
+const nf=(v,d=1)=>Number.isFinite(v)?v.toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d}):'—';
+const pc=(v,d=0)=>Number.isFinite(v)?(v*100).toFixed(d)+'%':'—';
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+/* English hover-text: authors embed "::EN::<english>" inside a ja string; jaAttr splits it
+   into separate data-ja / data-en attributes at markup-build time (no runtime parsing needed) */
+const splitEN=s=>{const i=String(s).indexOf('::EN::'); return i<0?[String(s),'']:[String(s).slice(0,i),String(s).slice(i+6)];};
+const jaAttr=ja=>{const[j,e]=splitEN(ja); return e?`data-ja="${esc(j)}" data-en="${esc(e)}"`:`data-ja="${esc(j)}"`;};
+const J=(mn,ja)=>`<span ${jaAttr(ja)}>${mn}</span>`;
+/* cross-currency hover: wrap a ₮ or ¥ amount so hovering it shows the other currency */
+function mnt(v,d,isM=true){
+  const fx=S.fx;
+  if(!Number.isFinite(v)) return nf(v,d);
+  if(!(fx>0)) return nf(v,d);
+  const tip='≈ '+nf(v/fx,isM?2:0)+(isM?' сая':'')+' ¥';
+  return `<span class="cv" data-cur="${esc(tip)}">${nf(v,d)}</span>`;
+}
+function jpy(v,d,isM=true){
+  const fx=S.fx;
+  if(!Number.isFinite(v)) return nf(v,d);
+  if(!(fx>0)) return nf(v,d);
+  const tip='≈ '+nf(v*fx,isM?1:0)+(isM?' сая':'')+' ₮';
+  return `<span class="cv" data-cur="${esc(tip)}">${nf(v,d)}</span>`;
+}
+/* safety net: catch any inline "N сая ₮/¥" or "N ₮/¥" left as plain text (KPIs, formula live examples,
+   lede/verdict prose) and make those hoverable too, without having to hand-wrap every occurrence */
+const CUR_RE=/(-?[\d][\d,]*(?:\.\d+)?)(\s*сая)?(\s*)(₮|¥)/g;
+function tagCurrency(root){
+  if(!root) return;
+  const fx=S.fx;
+  const walker=document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+    acceptNode(n){
+      const p=n.parentNode;
+      if(!p||!p.closest) return NodeFilter.FILTER_REJECT;
+      const tag=p.nodeName;
+      if(tag==='SCRIPT'||tag==='STYLE'||tag==='OPTION') return NodeFilter.FILTER_REJECT;
+      if(p.closest('.cv')) return NodeFilter.FILTER_REJECT;
+      CUR_RE.lastIndex=0;
+      return CUR_RE.test(n.nodeValue)?NodeFilter.FILTER_ACCEPT:NodeFilter.FILTER_REJECT;
+    }
+  });
+  const nodes=[]; let n; while((n=walker.nextNode())) nodes.push(n);
+  nodes.forEach(node=>{
+    const text=node.nodeValue, frag=document.createDocumentFragment();
+    let last=0,m; CUR_RE.lastIndex=0;
+    while((m=CUR_RE.exec(text))){
+      if(m.index>last) frag.appendChild(document.createTextNode(text.slice(last,m.index)));
+      const num=parseFloat(m[1].replace(/,/g,'')), isM=!!m[2], sym=m[4];
+      const span=document.createElement('span'); span.className='cv';
+      if(Number.isFinite(num)&&fx>0){
+        const tip=sym==='₮'
+          ?'≈ '+nf(num/fx,isM?2:0)+(isM?' сая':'')+' ¥'
+          :'≈ '+nf(num*fx,isM?1:0)+(isM?' сая':'')+' ₮';
+        span.setAttribute('data-cur',tip);
+      }
+      span.textContent=m[0];
+      frag.appendChild(span);
+      last=m.index+m[0].length;
+    }
+    if(last<text.length) frag.appendChild(document.createTextNode(text.slice(last)));
+    node.parentNode.replaceChild(frag,node);
+  });
+}
+function get(p){ if(p==='__allInfl') return S.otherOpexInflation; return p.split('.').reduce((o,k)=>o[k],S); }
+function set(p,v){
+  if(p==='__allInfl'){ INF_ALL.forEach(k=>S[k]=v); return; }
+  const k=p.split('.'),l=k.pop(); k.reduce((o,x)=>o[x],S)[l]=v;
+}
+const CO={navy:'#2F4858',blue:'#8AA4B2',rust:'#B4713D',red:'#9C3D2E',green:'#2E6049',
+  sand:'#C9BFA8',line:'#EBE9E4',mute:'#82858B',ink:'#16181A'};
+
+/* ═════════ TOP STRIP (built once, updated in place) ═════════ */
+const CTRL=[
+  ['Түрээс','賃料（税込・㎡/月）::EN::Monthly rent per m² (incl. VAT)','rent',20000,60000,500,v=>nf(v,0)+' ₮'],
+  ['Дүүргэлт','稼働率::EN::Occupancy rate','occupancy',30,100,.5,v=>nf(v,0)+'%'],
+  ['Зардлын өсөлт','運営費の上昇率（全項目）::EN::Annual increase for all operating costs','__allInfl',0,20,.5,v=>nf(v,1)+'%/жил'],
+  ['Түрээсийн өсөлт','賃料改定率（1回あたり）::EN::Rent step-up per revision','rentAdjustment',0,30,1,
+     v=>nf(v,0)+'%'+(v>S.maxRentIncrease?` (≤${nf(S.maxRentIncrease,0)})`:'')],
+  ['Зээлийн хүү','借入金利::EN::Loan interest rate','loan.rate',0,20,.1,v=>nf(v,1)+'%'],
+  ['Зээлийн хугацаа','借入期間::EN::Loan term','loan.term',5,30,1,v=>v+' жил']
+];
+function buildCtrl(){
+  document.getElementById('ctrl').innerHTML=CTRL.map(([mn,ja,p,mn_,mx,st],i)=>
+    `<div class="c" ${jaAttr(ja)}><div class="top"><span class="lab">${mn}</span><span class="val" id="cv${i}"></span></div>
+      <input type="range" min="${mn_}" max="${mx}" step="${st}" data-p="${p}" data-min="${mn_}" id="cr${i}"></div>`).join('');
+}
+function updateCtrl(){
+  CTRL.forEach(([mn,ja,p,mn_,mx,st,f],i)=>{
+    const v=get(p), r=document.getElementById('cr'+i), t=document.getElementById('cv'+i);
+    if(r&&document.activeElement!==r) r.value=Math.min(mx,Math.max(mn_,v));
+    if(t) t.textContent=f(v);
+  });
+}
+function updateSeg(){
+  document.getElementById('seg').innerHTML=
+    [['A','1 давхар','1階建て（案A）の初期値を読み込む::EN::Load Option A (1 floor) defaults'],
+     ['B','2 давхар','2階建て（案B）の初期値を読み込む::EN::Load Option B (2 floors) defaults']]
+    .map(([k,t,ja])=>`<button data-preset="${k}" ${jaAttr(ja)} class="${S.preset===k?'on':''}">${t}</button>`).join('');
+}
+
+/* ═════════ DRAWER ═════════ */
+const TABS=[['bld','Барилга','建物::EN::Building'],['rent','Түрээс','賃料::EN::Rent'],['cost','Зардал','運営費::EN::Costs'],
+            ['loan','Зээл','借入::EN::Loan'],['tax','Татвар / бусад','税金・その他::EN::Tax / other']];
+/* default to compare against: scenario fields use the loaded preset, everything else uses DEF */
+function baseVal(p){
+  const sc=p.startsWith('sc.');
+  return (sc?p.slice(3):p).split('.').reduce((o,k)=>o==null?undefined:o[k],sc?PRESETS[S.base||'B']:DEF);
+}
+const isChanged=p=>JSON.stringify(get(p))!==JSON.stringify(baseVal(p));
+const RS='<button class="rs" data-reset-btn data-ja="初期値に戻す" data-en="Reset to default">↺</button>';
+function fn(mn,ja,p,st,min,cls){
+  const m=min===undefined?0:min;
+  return `<div class="f${isChanged(p)?' chg':''}${cls?' '+cls:''}"><label ${jaAttr(ja)}>${mn}</label>
+    <input type="number" step="${st||1}" ${m!==null?`min="${m}" data-min="${m}"`:''} value="${get(p)}" data-p="${p}">${RS}</div>`;
+}
+function ft(mn,ja,p){
+  return `<div class="f${isChanged(p)?' chg':''}"><label ${jaAttr(ja)}>${mn}</label>
+    <label class="sw"><input type="checkbox" ${get(p)?'checked':''} data-p="${p}"><i></i></label>${RS}</div>`;
+}
+function fsel(mn,ja,p,o){
+  return `<div class="f${isChanged(p)?' chg':''}"><label ${jaAttr(ja)}>${mn}</label><select data-p="${p}">${
+    o.map(([v,t])=>`<option value="${v}">${t}</option>`).join('')}</select>${RS}</div>`;
+}
+function ftxt(mn,ja,p){
+  return `<div class="f"><label ${jaAttr(ja)}>${mn}</label><input type="text" value="${esc(get(p))}" data-t="${p}"><span class="rs"></span></div>`;
+}
+function markChanged(){
+  let n=0;
+  document.querySelectorAll('#pbody .f').forEach(f=>{
+    const el=f.querySelector('[data-p]'); if(!el) return;
+    constc=isChanged(el.dataset.p); f.classList.toggle('chg',c); if(c) n++;
+  });
+  const b=document.getElementById('chgCount'); if(b) b.textContent=n?n+' өөрчлөлт':'';
+}
+const grp=(mn,ja,body)=>`<div class="grp"><h4 ${jaAttr(ja)}>${mn}</h4>${body}</div>`;
+const live=k=>`<span data-live="${k}"></span>`;
+
+function drawTabs(){
+  document.getElementById('ptabs').innerHTML=TABS.map(([k,mn,ja])=>
+    `<button data-tab="${k}" ${jaAttr(ja)} class="${activeTab===k?'on':''}">${mn}</button>`).join('');
+}
+function drawAdv(){
+  const sc=S.sc;
+  const staff=sc.staff.map((r,i)=>`<div class="stf">
+    <div class="r"><input type="text" value="${esc(r.name)}" data-t="sc.staff.${i}.name" style="flex:1;height:30px;border:1px solid var(--line);border-radius:7px;padding:0 9px;font:inherit;font-size:12.8px">
+      <button class="xb" data-sd="${i}" data-ja="この職種を削除" data-en="Remove this role">×</button></div>
+    ${fn('Ажилтны тоо','人数::EN::Head count',`sc.staff.${i}.count`,1)}
+    ${fn('Сарын цалин ₮','月給（₮）::EN::Monthly salary (₮)',`sc.staff.${i}.salary`,50000)}
+    ${fn('Ажил олгогчийн шимтгэл %','事業主負担（社会保険等）%::EN::Employer social contributions %',`sc.staff.${i}.burden`,.5)}
+    ${fn('Урамшуулал · сар','賞与（月数）::EN::Bonus, in months of salary',`sc.staff.${i}.bonusMonths`,.5)}</div>`).join('');
+
+  const panes={
+  bld:`
+    ${grp('Эхлэх загвар','初期値の選択::EN::Choose a starting scenario',`
+      <div class="preset">
+        <button data-preset="A" class="${S.preset==='A'?'on':''}" data-ja="1階建て・600㎡・建設費5,500万円（案A）の初期値" data-en="Option A defaults: 1 floor, 600 m², ¥55 million build cost"><b>1 давхар</b><span>600 м² · 55 сая ¥</span></button>
+        <button data-preset="B" class="${S.preset==='B'?'on':''}" data-ja="2階建て・1,050㎡・建設費9,000万円（案B）の初期値" data-en="Option B defaults: 2 floors, 1,050 m², ¥90 million build cost"><b>2 давхар</b><span>1,050 м² · 90 сая ¥</span></button>
+      </div>
+      <div class="note" data-ja="建物・建設費・人件費・運営費が案A／案Bの値に置き換わります。賃料や金利などの共通条件は変わりません。" data-en="Replaces building, cost, staff and operating costs with Option A/B values. Shared inputs like rent and rate are untouched.">
+        Барилга, өртөг, ажилтан, зардлыг тухайн хувилбарын утгаар солино. Түрээс, хүү зэрэг нийтлэг нөхцөл өөрчлөгдөхгүй.</div>`)}
+    ${grp('Барилга','建物::EN::Building',`
+      ${ftxt('Нэр','シナリオ名::EN::Scenario name','sc.name')}
+      ${fn('1 давхрын талбай м²','1階の面積（㎡）::EN::Ground-floor area (m²)','sc.ground',10)}
+      ${fn('2 давхрын талбай м²','2階の面積（㎡）（0＝1階建て）::EN::2nd-floor area (m²) — 0 = single-storey','sc.second',10)}
+      <div class="note" data-ja="階数と賃貸可能面積の合計は、上記の面積から自動的に計算されます（編集不可）。" data-en="Floor count and total rentable area are computed automatically from the areas above (read-only).">${live('area')}</div>
+      ${fn('Түрээслэх хувь %','賃貸比率（共用部を除く）%::EN::Share of floor area that is leasable, net of common space','rentablePct',.5)}
+      ${fn('Барилга барих хугацаа · сар<span class="reftag"> (лавлагаа)</span>','工期（月）。拡張モデルの「工期を期間に含める」をオンにした場合のみ計算に使われ、オフのときは参考情報です。::EN::Construction period in months. Used only when Extended model > Build period is on; otherwise reference only.','sc.constructionMonths',1,0,'ref')}
+      ${fn('Ашиглалтад орох он (лавлагаа)','開業年。年次スケジュール表の暦年表示にのみ使われ、収益・返済などの試算結果には影響しません。::EN::Opening year. Only labels the calendar years in the schedule; no effect on results.','sc.openingYear',1,2000,'ref')}`)}
+    ${grp('Хөрөнгө оруулалт','投資額::EN::Investment',`
+      ${fn('Барилгын өртөг · сая ¥','建設費（百万円）::EN::Construction cost, ¥ million','sc.construction',1)}
+      ${fn('Нөөц зардал %','予備費 %::EN::Contingency %','sc.contingency',1)}
+      ${fn('Дотор засал · сая ¥','内装工事（百万円）::EN::Fit-out, ¥ million','sc.fitout',1)}
+      ${fn('Тоног төхөөрөмж · сая ¥','設備・ラック（百万円）::EN::Equipment / racking, ¥ million','sc.equipment',1)}
+      <div class="note">${live('pcost')}</div>`)}`,
+  rent:`
+    ${grp('Түрээс','賃料::EN::Rent',`
+      ${fn('Нийт түрээс ₮/м²/сар','賃料（₮/㎡/月）::EN::Headline rent, ₮/m²/month','rent',500)}
+      ${ft('Түрээс НӨАТ багтсан','賃料にVATを含む::EN::Rent includes VAT','vatInclusive')}
+      ${fn('НӨАТ %','VAT（付加価値税）%::EN::VAT %','vat',.5)}
+      ${fn('Бусад орлого ₮/сар','その他収入（₮/月）::EN::Other income, ₮/month','otherMonthlyIncome',10000)}
+      ${fn('Бусад орлогын өсөлт %','その他収入の伸び率 %::EN::Growth rate of other income %','otherIncomeGrowth',.5,-50)}
+      ${fn('Төлөгдөхгүй эрсдэл %','貸倒れ引当 %::EN::Bad-debt allowance %','badDebt',.5)}
+      <div class="note">${live('netrent')}</div>`)}
+    ${grp('Түрээсийн шинэчлэл','賃料改定::EN::Rent reviews',`
+      ${fn('Үнэ тогтмол байх жил','賃料据置期間（年）::EN::Years before the first rent review','yearsFixed',1)}
+      ${fn('Шинэчлэх давтамж · жил','改定間隔（年）::EN::Years between reviews','reviewEvery',1,1)}
+      ${fn('Нэг удаагийн өсөлт %','1回あたりの改定率 %::EN::Increase per review %','rentAdjustment',.5)}
+      ${fn('Дээд хязгаар %','1回あたりの上限 %::EN::Cap per review %','maxRentIncrease',.5)}
+      <div class="note">${live('effstep')}</div>`)}
+    ${grp('Дүүргэлт ба түрээслэлт','稼働率とリースアップ::EN::Occupancy & lease-up',`
+      ${fn('Тогтвортой дүүргэлт %','安定時の稼働率 %::EN::Stabilized occupancy %','occupancy',.5)}
+      ${fn('Дүүргэх хугацаа · жил','リースアップ期間（年）::EN::Lease-up period, years','rampYears',1)}
+      ${fn('1 дэх жилийн дүүргэлт %','初年度の稼働率 %::EN::Year-1 occupancy %','rampStart',.5)}
+      ${fn('Түрээсгүй сар · 1 дэх жил','フリーレント（初年度の月数）::EN::Free-rent months in year 1','rentFreeMonths',1)}
+      ${fn('Нэг түрээслэгчийн талбай м²','1テナントあたりの面積（㎡）::EN::Average area per tenant (m²)','avgTenantArea',5,1)}
+      <div class="note">${live('ramp')}</div>`)}`,
+  cost:`
+    ${grp('Ажиллах хүч','人員::EN::Staff',`${staff}
+      <button class="addb" id="addS" data-ja="職種を追加" data-en="Add a role">+ Ажлын байр нэмэх</button>
+      <div class="note">${live('staff')}</div>`)}
+    ${grp('Үйл ажиллагааны зардал · сая ₮/жил','運営費（百万₮/年）::EN::Operating costs, ₮ million/year',
+      OPEX_KEYS.filter(k=>!UTIL[k]).map(k=>fn(OPEX_LBL[k][0],OPEX_LBL[k][1]+'（百万₮/年）::EN::'+OPEX_LBL[k][2]+', ₮ million/year',`sc.opex.${k}`,.1)).join(''))}
+    ${grp('Ашиглалтын зардал · сая ₮/жил','光熱費（百万₮/年）::EN::Utilities, ₮ million/year',`
+      ${OPEX_KEYS.filter(k=>UTIL[k]).map(k=>fn(OPEX_LBL[k][0],OPEX_LBL[k][1]+'（百万₮/年）::EN::'+OPEX_LBL[k][2]+', ₮ million/year',`sc.opex.${k}`,.1)).join('')}
+      ${ft('Халаалтыг түрээслэгч төлнө','暖房費はテナント負担::EN::Heating paid by tenant','sc.tenantPaid.heating')}
+      ${ft('Цахилгааныг түрээслэгч төлнө','電気代はテナント負担::EN::Electricity paid by tenant','sc.tenantPaid.electricity')}
+      ${ft('Усыг түрээслэгч төлнө','水道代はテナント負担::EN::Water paid by tenant','sc.tenantPaid.water')}`)}
+    ${grp('Жилийн өсөлт · %','年間上昇率 %::EN::Annual increase %',`
+      ${fn('Цалингийн өсөлт','給与の上昇率::EN::Salary growth','salaryGrowth',.5,-20)}
+      ${fn('Засвар үйлчилгээ','維持管理費の上昇率::EN::Maintenance cost growth','maintenanceInflation',.5,-20)}
+      ${fn('Даатгал','保険料の上昇率::EN::Insurance cost growth','insuranceInflation',.5,-20)}
+      ${fn('Маркетинг','マーケティング費の上昇率::EN::Ma
+    
+    
+
+
