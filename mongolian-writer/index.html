@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="mn" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="A browser-only word processor for Mongolian Cyrillic. Type Latin keys and get Cyrillic as you write. Export to Word, Markdown or PDF. Nothing is uploaded.">
+<link rel="canonical" href="https://www.dbanza.com/projects/mongolian-writer/index.html">
+<meta property="og:title" content="Mongolian Writer · dbanza">
+<meta property="og:description" content="A browser-only word processor for Mongolian Cyrillic. Type Latin keys and get Cyrillic as you write. Export to Word, Markdown or PDF. Nothing is uploaded.">
+<meta property="og:image" content="https://www.dbanza.com/assets/og.png">
+<meta property="og:type" content="website">
+<link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+<meta name="copyright" content="© 2026 dbanza. All rights reserved.">
+<title>Монгол бичгийн редактор</title>
+<meta name="description" content="Монгол кирилл бичгийн, хөтөч дээр ажилладаг текст боловсруулагч. Word, Markdown, PDF руу экспортлох боломжтой.">
+<link rel="stylesheet" href="../../css/site.css">
+<link rel="stylesheet" href="vendor/quill.snow.css">
+<script src="vendor/quill.js"></script>
+<script src="vendor/turndown.js"></script>
+<script src="vendor/docx.umd.js"></script>
+<script src="dictionary.js"></script>
+<style>
+
+  .wr-main { padding-top: 40px; padding-bottom: 64px; }
+
+  .layout { display: grid; grid-template-columns: minmax(0, 740px) 240px; justify-content: center; gap: 24px; align-items: start; }
+  .layout.no-panel { grid-template-columns: minmax(0, 740px); }
+  .layout.no-panel .suggest-panel { display: none; }
+  @media (max-width: 960px) { .layout, .layout.no-panel { grid-template-columns: minmax(0, 740px); justify-content: stretch; } .suggest-panel { position: static !important; width: auto !important; } }
+
+  #page { min-height: 1040px; padding: 56px 64px; overflow: hidden; background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); }
+  @media (max-width: 640px) { #page { padding: 28px 20px; } }
+
+  .ql-toolbar.ql-snow { border: none; border-bottom: 1px solid var(--line); background: var(--panel-2); border-radius: var(--radius) var(--radius) 0 0; padding: 8px 12px; margin: -56px -64px 28px; }
+  @media (max-width: 640px) { .ql-toolbar.ql-snow { margin: -28px -20px 20px; } }
+  .ql-container.ql-snow { border: none; font-family: var(--body); }
+  .ql-snow .ql-stroke { stroke: var(--mute); }
+  .ql-snow .ql-fill { fill: var(--mute); }
+  .ql-snow .ql-picker { color: var(--mute); }
+  .ql-snow .ql-toolbar button:hover .ql-stroke, .ql-snow .ql-toolbar button.ql-active .ql-stroke { stroke: var(--ink); }
+  .ql-snow .ql-toolbar button:hover .ql-fill, .ql-snow .ql-toolbar button.ql-active .ql-fill { fill: var(--ink); }
+  .ql-snow .ql-picker-options { background: var(--panel); border-color: var(--line-2); }
+  .ql-snow .ql-picker.ql-header { width: 112px; }
+
+  .ql-snow .ql-picker.ql-header .ql-picker-label::before, .ql-snow .ql-picker.ql-header .ql-picker-item::before { content: 'Энгийн'; }
+  .ql-snow .ql-picker.ql-header .ql-picker-label[data-value="1"]::before, .ql-snow .ql-picker.ql-header .ql-picker-item[data-value="1"]::before { content: 'Гарчиг 1'; }
+  .ql-snow .ql-picker.ql-header .ql-picker-label[data-value="2"]::before, .ql-snow .ql-picker.ql-header .ql-picker-item[data-value="2"]::before { content: 'Гарчиг 2'; }
+  .ql-snow .ql-picker.ql-header .ql-picker-label[data-value="3"]::before, .ql-snow .ql-picker.ql-header .ql-picker-item[data-value="3"]::before { content: 'Гарчиг 3'; }
+  .ql-editor { min-height: 900px; padding: 0; font-size: 15px; line-height: 1.75; color: var(--ink); }
+  .ql-editor.ql-blank::before { color: var(--faint); font-style: normal; left: 0; right: 0; }
+  .ql-editor h1 { font-size: 1.9em; }
+  .ql-editor h2 { font-size: 1.4em; }
+  .ql-editor h3 { font-size: 1.1em; }
+  .ql-editor a { color: var(--action); }
+
+  .suggest-panel { position: sticky; top: 86px; width: 240px; padding: 16px; }
+  .sp-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .sp-head .eyebrow { margin: 0; }
+  .sp-close { width: 28px; height: 28px; border: 1px solid var(--line-2); border-radius: 8px; background: var(--panel); color: var(--mute); font: 500 18px/1 var(--body); cursor: pointer; padding: 0; }
+  .sp-close:hover { color: var(--ink); border-color: var(--faint); }
+  .suggest-bar { display: flex; flex-direction: column; gap: 6px; height: 214px; }
+  .suggest-bar .sug { flex: none; height: 38px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 500 14px/1 var(--body); padding: 0 12px; border: 1px solid var(--line-2); border-radius: 999px; background: var(--panel); color: var(--ink); cursor: pointer; text-align: left; }
+  .suggest-bar .sug:hover { border-color: var(--action); color: var(--action); }
+  .suggest-bar .sug.on { background: var(--action); border-color: var(--action); color: var(--action-ink); }
+  .suggest-bar .sug.empty { border-color: transparent; background: transparent; cursor: default; }
+  .sp-hint { margin: 10px 0 0; font: 500 11.5px/1.4 var(--mono); color: var(--faint); }
+
+  #settings { position: fixed; inset: 0; z-index: 300; background: rgba(10,12,14,.5); display: flex; align-items: center; justify-content: center; padding: 20px; }
+  #settings[hidden] { display: none; }
+  #settings .card { padding: 24px; max-width: 760px; width: 100%; max-height: 90vh; overflow: auto; }
+  .set-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 4px; }
+  #settings h3 { font-size: 1.25rem; }
+  #settings .lead { color: var(--mute); font-size: 14px; margin: 0 0 16px; }
+  .kmap summary { cursor: pointer; font: 600 15px/1.4 var(--display); padding: 10px 0; list-style: none; display: flex; align-items: center; gap: 8px; }
+  .kmap summary::-webkit-details-marker { display: none; }
+  .kmap summary::before { content: "+"; font: 600 15px/1 var(--mono); color: var(--accent); width: 14px; }
+  .kmap[open] summary::before { content: "−"; }
+  .kmap summary:focus-visible { outline: 2px solid var(--action); outline-offset: 3px; border-radius: 4px; }
+  .kmap .sub { font: 600 11px/1.4 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--accent); margin: 16px 0 10px; }
+  #map-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px 16px; }
+  @media (max-width: 640px) { #map-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  #map-grid .cell { display: flex; align-items: center; gap: 6px; }
+  #map-grid .cell span { width: 56px; font-weight: 600; font-size: 14px; }
+  #map-grid input { width: 48px; font: 500 13px/1 var(--mono); padding: 7px 6px; border: 1px solid var(--line-2); border-radius: 8px; background: var(--panel); color: var(--ink); text-align: center; }
+  #map-grid input:focus-visible { outline: 2px solid var(--action); outline-offset: 1px; }
+  .map-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 20px; }
+  @media (max-width: 640px) { .map-list { grid-template-columns: 1fr; } }
+  .map-row { display: grid; grid-template-columns: 74px 1fr; align-items: center; gap: 8px; padding: 7px 0; border-top: 1px solid var(--line); }
+  .map-cyr { font-family: var(--display); font-weight: 600; font-size: 14px; }
+  .map-keys { display: flex; gap: 4px; flex-wrap: wrap; }
+  .kbd { font: 500 12px/1 var(--mono); padding: 4px 6px; border-radius: 6px; background: var(--panel-2); border: 1px solid var(--line); color: var(--ink); min-width: 26px; text-align: center; }
+  .kbd.empty { color: var(--faint); }
+  #settings .actions { display: flex; justify-content: flex-end; align-items: center; gap: 8px; margin-top: 18px; }
+  #map-error { color: var(--accent); min-height: 18px; margin: 10px 0 0; font-size: 13px; }
+
+  @media print {
+    .hdr, #settings, .ql-toolbar, .suggest-panel { display: none !important; }
+    body { background: #fff; }
+    .layout { display: block; }
+    #page { box-shadow: none; border: none; padding: 0; min-height: 0; max-width: none; margin: 0; }
+  }
+</style>
+
+</head>
+<body>
+
+
+<header class="hdr">
+  <div class="wrap hdr-in">
+    <a class="brand" href="../../index.html" aria-label="dbanza.com, home"><svg viewBox="0 0 28 28" aria-hidden="true"><rect x="1.5" y="1.5" width="25" height="25" rx="7" fill="none" stroke="currentColor" stroke-width="2"/><text x="14" y="18.6" text-anchor="middle" font-family="ui-monospace,Menlo,Consolas,monospace" font-weight="800" font-size="12.5" fill="currentColor">db</text></svg><span class="brand-word">dbanza</span></a>
+    <div class="ctl">
+      <button class="btn ghost sm" id="btn-print" type="button">Хэвлэх / PDF</button>
+      <button class="btn ghost sm" id="btn-md" type="button">Markdown</button>
+      <button class="btn ghost sm" id="btn-docx" type="button">Word (.docx)</button>
+      <button class="btn ghost sm" id="btn-suggest" type="button">Санал</button>
+      <button class="btn sm" id="btn-settings" type="button">Тохиргоо</button>
+      <button class="theme-btn" id="btn-theme" type="button" aria-label="Гэрэл / харанхуй горим" title="Гэрэл / харанхуй горим">
+        <svg class="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2.2M12 19.8V22M4.9 4.9l1.6 1.6M17.5 17.5l1.6 1.6M2 12h2.2M19.8 12H22M4.9 19.1l1.6-1.6M17.5 6.5l1.6-1.6"/></svg>
+        <svg class="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap wr-main layout" id="layout">
+  <section id="page"><div id="editor"></div></section>
+  <aside class="card suggest-panel" id="suggest-panel" aria-label="Санал үгс">
+    <div class="sp-head">
+      <span class="eyebrow">Санал үгс</span>
+      <button class="sp-close" id="btn-suggest-close" type="button" aria-label="Санал хаах" title="Санал хаах">×</button>
+    </div>
+    <div class="suggest-bar" id="suggest-bar"></div>
+    <p class="sp-hint">Shift+↑↓ сонгох · Enter оруулах</p>
+  </aside>
+</main>
+
+<div id="settings" hidden>
+  <div class="card" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+    <div class="set-head">
+      <h3 id="settings-title">Тохиргоо</h3>
+      <button class="btn ghost sm" id="btn-reset" type="button">Анхдагч</button>
+    </div>
+    <p class="lead">Өөрчлөлт зөвхөн энэ хуудсын нээлттэй үед хадгалагдана. Хуудсыг дахин ачаалахад анхдагч утгууд сэргээгдэнэ.</p>
+    <details class="kmap">
+      <summary>Гарын товчны зураг</summary>
+      <p class="sub">Үсгүүд</p>
+      <p class="lead">Үсэг бүрийн Латин товчийг засна. Том ба жижиг үсгийн товчийг тус тусад нь оруулна. Товчийг хоосон орхивол тухайн үсэг идэвхгүй болно.</p>
+      <div id="map-grid"></div>
+      <p class="sub">Тусгай дараалал</p>
+      <div class="map-list" id="map-extra"></div>
+    </details>
+    <p id="map-error" role="alert"></p>
+    <div class="actions">
+      <button class="btn ghost sm" id="btn-cancel" type="button">Хаая</button>
+      <button class="btn sm" id="btn-save" type="button">Хадгалъя</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const quill = new Quill('#editor', {
+    theme: 'snow',
+    modules: { toolbar: [
+      [{ header: [1, 2, 3, false] }],
+      ['bold', 'italic', 'underline', 'strike'],
+      [{ color: [] }, { background: [] }],
+      [{ list: 'ordered' }, { list: 'bullet' }],
+      [{ align: [] }],
+      ['image', 'clean'],
+    ] },
+    placeholder: 'Бичиж эхлэх…',
+  });
+
+  function download(blob, name) {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = name;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+
+  const Delta = Quill.import('delta');
+
+  document.getElementById('btn-theme').onclick = () => {
+    const html = document.documentElement;
+    html.dataset.theme = html.dataset.theme === 'dark' ? 'light' : 'dark';
+  };
+
+  const DEFAULT_ROWS = [
+    ['А', 'а', 'A', 'a'],   ['Б', 'б', 'B', 'b'],   ['В', 'в', 'V', 'v'],   ['Г', 'г', 'G', 'g'],   ['Д', 'д', 'D', 'd'],
+    ['Е', 'е', 'Ye', 'ye'], ['Ё', 'ё', 'Yo', 'yo'], ['Ж', 'ж', 'J', 'j'],   ['З', 'з', 'Z', 'z'],   ['И', 'и', 'I', 'i'],
+    ['Й', 'й', 'III', 'iii'], ['К', 'к', 'K', 'k'],   ['Л', 'л', 'L', 'l'],   ['М', 'м', 'M', 'm'],   ['Н', 'н', 'N', 'n'],
+    ['О', 'о', 'O', 'o'],   ['Ө', 'ө', 'Q', 'q'],   ['П', 'п', 'P', 'p'],   ['Р', 'р', 'R', 'r'],   ['С', 'с', 'S', 's'],
+    ['Т', 'т', 'T', 't'],   ['У', 'у', 'U', 'u'],   ['Ү', 'ү', 'W', 'w'],   ['Ф', 'ф', 'F', 'f'],   ['Х', 'х', 'H', 'h'],
+    ['Ц', 'ц', 'C', 'c'],   ['Ч', 'ч', 'Ch', 'ch'], ['Ш', 'ш', 'Sh', 'sh'], ['Щ', 'щ', '', ''],     ['Ъ', 'ъ', '""', '"'],
+    ['Ы', 'ы', 'Y', 'y'],   ['Ь', 'ь', "''", "'"], ['Э', 'э', 'E', 'e'],   ['Ю', 'ю', 'Yu', 'yu'], ['Я', 'я', 'Ya', 'ya'],
+  ];
+
+  const DEFAULT_EXTRA = { "O'o'": 'Өө', "U'u'": 'Үү', AI: 'АЙ', Ai: 'Ай', ai: 'ай' };
+
+  function buildMap(rows, extra = DEFAULT_EXTRA) {
+    const map = {};
+    for (const [cyrUpper, cyrLower, keyUpper, keyLower] of rows) {
+      if (keyUpper) map[keyUpper] = cyrUpper;
+      if (keyLower) map[keyLower] = cyrLower;
+    }
+    return Object.assign(map, extra);
+  }
+
+  function findDuplicateKeys(rows) {
+    const seen = new Set();
+    const duplicates = [];
+    for (const [, , keyUpper, keyLower] of rows) {
+      for (const key of [keyUpper, keyLower]) {
+        if (!key) continue;
+        if (seen.has(key)) duplicates.push(key);
+        seen.add(key);
+      }
+    }
+    return duplicates;
+  }
+
+  function createTranslit(map) {
+    const table = new Map(Object.entries(map));
+    const keys = [...table.keys()];
+    const maxLen = Math.max(...keys.map(k => k.length));
+
+    const extendable = s => keys.some(k => k.length > s.length && k.startsWith(s));
+
+    function matchLength(text, i) {
+      for (let len = Math.min(maxLen, text.length - i); len > 0; len--) {
+        if (table.has(text.substr(i, len))) return len;
+      }
+      return 0;
+    }
+
+    function convert(text) {
+      let out = '';
+      let i = 0;
+      while (i < text.length) {
+        const len = matchLength(text, i);
+        if (len) {
+          out += table.get(text.substr(i, len));
+          i += len;
+        } else {
+          out += text[i];
+          i++;
+        }
+      }
+      return out;
+    }
+
+    function step(state, key) {
+      const raw = (state ? state.raw : '') + key;
+      const bounds = [0];
+      for (let i = 0; i < raw.length;) {
+        i += Math.max(1, matchLength(raw, i));
+        bounds.push(i);
+      }
+      const split = bounds.find(b => b < raw.length && extendable(raw.slice(b))) ?? raw.length;
+      const open = raw.slice(split);
+      const openOut = convert(open);
+      return {
+        replaceLength: state ? state.out.length : 0,
+        text: convert(raw.slice(0, split)) + openOut,
+        state: { raw: open, out: openOut },
+      };
+    }
+
+    function typeKeys(keys) {
+      let out = '';
+      let state = null;
+      for (const key of keys) {
+        const r = step(state, key);
+        out = out.slice(0, out.length - r.replaceLength) + r.text;
+        state = r.state;
+      }
+      return out;
+    }
+
+    return { convert, step, typeKeys };
+  }
+
+  function createSuggester(words) {
+    const used = new Map();
+
+    function suggestAll(prefix, n) {
+      const p = prefix.toLowerCase();
+      if (p.length < 2) return [];
+      const out = [...used.keys()]
+        .filter(w => w.length > p.length && w.startsWith(p))
+        .sort((a, b) => used.get(b) - used.get(a));
+      for (const w of words) {
+        if (out.length >= n) break;
+        if (w.length > p.length && w.startsWith(p) && !out.includes(w)) out.push(w);
+      }
+      return out.slice(0, n);
+    }
+
+    function suggest(prefix) {
+      return suggestAll(prefix, 1)[0] ?? null;
+    }
+
+    function learn(word) {
+      const w = word.toLowerCase();
+      if (w.length >= 2) used.set(w, (used.get(w) || 0) + 1);
+    }
+
+    return { suggest, suggestAll, learn };
+  }
+
+  if (typeof module !== 'undefined') module.exports = { DEFAULT_ROWS, buildMap, findDuplicateKeys, createTranslit, createSuggester };
+
+  let activeRows = DEFAULT_ROWS.map(row => [...row]);
+  let translit = createTranslit(buildMap(activeRows));
+  let tail = null;
+
+  const SUGGESTION_COUNT = 5;
+  const suggester = createSuggester(MN_WORDS);
+  const bar = document.getElementById('suggest-bar');
+  const layout = document.getElementById('layout');
+  const panelButton = document.getElementById('btn-suggest');
+
+  let candidates = [];
+  let picked = -1;
+  let prefixNow = '';
+  let suppressed = false;
+
+  function wordBeforeCursor(index) {
+    const text = quill.getText(Math.max(0, index - 40), Math.min(40, index));
+    return (text.match(/[А-Яа-яӨөҮүЁё]+$/) || [''])[0];
+  }
+
+  function renderSuggestionBar() {
+    bar.replaceChildren();
+    for (let i = 0; i < SUGGESTION_COUNT; i++) {
+      const word = candidates[i];
+      const slot = document.createElement('button');
+      slot.type = 'button';
+      slot.className = !word ? 'sug empty' : i === picked ? 'sug on' : 'sug';
+      slot.disabled = !word;
+      slot.textContent = word || '';
+      slot.title = word || '';
+      slot.addEventListener('mousedown', e => { e.preventDefault(); acceptCandidate(i); });
+      bar.append(slot);
+    }
+  }
+
+  const panelOpen = () => !layout.classList.contains('no-panel');
+
+  function refreshSuggestion() {
+    const range = quill.getSelection();
+    candidates = [];
+    picked = -1;
+    if (panelOpen() && range && !range.length && !suppressed) {
+      prefixNow = wordBeforeCursor(range.index);
+      candidates = suggester.suggestAll(prefixNow, SUGGESTION_COUNT);
+    }
+    renderSuggestionBar();
+  }
+
+  function acceptCandidate(i) {
+    const range = quill.getSelection();
+    if (!range || !candidates[i]) return;
+    const word = candidates[i];
+    const text = word.slice(prefixNow.length);
+    quill.insertText(range.index, text, 'user');
+    quill.setSelection(range.index + text.length, 0, 'silent');
+    suggester.learn(word);
+    tail = null;
+    suppressed = false;
+    refreshSuggestion();
+  }
+
+  function setPanelOpen(open) {
+    layout.classList.toggle('no-panel', !open);
+    panelButton.setAttribute('aria-pressed', String(open));
+    refreshSuggestion();
+  }
+  document.getElementById('btn-suggest-close').onclick = () => setPanelOpen(false);
+  panelButton.onclick = () => setPanelOpen(layout.classList.contains('no-panel'));
+  setPanelOpen(true);
+
+  quill.on('text-change', refreshSuggestion);
+  quill.on('selection-change', refreshSuggestion);
+
+  quill.container.addEventListener('keydown', e => {
+    if (candidates.length && panelOpen()) {
+      const direction = { ArrowDown: 1, ArrowRight: 1, ArrowUp: -1, ArrowLeft: -1 }[e.key];
+      if (e.shiftKey && direction) {
+        e.preventDefault();
+        const n = candidates.length;
+        picked = picked < 0 ? (direction > 0 ? 0 : n - 1) : (picked + direction + n) % n;
+        renderSuggestionBar();
+        return;
+      }
+      if (e.key === 'Enter' && picked >= 0) {
+        e.preventDefault();
+        acceptCandidate(picked);
+        return;
+      }
+    }
+
+    if (candidates.length && e.key === 'Escape') { suppressed = true; refreshSuggestion(); return; }
+
+    const typing = !e.isComposing && !e.ctrlKey && !e.metaKey && !e.altKey && e.key.length === 1;
+    const range = typing ? quill.getSelection() : null;
+
+    if (e.key === 'Enter' || /^[\s.,;:!?)]$/.test(e.key)) {
+      const before = quill.getSelection();
+      if (before) suggester.learn(wordBeforeCursor(before.index));
+    }
+
+    if (!range) { tail = null; return; }
+
+    const base = tail && range.length === 0 && range.index >= tail.out.length
+      && quill.getText(range.index - tail.out.length, tail.out.length) === tail.out
+      ? tail
+      : null;
+    const r = translit.step(base, e.key);
+    e.preventDefault();
+
+    const start = range.index - r.replaceLength;
+    quill.updateContents(
+      new Delta().retain(start).delete(r.replaceLength + range.length).insert(r.text),
+      'user',
+    );
+    quill.setSelection(start + r.text.length, 0, 'silent');
+    tail = r.state;
+    suppressed = false;
+    refreshSuggestion();
+  }, true);
+
+  quill.root.addEventListener('mousedown', () => { tail = null; });
+
+  const settings = document.getElementById('settings');
+  const grid = document.getElementById('map-grid');
+  const mapExtra = document.getElementById('map-extra');
+  const mapError = document.getElementById('map-error');
+
+  function kbd(text) {
+    const k = document.createElement('span');
+    k.className = text ? 'kbd' : 'kbd empty';
+    k.textContent = text || '—';
+    return k;
+  }
+
+  function renderExtra() {
+    mapExtra.replaceChildren(...Object.entries(DEFAULT_EXTRA).map(([key, value]) => {
+      const row = document.createElement('div');
+      row.className = 'map-row';
+      const keyBox = document.createElement('span');
+      keyBox.className = 'map-keys';
+      keyBox.append(kbd(key));
+      const cyr = document.createElement('span');
+      cyr.className = 'map-cyr';
+      cyr.textContent = value;
+      row.append(keyBox, cyr);
+      return row;
+    }));
+  }
+
+  function renderGrid(rows) {
+    grid.replaceChildren();
+    for (const [cyrUpper, cyrLower, keyUpper, keyLower] of rows) {
+      const cell = document.createElement('div');
+      cell.className = 'cell';
+      const label = document.createElement('span');
+      label.textContent = `${cyrUpper} ${cyrLower}`;
+      const up = document.createElement('input');
+      up.value = keyUpper;
+      up.maxLength = 4;
+      up.setAttribute('aria-label', `${cyrUpper} үсгийн товч`);
+      const lo = document.createElement('input');
+      lo.value = keyLower;
+      lo.maxLength = 4;
+      lo.setAttribute('aria-label', `${cyrLower} үсгийн товч`);
+      cell.append(label, up, lo);
+      grid.append(cell);
+    }
+    mapError.textContent = '';
+  }
+
+  function readGrid() {
+    const inputs = [...grid.querySelectorAll('input')];
+    return DEFAULT_ROWS.map(([cyrUpper, cyrLower], i) =>
+      [cyrUpper, cyrLower, inputs[2 * i].value.trim(), inputs[2 * i + 1].value.trim()]);
+  }
+
+  renderExtra();
+
+  document.getElementById('btn-settings').onclick = () => {
+    renderGrid(activeRows);
+    settings.hidden = false;
+  };
+  document.getElementById('btn-cancel').onclick = () => { settings.hidden = true; };
+  document.getElementById('btn-reset').onclick = () => renderGrid(DEFAULT_ROWS);
+  settings.addEventListener('click', e => { if (e.target === settings) settings.hidden = true; });
+
+  document.getElementById('btn-save').onclick = () => {
+    const rows = readGrid();
+    const duplicates = findDuplicateKeys(rows);
+    if (duplicates.length) {
+      mapError.textContent = `Давхардсан товч: ${duplicates.join(', ')}`;
+      return;
+    }
+    activeRows = rows;
+    translit = createTranslit(buildMap(activeRows));
+    tail = null;
+    settings.hidden = true;
+  };
+
+  document.getElementById('btn-print').onclick = () => window.print();
+
+  document.getElementById('btn-md').onclick = () => {
+    const md = new TurndownService().turndown(quill.getSemanticHTML());
+    download(new Blob([md], { type: 'text/markdown' }), 'document.md');
+  };
+
+  document.getElementById('btn-docx').onclick = () => {
+    if (!window.docx) { alert('Word модуль ачаалагдсангүй. Интернэт холболтоо шалгана уу.'); return; }
+    const { Document, Packer, Paragraph, TextRun } = window.docx;
+    const lines = quill.getText().split('\n').filter(l => l.trim());
+    const doc = new Document({
+      sections: [{ children: lines.map(l => new Paragraph({ children: [new TextRun(l)] })) }],
+    });
+    Packer.toBlob(doc).then(blob => download(blob, 'document.docx'));
+  };
+</script>
+</body>
+</html>
