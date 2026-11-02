@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Inaba Rakuten Calendar 2026 Oct</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;600;700&family=Space+Mono&family=Zen+Maru+Gothic:wght@500;700&display=swap');
+
+  /* warm sand · editorial */
+  :root{
+    --paper:#efe4d4; --card:#fbf5ea; --ink:#2b2118; --ink2:#6a5a4a; --ink3:#a0907d;
+    --line:#e0d2bd; --accent:#7a4a2b; --c1:#c8733a; --c2:#8a9a5b; --c3:#5d7d8f; --c4:#a0826d; --red:#b8412e;
+    --fh:"Playfair Display",serif; --fb:"Inter",system-ui,sans-serif; --fa:"Kalam","Zen Maru Gothic",sans-serif;
+    --mono:"Space Mono",ui-monospace,monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;min-height:100%}
+  body{background:var(--paper);color:var(--ink);font-family:var(--fb);-webkit-font-smoothing:antialiased;
+    background-image:radial-gradient(var(--line) 1.1px,transparent 1.1px);background-size:18px 18px}
+  button{font-family:inherit}
+
+  .wrap{max-width:1180px;margin:0 auto;padding:26px 28px 20px}
+  .nav{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}
+  .brand{font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--ink3)}
+  .seg{display:inline-flex;gap:4px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:4px}
+  .seg button{border:0;background:none;padding:8px 16px;border-radius:999px;font-size:13px;color:var(--ink2);cursor:pointer;display:inline-flex;gap:6px;align-items:center}
+  .seg button.on{background:var(--accent);color:var(--card)}
+  .seg .n{font-family:var(--mono);font-size:11px;opacity:.6}
+  .seg button.play{background:var(--c1);color:var(--card)}
+  .seg button.play.on{background:var(--c1);color:var(--card)}
+
+  .page{display:none}
+  .page.active{display:block;animation:fadein .5s ease}
+  @keyframes fadein{from{opacity:0;transform:translateY(8px)}}
+
+  /* ============ PAGE 1 · CALENDAR ============ */
+  header.top{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap;margin:26px 0 22px}
+  .kicker{font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink3)}
+  h1{font-family:var(--fh);font-weight:400;font-style:italic;font-size:clamp(34px,4.6vw,58px);line-height:1.05;margin:8px 0 0}
+  h1 b{font-weight:700;font-style:normal}
+  .sub{font-family:var(--fa);font-size:18px;color:var(--ink2);margin:10px 0 0}
+  .tools{display:flex;flex-direction:column;align-items:flex-end;gap:12px}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12.5px;color:var(--ink2);justify-content:flex-end}
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+  .legend i{width:12px;height:12px;border-radius:4px;display:inline-block}
+  .play{font-size:15px;background:var(--accent);color:var(--card);border:0;border-radius:999px;padding:13px 26px;cursor:pointer;box-shadow:0 10px 22px rgba(60,40,20,.2);transition:transform .2s}
+  .play:hover{transform:translateY(-2px)}
+
+  .cal{display:grid;grid-template-columns:repeat(7,1fr);gap:10px;background:var(--card);border:1px solid var(--line);border-radius:22px;padding:14px;box-shadow:0 18px 40px rgba(60,40,20,.08)}
+  .cell{position:relative;min-height:128px;background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:12px 12px 10px;cursor:pointer;text-align:left;color:var(--ink);display:flex;flex-direction:column;transition:transform .2s,box-shadow .2s,background .3s;animation:in .5s ease backwards;animation-delay:calc(var(--i)*18ms)}
+  @keyframes in{from{opacity:0;transform:translateY(8px)}}
+  .cell:hover{transform:translateY(-3px);box-shadow:0 10px 20px rgba(60,40,20,.14);z-index:2}
+  .cell:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+  .cell.now{outline:3px solid var(--accent);outline-offset:2px;background:var(--card);z-index:3}
+  .tag{align-self:flex-start;margin-bottom:8px;font-size:10.5px;font-weight:700;letter-spacing:.04em;line-height:1.25;padding:4px 9px;border-radius:8px;background:var(--accent);color:var(--card)}
+  .num{font-family:var(--fh);font-size:46px;line-height:1;font-weight:700;color:var(--accent)}
+  .who{margin-top:auto;font-family:var(--fa);font-size:17px;line-height:1.1;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .peek{font-size:12px;color:var(--ink3);margin-top:4px;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .cell.c1 .tag{background:var(--c1)}
+  .cell.red{background:#f3d9cf;border-color:#e6b5a4}
+  .cell.red .num,.cell.red .who{color:var(--red)}
+  .cell.red .tag{background:var(--red)}
+  .cell.intf{background:#eadcc4}
+  .cell.c2 .tag{background:var(--c2)}
+  .cell.c4 .tag{background:var(--c4)}
+  .cell.intf .tag{background:var(--c3)}
+
+  /* popup */
+  .modal{position:fixed;inset:0;background:rgba(43,33,24,.45);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:opacity .3s;z-index:20}
+  .modal.open{opacity:1;pointer-events:auto}
+  .sheet{width:min(660px,100%);background:var(--card);border-radius:24px;padding:28px 34px 0;box-shadow:0 40px 80px rgba(0,0,0,.3);transform:translateY(18px) scale(.96);transition:transform .4s cubic-bezier(.2,.8,.2,1);position:relative;overflow:hidden}
+  .modal.open .sheet{transform:none}
+  .sh-top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}
+  .sh-day{font-family:var(--fh);font-size:84px;font-weight:700;color:var(--accent);line-height:.9}
+  .sh-day small{font-family:var(--fb);font-size:14px;color:var(--ink3);font-weight:600;letter-spacing:.1em;margin-left:8px}
+  .sh-x{background:none;border:1px solid var(--line);border-radius:10px;width:36px;height:36px;color:var(--ink2);cursor:pointer;font-size:14px}
+  .sh-x:hover{border-color:var(--accent);color:var(--accent)}
+  .sh-mark{display:inline-block;margin-top:14px;font-size:13px;font-weight:700;padding:6px 12px;border-radius:8px;background:var(--accent);color:var(--card)}
+  .sh-mark.red{background:var(--red)} .sh-mark.c1{background:var(--c1)} .sh-mark.c3{background:var(--c3)} .sh-mark.c2{background:var(--c2)} .sh-mark.c4{background:var(--c4)}
+  .sh-text{font-family:var(--fa);font-size:24px;line-height:1.45;margin:18px 0 0;white-space:pre-line;color:var(--ink);max-height:300px;overflow:auto}
+  .sh-from{font-family:var(--fh);font-style:italic;font-size:18px;color:var(--ink2);text-align:right;margin-top:14px}
+  .sh-nav{display:flex;gap:10px;justify-content:space-between;align-items:center;margin:20px 0 0;padding:16px 0 22px;border-top:1px dashed var(--line)}
+  .sh-nav button{font-size:13px;color:var(--ink2);background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:9px 16px;cursor:pointer}
+  .sh-nav button:hover{border-color:var(--accent);color:var(--accent)}
+  .sh-nav .mid{background:var(--accent);color:var(--card);border-color:var(--accent);min-width:130px}
+  .prog{position:absolute;left:0;right:0;bottom:0;height:4px;background:var(--line)}
+  .prog i{display:block;height:100%;width:100%;background:var(--c1);transform-origin:left;animation:shrink linear forwards}
+  .prog.paused i{animation-play-state:paused}
+  .prog.off{display:none}
+  @keyframes shrink{from{transform:scaleX(1)}to{transform:scaleX(0)}}
+
+  footer.foot{text-align:center;font-family:var(--fa);color:var(--ink3);font-size:16px;padding:30px 0 50px}
+
+  /* ============ PAGE 2 · METRICS (Banza) ============ */
+  .m-head{margin:26px 0 22px}
+  .m-head .code{font-family:var(--mono);font-size:13px;color:var(--ink2);background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 14px;display:inline-block;margin-top:14px}
+  .m-head .code b{color:var(--c1);font-weight:700}
+  .kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:12px}
+  @media(max-width:900px){.kpis{grid-template-columns:repeat(2,1fr)}}
+  .kpi{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 18px}
+  .kpi .k{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink3)}
+  .kpi .v{font-family:var(--fh);font-size:36px;font-weight:700;color:var(--accent);line-height:1.1;margin-top:4px}
+  .kpi .n{font-family:var(--fa);font-size:15px;color:var(--ink2)}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+  @media(max-width:900px){.grid{grid-template-columns:1fr}}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:20px 22px;min-width:0}
+  .panel.wide{grid-column:1/-1}
+  .panel h3{font-family:var(--fh);font-size:21px;margin:0}
+  .panel .cap{font-family:var(--mono);font-size:11px;color:var(--ink3);margin:4px 0 14px}
+  .bars .row{display:grid;grid-template-columns:150px 1fr 44px;gap:10px;align-items:center;font-size:13px;margin-bottom:7px}
+  .bars .bar{height:12px;background:var(--paper);border-radius:6px;overflow:hidden}
+  .bars .bar i{display:block;height:100%;background:var(--c1);border-radius:6px}
+  .bars .val{font-family:var(--mono);font-size:12px;color:var(--ink2);text-align:right}
+  .cloud{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;justify-content:center;min-height:200px;padding:6px}
+  .cloud span{font-family:var(--fh);line-height:1;color:var(--accent);transition:transform .2s;cursor:default}
+  .cloud span:nth-child(3n){color:var(--c1)} .cloud span:nth-child(3n+1){color:var(--c2)} .cloud span:nth-child(5n){color:var(--c3)}
+  .cloud span:hover{transform:scale(1.12)}
+  table{width:100%;border-collapse:collapse;font-size:13.5px}
+  th,td{text-align:left;padding:7px 6px;border-bottom:1px dashed var(--line)}
+  th{font-family:var(--mono);font-size:11px;letter-spacing:.06em;color:var(--ink3);font-weight:400;text-transform:uppercase}
+  td.c,th.c{text-align:right;font-family:var(--mono)}
+  .donut{display:flex;flex-direction:column;gap:20px;align-items:center}
+  .legend2{display:flex;flex-wrap:wrap;justify-content:center;gap:10px 22px;font-size:14px}
+  .legend2 span{display:flex;align-items:center;gap:8px}
+  .legend2 i{width:12px;height:12px;border-radius:4px;display:inline-block}
+  .legend2 b{font-family:var(--mono);padding-left:8px;font-weight:400;color:var(--ink2)}
+  .lb{max-height:520px;overflow:auto;padding-right:6px}
+  .heat{display:grid;grid-template-columns:minmax(120px,1.2fr) repeat(4,1fr);gap:6px;font-size:12.5px;align-items:center}
+  .heat .h{font-family:var(--mono);font-size:10.5px;color:var(--ink3);text-transform:uppercase;text-align:center}
+  .heat .p{font-family:var(--fa);font-size:15px;color:var(--ink)}
+  .heat .c{height:40px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:12px}
+  .foot-note{font-family:var(--mono);font-size:11px;color:var(--ink3);margin-top:12px}
+  .banza{max-width:760px;margin:34px auto 0;padding:34px 40px;background:var(--card);border:1px solid var(--line);border-radius:22px;position:relative}
+  .banza small{font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink3)}
+  .banza p{font-family:var(--fa);font-size:24px;line-height:1.5;margin:14px 0 0;white-space:pre-line}
+  .banza .sig{font-family:var(--fh);font-style:italic;font-size:20px;text-align:right;margin-top:18px;color:var(--ink2)}
+
+  /* password gate */
+  .gate{position:fixed;inset:0;z-index:100;background:var(--paper);display:flex;align-items:center;justify-content:center;padding:24px}
+  .gate[hidden]{display:none}
+  .gate form{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:34px 36px 28px;width:min(380px,100%);box-shadow:0 30px 60px rgba(60,40,20,.15);text-align:center}
+  .gate .kicker{margin-bottom:10px}
+  .gate h2{font-family:var(--fh);font-style:italic;font-weight:400;font-size:30px;margin:0;line-height:1.1}
+  .gate p{font-family:var(--fa);color:var(--ink2);font-size:18px;margin:8px 0 18px}
+  .gate input{width:100%;font:inherit;font-size:16px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--paper);color:var(--ink)}
+  .gate input:focus{outline:2px solid var(--accent);outline-offset:1px}
+  .gate button{margin-top:14px;width:100%;font-size:15px;background:var(--accent);color:var(--card);border:0;border-radius:999px;padding:12px;cursor:pointer}
+  .gate .err{min-height:20px;font-size:13px;color:var(--red);margin-top:10px}
+
+  @media(max-width:820px){
+    .wrap{padding:20px 14px}
+    .cal{gap:6px;padding:8px}
+    .cell{min-height:96px;padding:8px}
+    .num{font-size:30px}
+    .who{font-size:14px}
+    .peek,.tag{display:none}
+    .tools{align-items:flex-start}
+    .legend{justify-content:flex-start}
+    .sh-day{font-size:60px}
+    .sh-text{font-size:20px}
+    .sheet{padding:22px 20px 0}
+    .banza{padding:24px}
+  }
+</style>
+</head>
+<body>
+<!-- password gate: removed from the downloaded copy -->
+<div class="gate" id="gate">
+  <form id="gateForm" autocomplete="off">
+    <div class="kicker">Farewell · for Inaba-san</div>
+    <h2>Inaba Rakuten Calendar</h2>
+    <p>enter the password to view</p>
+    <input type="password" id="gateInput" placeholder="password" aria-label="password" />
+    <button type="submit">Enter</button>
+    <div class="err" id="gateErr"></div>
+  </form>
+</div>
+<div class="wrap">
+  <nav class="nav">
+    <span class="brand">Farewell · Oct 2026</span>
+    <div class="seg">
+      <button id="tabCal" class="on" onclick="go('cal')"><span class="n">01</span>Calendar</button>
+      <button id="tabMet" onclick="go('met')"><span class="n">02</span>Metrics</button>
+      <button id="dlBtn" onclick="downloadPage()">⤓ Download</button>
+      <button id="playBtn" class="play" onclick="playFromNav()">▶ Play</button>
+    </div>
+  </nav>
+
+  <!-- ===================== PAGE 1 · CALENDAR ===================== -->
+  <section class="page active" id="pageCal">
+    <header class="top">
+      <div>
+        <div class="kicker">Farewell · for Inaba-san</div>
+        <h1>Inaba Rakuten Calendar <b>2026 Oct</b></h1>
+        <p class="sub">one day, one voice. tap a day to read it, or press play.</p>
+      </div>
+      <div class="tools">
+        <div class="legend">
+          <span><i style="background:var(--accent)"></i>person of the day</span>
+          <span><i style="background:var(--c1)"></i>from Banza</span>
+          <span><i style="background:var(--c3)"></i>interface day</span>
+          <span><i style="background:var(--red)"></i>SAP closing</span>
+          <span><i style="background:var(--c2)"></i>team event</span>
+          <span><i style="background:var(--c4)"></i>deadline / work</span>
+        </div>
+      </div>
+    </header>
+    <section class="cal" id="cal"></section>
+  </section>
+
+  <!-- ===================== PAGE 2 · METRICS ===================== -->
+  <section class="page" id="pageMet">
+    <header class="m-head">
+      <div class="kicker">Farewell · the numbers</div>
+      <h1>The <b>Metrics</b></h1>
+    </header>
+
+    <div class="kpis" id="kpis"></div>
+
+    <div class="grid">
+      <div class="panel">
+        <h3>Top Words</h3>
+        <div class="cap">most used words, filler words removed</div>
+        <div class="bars" id="topWords"></div>
+      </div>
+      <div class="panel">
+        <h3>Word Cloud</h3>
+        <div class="cap">bigger = said more often</div>
+        <div class="cloud" id="cloud"></div>
+      </div>
+      <div class="panel">
+        <h3>Common Phrases</h3>
+        <div class="cap">phrases people used most</div>
+        <table><thead><tr><th>2 words</th><th class="c">times</th></tr></thead><tbody id="bi"></tbody></table>
+        <div style="height:14px"></div>
+        <table><thead><tr><th>3 words</th><th class="c">times</th></tr></thead><tbody id="tri"></tbody></table>
+      </div>
+      <div class="panel">
+        <h3>Tone</h3>
+        <div class="cap">how the messages feel</div>
+        <div class="donut">
+          <svg width="300" height="300" viewBox="0 0 170 170" id="donut"></svg>
+          <div class="legend2" id="donutLegend"></div>
+        </div>
+      </div>
+      <div class="panel">
+        <h3>Languages</h3>
+        <div class="cap">messages in each language</div>
+        <div class="bars" id="langs"></div>
+      </div>
+      <div class="panel">
+        <h3>Phrases by Tone</h3>
+        <div class="cap">how many messages of each tone use the phrase</div>
+        <div class="heat" id="heat"></div>
+      </div>
+    </div>
+
+    <section class="banza">
+      <small>a message from banza</small>
+      <p id="bzText"></p>
+      <div class="sig">— Banza</div>
+    </section>
+  </section>
+
+  <footer class="foot">made with ♥ by banza</footer>
+</div>
+
+<!-- popup -->
+<div class="modal" id="modal" role="dialog" aria-modal="true">
+  <div class="sheet">
+    <div class="sh-top">
+      <div>
+        <div class="sh-day" id="mDay"></div>
+        <span class="sh-mark" id="mMark" hidden></span>
+      </div>
+      <button class="sh-x" id="mClose" aria-label="close">✕</button>
+    </div>
+    <p class="sh-text" id="mText"></p>
+    <div class="sh-from" id="mFrom"></div>
+    <div class="sh-nav">
+      <button id="mPrev">← previous</button>
+      <button class="mid" id="mPlay">❚❚ Pause</button>
+      <button id="mNext">next →</button>
+    </div>
+    <div class="prog off" id="mProg"><i></i></div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   ✎ settings (edit these)
+   ============================================================ */
+const TO_NAME = "Inaba";
+const DAYS = 47;            // 47 real messages; set 48 if you add one more (messages repeat if days > messages)
+const BANZA_MESSAGE = `Inaba-san, thank you for always responding to Mahima’s inquiries.
+***it takes lots of load from all of us ***
+and for being understanding && positive colleague
+Enjoy the next chapter !!!
+Wishing you a future with no pending accruals, no overdue invoices, and no “final final” versions XD.
+Let's grab that drink soon 🍻`;
+
+/* special days */
+const SPECIAL = {
+  2:  {label:'Go home early', kind:'c2'},
+  10: {label:'COGS number', sub:'from Banza', kind:'c1'},
+  15: {label:'SAP closing', kind:'red'},
+  20: {label:'Interface day', kind:'intf'},
+  24: {label:'Accounting stuff', kind:'c4'},
+  30: {label:'Nomikai', kind:'c2'},
+  33: {label:'Budget submission', kind:'c4'},
+};
+
+const MESSAGES = [
+ {
+  "tone": "warm",
+  "from": "安慶名",
+  "text": "稲葉さん\n今まで本当にありがとうございました！本当に感謝してもしきれないくらい、たくさん助けてもらいました！寂しい気持ちと不安でいっぱいですが、稲葉さんのことなので、新しい場所でもすぐに大活躍しちゃうんだろうなと思ってます。定期的にのみましょー！"
+ },
+ {
+  "tone": "warm",
+  "from": "Paula",
+  "text": "Hi Inaba-san my mentor! \n\nWe have been through many ups and downs together  :D but at in the end, I am truly grateful for all your support and for teaching me many things in Rakuten. \n\nI can't deny that working with you has been fun (ofcourse, when you are in good mood :D) Thank you for everything you helped me when I had questions about  RSJP accounting related matters.\n\nI really wish you all the best in your new challenge. I know you will master it!  \n\nPlease take good care of your health and I do hope we keep in touch. Let's go for drink with everyone sometimes!"
+ },
+ {
+  "tone": "warm",
+  "from": "たけざき",
+  "text": "旅立たれるのですね…コマースでの月次決算中にGSAPの消込方法を緊急で教えてもらったり、シンフォニー異動後は色々情報を提供していただき、お世話になりました。何もお返し出来ておらず申し訳ありません。新天地でもどうかご活躍を！"
+ },
+ {
+  "tone": "warm",
+  "from": "Risako Ichikawa",
+  "text": "I will very missing you as last 同期 graduated. I'm grateful to have opportunity to work with you for last 1-2 years in same department -symphony.  Let's keep in touch and have a 飲み会 soon!!"
+ },
+ {
+  "tone": "warm",
+  "from": "Yuko Miura",
+  "text": "長い間、本当にお疲れ様でした！\nいつも穏やかで優しく、誰に対しても気持ちよく接してくださるお人柄が、とても印象に残っています。\nFASSの試験では「絶対にAを取ります！」と宣言され、見事に有言実行されたことも懐かしい思い出です。\nこれまでご一緒できたことに感謝しています。\n新天地でのご活躍と、ますますのお幸せを心よりお祈りしています！"
+ },
+ {
+  "tone": "pro",
+  "from": "沖土居尚美",
+  "text": "You have truly been an invaluable asset to Rakuten.\nCongratulations on your new journey, and I wish you every success and happiness in your new endeavor！身体を大事にして過ごしてね！"
+ },
+ {
+  "tone": "funny",
+  "from": "Ryo Konishi",
+  "text": "稲葉氏、次のステージでも頑張って。\n次会ったときはスタバ奢らせる。また飲みに行こう！"
+ },
+ {
+  "tone": "warm",
+  "from": "Takeshi Ogawa",
+  "text": "お疲れさまです！楽天でのお仕事、本当にお疲れさまでした。いつもくだらない話にも付き合ってくれて、ありがとう！楽天を卒業して次のステップに進むとのこと、これからもずっと応援してます。また一緒に走ったり、飲んだりしましょう！"
+ },
+ {
+  "tone": "funny",
+  "from": "尾城明拓",
+  "text": "新卒の鏡としてHPにも載っていた稲葉さん。片手に電卓、片手はタクシーを止める姿憧れのあまり記憶から離れません。\nまたヨガの画像楽しみにしています"
+ },
+ {
+  "tone": "hype",
+  "from": "朽木 良輔",
+  "text": "ニキには長くお世話になりました。鉄人としての姿は目に焼き付いております。同じように働くのは僕にはとてもじゃないですけど無理ですが。また飲みに行きましょう。"
+ },
+ {
+  "tone": "hype",
+  "from": "Eric",
+  "text": "Best wishes for your next chapter!\n\n人の夢は終わらねェ！🏴‍☠️\n\n新天地でのご活躍を祈っています。"
+ },
+ {
+  "tone": "warm",
+  "from": "Yui Yamada",
+  "text": "いなばさん、大好きな先輩のご卒業は寂しすぎます😢\n心細い新卒1年目から経理のお仕事以外にも郵便やら締め会やらご丁寧にたくさん教えてくれてありがとうございました🌸\n私のヨガクラスも来てくれて本当に本当にうれしいです🥰\nパークヨガお誘いしますね🍀✨\nこれからのご活躍めっちゃ応援しています😉✊"
+ },
+ {
+  "tone": "pro",
+  "from": "李順子",
+  "text": "お世話になりました。RSJP人件費引継ぎする際も大変ご苦労様でした。新天地での益々のご活躍をお祈り申し上げます。"
+ },
+ {
+  "tone": "pro",
+  "from": "Koji Kawashima",
+  "text": "9年半、楽天でいろいろなことを経験されたと思います。新天地でのご活躍をお祈り申し上げます。"
+ },
+ {
+  "tone": "warm",
+  "from": "松井翼",
+  "text": "稲葉さん楽天生活お疲れ様でした！業務でのかかわりは多くはなかったですが、岸本さんの同級生ということで色々お話はよく伺っていましたし飲みにも行けて嬉しかったです！またご一緒できる機会があれば嬉しいです。今後のご活躍を願っております！"
+ },
+ {
+  "tone": "warm",
+  "from": "Kenya Azami",
+  "text": "楽天生活お疲れ様でした。厳しい環境の中で長年過ごされたことで、きっと外に出たら想像以上の成長を実感することが出来ると思います。これから先のチャレンジも応援しています。またお会いできる日まで互いに成長できるよう頑張りましょう！お世話になりました。"
+ },
+ {
+  "tone": "funny",
+  "from": "西川",
+  "text": "お仕事！テニス！飲み会！いろいろな場面でご一緒できたことは楽しい思い出ばかりです！ありがとうございました。これからも関係性は続く？と思うのでよろしくお願いいたします(笑)次もがんばってくださいね(^_-)-☆"
+ },
+ {
+  "tone": "pro",
+  "from": "田村久子",
+  "text": "稲葉さんも楽天ご卒業ですね。さみしくなります。ピュアな新卒の頃から大分成長されたのだと想像します。\n困ったことがあったらいつでも（栗原さんたちとｗ）聞きますので定期報告飲み会をよろしくお願いします！\n新天地でのご活躍をお祈り申し上げます。お体にお気をつけて！（一瞬元上長の田村より）"
+ },
+ {
+  "tone": "funny",
+  "from": "Kumiko Otake",
+  "text": "Good luck with your next adventure, and let’s catch up for some coriander again soon!"
+ },
+ {
+  "tone": "warm",
+  "from": "上村 英里子",
+  "text": "稲葉さん、風のうわさでご卒業と聞きました。2017年とか18年、わたしが入社したての頃にとってもお世話になりました。土曜か日曜、ニコタマで焼肉たべいったよね。あの頃が懐かしいな。新しいところでのご活躍をお祈りしております！"
+ },
+ {
+  "tone": "warm",
+  "from": "じーの",
+  "text": "稲葉さん、本当にお疲れ様でした！直接業務で絡む機会は少なかったけれど、稲葉さんが活躍されている姿はよく隣で見ていましたよ。次のステージでも、頑張ってください。応援しています。"
+ },
+ {
+  "tone": "warm",
+  "from": "Emi Yamada",
+  "text": "稲葉さんと最初に出会ったのは、2018年EC経理でした。そのあと2023年シンフォニー（内部統制課）で再開したときは、頼もしく成長していてびっくりしました。楽天卒業とのこと寂しいですが、新しい環境でもますます力を発揮するのではないかと思います。応援してます！"
+ },
+ {
+  "tone": "warm",
+  "from": "國井渉",
+  "text": "稲葉さんが自らの意思で旅立つ日を迎えることを嬉しく思います。これからの冒険の話をいつか聞かせてください。応援しています。"
+ },
+ {
+  "tone": "pro",
+  "from": "Misato Sando",
+  "text": "稲葉さん、内部統制課時代から大変お世話になりました！業務ではあまりご一緒することはなかったですが、時々、ゆるくおしゃべりさせていただくのが楽しかったです。楽天ご卒業されるとのこと、淋しいですが次のステージでのご活躍をお祈りしています。Good Luck！"
+ },
+ {
+  "tone": "warm",
+  "from": "笠木智広",
+  "text": "稲葉くん 新卒から9年間(？)お疲れ様でした！楽天に大きく貢献してくれて本当にありがとう！特にシンフォニーでは大変だったと思うけど、必ず稲葉くんの力になっているので、楽天での経験を信じて大きく羽ばたいてください！しばらくテニスをやっていないけど、また機会があればやりましょう♪"
+ },
+ {
+  "tone": "warm",
+  "from": "コマース経理部 片山",
+  "text": "修士くん、さようなら。ひそかに岸本さんと三人で飲みに行きたいと思っていましたがついぞ叶わず。お元気でやってください、またサシ飲みしましょう。"
+ },
+ {
+  "tone": "funny",
+  "from": "Motoe Sasaki",
+  "text": "Hi Inaba san,\nIt's been a year since we both moved to Symphony, and I really appreciate all the conversations we've had.  You've always been someone I could ask anything or talk to.\nI also feel that you've been a real mood-maker in the Symphony Accounting, bringing positive energy to everyone around you.  I'm sure we will miss you.\nI wish you all the best in your next journey!  And I hope you'll come back someday with even more experience!  Keep in touch!"
+ },
+ {
+  "tone": "warm",
+  "from": "Anoop Jain",
+  "text": "Dear Inaba San\n\nYou are one of those colleagues who in very little time made a huge positive impact to all that you did. Much appreciate your limitless support at work.\n\nAll the very best for your future endeavor.\n\nCheers / AJ"
+ },
+ {
+  "tone": "pro",
+  "from": "海老澤瞳",
+  "text": "テニス一緒にやれてよかったです！新天地で頑張ってね！！"
+ },
+ {
+  "tone": "warm",
+  "from": "根本 龍彦",
+  "text": "稲葉さん、楽天生活お疲れ様でした！\n意外と業務で直接絡むことは少なかったですが、飲み会やヨガで一緒になることが多く親近感を覚えてました(笑)楽天で得た経験を生かして新天地でも頑張ってください。陰ながら応援しています。"
+ },
+ {
+  "tone": "funny",
+  "from": "Saori Hirakawa",
+  "text": "思い返すと感謝することばかりで、ただただ有難うございましたという一言しか浮かばないのですが、稲葉さんとこの一年一緒にお仕事させていただき本当に楽しかったことと、そして稲葉さんの優しさを改めて思います。行動で示してくださる優しさに何度も救われ、そして学ばせていただきました。感謝の気持ちでいっぱいです。本当にありがとうございました。次のステージでも更なるご活躍をお祈りしています！"
+ },
+ {
+  "tone": "warm",
+  "from": "Okane",
+  "text": "ギリギリまで働き続け、お疲れさまでした。そのマインドと類まれな体力はかならず次の職場でいきます。\nせっかくなので楽しんできてください。クライアント商売になるのでお酒には気を付けて！"
+ },
+ {
+  "tone": "pro",
+  "from": "Christina",
+  "text": "I have truly appreciated your support, guidance, and cooperation during our time working together.\nThank you so much for sharing your knowledge, and I am grateful for your patience and generosity.\nWishing you all the very best in your next chapter!"
+ },
+ {
+  "tone": "pro",
+  "from": "Handa",
+  "text": "稲葉さん、シンフォニーでの大変な業務お疲れさまでした。グループ経理部からの過度な要望もあり大変でしたよね。。大変お世話になりました。\nハードワークがお好きな稲葉さんなら今後もどこに行っても重宝されると思います。\n新天地でのご活躍をお祈りしています。"
+ },
+ {
+  "tone": "warm",
+  "from": "佐々木伸一",
+  "text": "稲葉さん、楽天で学んだことを生かして新天地でもご活躍されることを期待してます。一方で数年したらまた戻ってきてくださいね。"
+ },
+ {
+  "tone": "warm",
+  "from": "鶴巻玲雄",
+  "text": "楽天卒業おめでとうございます！\n急に異動してきたのですが、見知った顔が居て大変助かりました！"
+ },
+ {
+  "tone": "pro",
+  "from": "Keith",
+  "text": "およそ10年間の楽天生活お疲れ様でした。経理畑1本で10年と代え難い経験をエキサイティングな環境でされたと想像します。この経験は今後のコンサル業務においても財産として発揮されると思いますので、遠慮なくクライアントを引き付けてスーパーコンサルとしてご活躍ください。コンサルとしての経験も踏まえて、自分がやりたいことが何なのかが明確に決まることと想像します。\n最後に稲葉さんのシンフォニー関与後一緒に働いていただいて、ありがとうございました。"
+ },
+ {
+  "tone": "warm",
+  "from": "Suan Park",
+  "text": "Hi, Shuji san. Although we worked together for only a short time, you were a great help to me when I was still learning the ropes after joining RSK. Your quick responses to even my small questions and requests made it much easier for me to settle in.\n\nI'm sorry we didn't have more time to work together, but I'm truly grateful for all your help and support. Wherever you go next, I wish you happiness, good health, and all the best in everything you do!\n\nThank you so much for everything."
+ },
+ {
+  "tone": "warm",
+  "from": "佐藤 梨沙",
+  "text": "貴重な同世代の稲葉さんと時折する雑談が最高に楽しかったです。\n仕事に対するストイックさと成長意欲は脱帽もので、尊敬しています。くれぐれもお体には気を付けて新天地でも頑張ってください！"
+ },
+ {
+  "tone": "funny",
+  "from": "岡田ゆかり",
+  "text": "シンフォニーに異動後からお世話になりましてありがとうございました！\n稲葉さんには私たち現場と経理の架け橋となっていただき、本当に色々な業務をスムーズに行うことができました。\n息子のように思っていたので、いなくなってしまうのはとてもとても寂しいですが、稲葉さんのご活躍を陰ながら応援しています。LinkedInで探しますので状況アップデートしてくださいね。そして、彼女がまだできてなかったらうちの娘いかがですかね？笑"
+ },
+ {
+  "tone": "warm",
+  "from": "鈴木千映美",
+  "text": "稲葉さん\n短い間でしたが大変お世話になりました！！新天地でも、ますますご活躍されることと思います。 ヨガでもお会いできることを楽しみにしております。これからのご活躍を心よりお祈りしております！"
+ },
+ {
+  "tone": "warm",
+  "from": "Kellie Siow",
+  "text": "Hi Inaba-san! 😊\n\nWishing you all the best in your next chapter! It’s been a pleasure working with you, and thank you for all your support and help along the way.\n\nYou will be missed! Hope your new journey brings you lots of happiness, success, and exciting opportunities. Keep in touch, and all the best! 😊"
+ },
+ {
+  "tone": "pro",
+  "from": "平井琢磨",
+  "text": "2か月だけでしたが、いろいろと教えていただきありがとうございました。RSJPのTax担当として、力を発揮できるように頑張ろうと思います。新天地でのご活躍をお祈りしております。体に気を付けて頑張ってください！"
+ },
+ {
+  "tone": "warm",
+  "from": "Sai Charan",
+  "text": "Though I haven't worked closely with you, heard good inputs on your understanding capabilities and your supportive nature. Keep up your good spirit and leave an impact wherever you go. Wish you All Good Luck Inaba San :)"
+ },
+ {
+  "tone": "pro",
+  "from": "Thomas Wu",
+  "text": "Dear Inaba san, it was a great experience to work with you in the past few years.\nYou were one of the first person that I had direct contact from headquarter. By discussing with you, you helped me understand Rakuten organization and corporate culture better. Good bye and wish a good future career. Feel free to contact if you need anything from Germany."
+ },
+ {
+  "tone": "warm",
+  "from": "Huijuan",
+  "text": "Hi Inaba-san, it's been a real pleasure working with you all these years! Thank you for always being so helpful and supportive. And I've really appreciated how easygoing you are and how I can always count on you whenever I needed help. Wishing you all the best for the future, and let's definitely keep in touch!"
+ },
+ {
+  "tone": "warm",
+  "from": "Shunsuke Watanabe",
+  "text": "稲葉さんこれまで色々とお世話になりました！特にWTSでは大変助かりました。稲葉さんのこれからの活躍をお祈りしております！！お身体には気を付けて頑張って下さい！"
+ }
+];
+
+/* ============================================================
+   shared helpers
+   ============================================================ */
+const JP_RE = /[\u3040-\u30ff\u3400-\u9fff]/;
+const JP_CHARS = /[\u3040-\u30ff\u3400-\u9fff]/g;
+const LATIN = /[A-Za-z0-9’']+/g;
+const clip = (s,n) => s.length>n ? s.slice(0,n).trim()+'…' : s;
+const pad = n => String(n).padStart(2,'0');
+const G = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const wordsOf = t => (t.match(LATIN)||[]).length + Math.round((t.match(JP_CHARS)||[]).length/2);
+const day = d => MESSAGES[(d-1) % MESSAGES.length];
+const durFor = d => Math.max(4000, Math.round(wordsOf(day(d).text)*300));   // words × 0.3 s, min 4 s
+function fitSize(len){ return len>240 ? 19 : len>150 ? 22 : 25; }
+
+/* ============================================================
+   PAGE 1 · build calendar
+   ============================================================ */
+const cells = {};
+let html = '';
+for(let d=1; d<=DAYS; d++){
+  const m = day(d), s = SPECIAL[d];
+  const cls = ['cell'];
+  if(s && s.kind==='red') cls.push('red');
+  if(s && s.kind==='intf') cls.push('intf');
+  if(s && s.kind==='c1') cls.push('c1');
+  if(s && s.kind==='c2') cls.push('c2');
+  if(s && s.kind==='c4') cls.push('c4');
+  html += `<button class="${cls.join(' ')}" data-d="${d}" style="--i:${d}" aria-label="day ${d}">
+    ${s ? `<span class="tag">${s.label}${s.sub?' · '+s.sub:''}</span>` : ''}
+    <span class="num">${pad(d)}</span>
+    <span class="who">${esc(m.from)}</span>
+    <span class="peek">${esc(clip(m.text,60))}</span></button>`;
+}
+G('cal').innerHTML = html;
+G('cal').querySelectorAll('.cell').forEach(b=>{
+  cells[+b.dataset.d] = b;
+  b.onclick = ()=>openDay(+b.dataset.d);
+});
+
+/* ============================================================
+   PAGE 1 · popup + play engine
+   tap a day  -> popup stays until you close it
+   play       -> each popup stays for words × 0.3 s, then the next day
+   ============================================================ */
+const modal = G('modal'), mProg = G('mProg');
+const P = {playing:false, cur:null, nextDay:1, timer:null, gap:null, t0:0, el:0, dur:0};
+
+function setPlayUI(){
+  G('playBtn').textContent = P.playing ? '❚❚ Pause' : '▶ Play';
+  G('playBtn').classList.toggle('on', P.playing);
+  G('mPlay').textContent = P.playing ? '❚❚ Pause' : '▶ Play';
+}
+function playFromNav(){ go('cal'); togglePlay(); }
+function fill(d){
+  const m = day(d), s = SPECIAL[d];
+  G('mDay').innerHTML = `${pad(d)}<small>of ${DAYS}</small>`;
+  const mk = G('mMark');
+  if(s){
+    mk.hidden = false;
+    mk.className = 'sh-mark ' + (s.kind==='intf' ? 'c3' : s.kind);
+    mk.textContent = s.label + (s.sub ? ' · '+s.sub : '');
+  } else mk.hidden = true;
+  const t = G('mText');
+  t.textContent = m.text;
+  t.style.fontSize = fitSize(m.text.length)+'px';
+  G('mFrom').textContent = '— ' + m.from;
+}
+function openDay(d){
+  clearTimeout(P.timer); clearTimeout(P.gap);
+  if(P.cur!==null && cells[P.cur]) cells[P.cur].classList.remove('now');
+  P.cur = d; P.nextDay = d%DAYS+1;
+  cells[d].classList.add('now');
+  fill(d);
+  modal.classList.add('open');
+  P.dur = durFor(d); P.el = 0; P.t0 = performance.now();
+  mProg.classList.toggle('off', !P.playing);
+  mProg.innerHTML = '<i></i>';
+  mProg.firstChild.style.animationDuration = P.dur+'ms';
+  mProg.classList.toggle('paused', !P.playing);
+  if(P.playing) P.timer = setTimeout(advance, P.dur);
+}
+function hideOnly(){
+  modal.classList.remove('open');
+  if(P.cur!==null && cells[P.cur]) cells[P.cur].classList.remove('now');
+  P.cur = null;
+}
+function advance(){            // the popup's time is up → next day after a short beat
+  P.nextDay = P.cur%DAYS+1;
+  hideOnly();
+  P.gap = setTimeout(()=>{ if(P.playing) openDay(P.nextDay); }, 500);
+}
+function closeDay(){           // ✕ / backdrop: close, and stop the show
+  clearTimeout(P.timer); clearTimeout(P.gap);
+  if(P.playing){ P.playing=false; setPlayUI(); }
+  if(P.cur!==null) P.nextDay = P.cur;
+  hideOnly();
+}
+function togglePlay(){
+  P.playing = !P.playing;
+  setPlayUI();
+  if(P.playing){
+    if(P.cur!==null){          // resume the popup that is open
+      P.t0 = performance.now();
+      mProg.classList.remove('off'); mProg.classList.remove('paused');
+      P.timer = setTimeout(advance, Math.max(300, P.dur-P.el));
+    } else {
+      openDay(P.nextDay);
+    }
+  } else {
+    clearTimeout(P.timer); clearTimeout(P.gap);
+    if(P.cur!==null){ P.el += performance.now()-P.t0; mProg.classList.add('paused'); }
+  }
+}
+function stepDay(d){ openDay(((d-1+DAYS)%DAYS)+1); }
+
+G('mPlay').onclick = ()=>togglePlay();
+G('mClose').onclick = closeDay;
+G('mPrev').onclick = ()=>stepDay((P.cur||1)-1<1?DAYS:(P.cur||1)-1);
+G('mNext').onclick = ()=>stepDay((P.cur||1)+1>DAYS?1:(P.cur||1)+1);
+modal.addEventListener('click', e=>{ if(e.target===modal) closeDay(); });
+document.addEventListener('keydown', e=>{
+  if(modal.classList.contains('open')){
+    if(e.key==='Escape') closeDay();
+    if(e.key==='ArrowRight') G('mNext').click();
+    if(e.key==='ArrowLeft') G('mPrev').click();
+    if(e.key===' '){ e.preventDefault(); togglePlay(); }
+  }
+});
+
+/* ============================================================
+   PAGE 2 · metrics (computed from the messages)
+   ============================================================ */
+const STOP = new Set(('the a an and or to of in on for is it you your i we are be was were with that this my me at so all from as do have has just too not but what when how can will if its our out up more about by very oh yes im i\'m am their they them he she his her there here then than get got go one day').split(' '));
+const NAME_STOP = new Set(['inaba','san']);
+const tokens = t => (t.toLowerCase().match(/[a-z']+/g)||[]).filter(w=>w.length>1);
+const keep = w => !STOP.has(w) && !NAME_STOP.has(w);
+
+const uni = {}, bi = {}, tri = {};
+const biTone = {};   // bigram -> tone -> distinct message count
+MESSAGES.forEach(m=>{
+  const tk = tokens(m.text);
+  const seen2 = new Set();
+  tk.forEach(w=>{ if(keep(w)) uni[w]=(uni[w]||0)+1; });
+  for(let k=0;k<tk.length-1;k++){
+    if(keep(tk[k]) && keep(tk[k+1])){
+      const b = tk[k]+' '+tk[k+1];
+      bi[b]=(bi[b]||0)+1;
+      if(!seen2.has(b)){ seen2.add(b); biTone[b]=biTone[b]||{}; biTone[b][m.tone]=(biTone[b][m.tone]||0)+1; }
+    }
+  }
+  for(let k=0;k<tk.length-2;k++){
+    if(keep(tk[k])&&keep(tk[k+1])&&keep(tk[k+2])){
+      const t3 = tk[k]+' '+tk[k+1]+' '+tk[k+2]; tri[t3]=(tri[t3]||0)+1;
+    }
+  }
+});
+const topOf = (o,n) => Object.entries(o).sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0])).slice(0,n);
+const TONES = {warm:{label:'Warm',color:'var(--c1)'}, funny:{label:'Funny',color:'var(--c4)'}, pro:{label:'Professional',color:'var(--c3)'}, hype:{label:'Hype',color:'var(--c2)'}};
+const LANGS = {EN:{label:'English',color:'var(--c3)'}, JP:{label:'Japanese',color:'var(--c1)'}, MIX:{label:'Mixed EN / JP',color:'var(--c2)'}};
+
+const rows = MESSAGES.map((m,i)=>{
+  const jp=(m.text.match(JP_CHARS)||[]).length, latin=(m.text.match(LATIN)||[]).length;
+  return {...m, i, words: wordsOf(m.text), lang: jp===0?'EN':(latin>=3?'MIX':'JP')};
+});
+const totalWords = rows.reduce((a,r)=>a+r.words,0);
+const langCount = {EN:0,JP:0,MIX:0}; rows.forEach(r=>langCount[r.lang]++);
+const toneCount = {}; rows.forEach(r=>toneCount[r.tone]=(toneCount[r.tone]||0)+1);
+const senders = new Set(rows.map(r=>r.from)).size;
+
+/* KPIs */
+G('kpis').innerHTML = [
+  {k:'Messages', v:rows.length, n:'one per day'},
+  {k:'Days', v:DAYS, n:'on the calendar'},
+  {k:'Total words', v:totalWords.toLocaleString(), n:'all of it'},
+  {k:'Avg words', v:Math.round(totalWords/rows.length), n:'per message'},
+  {k:'Senders', v:senders, n:'incl. anonymous'},
+  {k:'Longest', v:Math.max(...rows.map(r=>r.words)), n:'words in one message'},
+].map(s=>`<div class="kpi"><div class="k">${s.k}</div><div class="v">${s.v}</div><div class="n">${s.n}</div></div>`).join('');
+
+/* top words */
+const topW = topOf(uni,12), maxW = topW[0] ? topW[0][1] : 1;
+G('topWords').innerHTML = topW.map(([w,c])=>`<div class="row"><span>${esc(w)}</span><div class="bar"><i style="width:${c/maxW*100}%"></i></div><span class="val">${c}</span></div>`).join('');
+
+/* word cloud */
+G('cloud').innerHTML = topOf(uni,30).map(([w,c])=>`<span style="font-size:${14+ (c/maxW)*34}px" title="${c}">${esc(w)}</span>`).join('');
+
+/* n-grams */
+G('bi').innerHTML = topOf(bi,8).map(([w,c])=>`<tr><td>${esc(w)}</td><td class="c">${c}</td></tr>`).join('') || '<tr><td>—</td><td class="c">0</td></tr>';
+G('tri').innerHTML = topOf(tri,5).map(([w,c])=>`<tr><td>${esc(w)}</td><td class="c">${c}</td></tr>`).join('') || '<tr><td>—</td><td class="c">0</td></tr>';
+
+/* tone donut */
+(function(){
+  const r=60, C=2*Math.PI*r; let acc=0; let s='';
+  Object.keys(TONES).forEach(k=>{
+    const f=(toneCount[k]||0)/rows.length;
+    s += `<circle cx="85" cy="85" r="${r}" fill="none" stroke="${TONES[k].color}" stroke-width="26"
+      stroke-dasharray="${(f*C).toFixed(2)} ${C.toFixed(2)}" stroke-dashoffset="${(-acc*C).toFixed(2)}" transform="rotate(-90 85 85)"/>`;
+    acc+=f;
+  });
+  G('donut').innerHTML = s + `<text x="85" y="82" text-anchor="middle" font-family="Playfair Display,serif" font-size="30" font-weight="700" fill="#2b2118">${rows.length}</text>
+    <text x="85" y="102" text-anchor="middle" font-family="Space Mono,monospace" font-size="10" fill="#a0907d">MESSAGES</text>`;
+  G('donutLegend').innerHTML = Object.keys(TONES).map(k=>`<span><i style="background:${TONES[k].color}"></i>${TONES[k].label}<b>${toneCount[k]||0} · ${Math.round((toneCount[k]||0)/rows.length*100)}%</b></span>`).join('');
+})();
+
+/* languages */
+G('langs').innerHTML = Object.keys(LANGS).map(k=>`<div class="row"><span>${LANGS[k].label}</span><div class="bar"><i style="width:${langCount[k]/rows.length*100}%;background:${LANGS[k].color}"></i></div><span class="val">${langCount[k]}</span></div>`).join('');
+
+/* phrase x tone heatmap */
+(function(){
+  const phrases = topOf(bi,6).map(([p])=>p);
+  const tones = Object.keys(TONES);
+  let h = `<div></div>` + tones.map(t=>`<div class="h">${TONES[t].label}</div>`).join('');
+  phrases.forEach(p=>{
+    h += `<div class="p">${esc(p)}</div>`;
+    tones.forEach(t=>{
+      const c = (biTone[p]&&biTone[p][t])||0;
+      const a = Math.min(1, c/3);
+      h += `<div class="c" style="background:color-mix(in srgb,var(--accent) ${Math.round(a*85)}%,var(--card));color:${a>.5?'var(--card)':'var(--ink2)'}">${c||''}</div>`;
+    });
+  });
+  G('heat').innerHTML = h;
+})();
+
+/* banza note */
+G('bzText').textContent = BANZA_MESSAGE;
+
+/* ============================================================
+   page switch
+   ============================================================ */
+function go(page){
+  const cal = page==='cal';
+  G('pageCal').classList.toggle('active', cal);
+  G('pageMet').classList.toggle('active', !cal);
+  G('tabCal').classList.toggle('on', cal);
+  G('tabMet').classList.toggle('on', !cal);
+  window.scrollTo({top:0});
+}
+/* ============================================================
+   download a copy of this page (the copy has no download button)
+   ============================================================ */
+function downloadPage(){
+  const copy = document.documentElement.cloneNode(true);
+  const dl = copy.querySelector('#dlBtn');
+  if(dl) dl.remove();                                   // the saved file never has the button
+  ['#gate','#gateScript'].forEach(sel=>{ const el = copy.querySelector(sel); if(el) el.remove(); }); // no password gate in the copy
+  const pb = copy.querySelector('#playBtn');            // saved file starts paused
+  if(pb){ pb.textContent = '▶ Play'; pb.classList.remove('on'); }
+  const md = copy.querySelector('#modal');
+  if(md) md.classList.remove('open');
+  const html = '<!DOCTYPE html>\n' + copy.outerHTML;
+  const url = URL.createObjectURL(new Blob([html], {type:'text/html;charset=utf-8'}));
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'farewell_calendar_inaba.html';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url), 1000);
+}
+
+setPlayUI();
+</script>
+<script id="gateScript">
+/* ============================================================
+   password gate (hardcoded; keeps casual visitors out, not real security)
+   ============================================================ */
+(function(){
+  const GATE_PASSWORD = "dbanza";
+  const gate = document.getElementById('gate');
+  if(!gate) return;
+  if(sessionStorage.getItem('inabaUnlocked') === '1'){ gate.hidden = true; return; }
+  const form = document.getElementById('gateForm');
+  const input = document.getElementById('gateInput');
+  const err = document.getElementById('gateErr');
+  form.onsubmit = e => {
+    e.preventDefault();
+    if(input.value === GATE_PASSWORD){
+      sessionStorage.setItem('inabaUnlocked', '1');
+      gate.hidden = true;
+    } else {
+      err.textContent = 'wrong password, try again';
+      input.select();
+    }
+  };
+  input.focus();
+})();
+</script>
+</body>
+</html>
